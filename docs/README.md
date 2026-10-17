@@ -6,13 +6,15 @@ without escaping, and the findings are written as an A4 PDF report by rule and r
 reports of [pieceofcake2/report](https://pieceofcake2.github.io/report/). The exit code fails CI when a finding
 reaches a risk.
 
-- [Rules](rules.md): what each rule finds, and how to fix it, with the checks of the configuration
+- [Rules](rules.md): what each rule finds, why it matters, and how to fix it, with the checks of the
+  configuration
+- [Fixing the Findings](fixing.md): the way through a report, from the first scan to a clean CI
 - [CI with GitHub Actions](ci.md)
 
 It is one of the security checks of pieceofcake2, with
 [pieceofcake2/security-sca](https://pieceofcake2.github.io/security-sca/) (the known vulnerabilities of the
-Composer packages) and pieceofcake2/security-dast (the running application); pieceofcake2/security-check runs
-them all.
+Composer packages) and [pieceofcake2/security-dast](https://pieceofcake2.github.io/security-dast/) (the running
+application); pieceofcake2/security-check runs them all.
 
 ## Two Engines
 

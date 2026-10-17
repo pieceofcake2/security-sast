@@ -5,11 +5,13 @@ CakePHP 2 アプリケーションの静的アプリケーションセキュリ�
 報告書にします。報告書は [pieceofcake2/report](https://pieceofcake2.github.io/report/ja/) のデザインです。あるリスク以上の
 指摘があれば、終了コードで CI を失敗にします。
 
-- [ルール](rules.md): 各ルールが見つけるものと直し方、設定の検査
+- [ルール](rules.md): 各ルールが見つけるもの、なぜ危ないか、修正方法と、設定の検査
+- [指摘を修正する](fixing.md): 最初のスキャンから、CI で問題のない状態を保つまでの進め方
 - [GitHub Actions での CI](ci.md)
 
 pieceofcake2 のセキュリティ診断の 1 つで、ほかに [pieceofcake2/security-sca](https://pieceofcake2.github.io/security-sca/ja/)
-(Composer のパッケージの既知の脆弱性) と pieceofcake2/security-dast (動いているアプリケーション) があります。
+(Composer のパッケージの既知の脆弱性) と [pieceofcake2/security-dast](https://pieceofcake2.github.io/security-dast/ja/)
+(動いているアプリケーション) があります。
 pieceofcake2/security-check で、すべてを実行できます。
 
 ## 2 つのエンジン
@@ -158,7 +160,7 @@ return [
 1. **表紙**: 結果、リスクごとの指摘の数、リポジトリ、ブランチ、コミット、検査したパスとファイルの数、ルール、設定の
    `APP_ENV`、不合格の基準、実行の日時、環境、ソフトウェア (エンジンとそのバージョン)
 2. **リスク別の指摘**: 緊急、高、中、低、不明の順に、箇所を見つけたルールとその箇所の数。それぞれのページへのリンク付き
-3. **ルールごとのページ**: タイトル、ID、リスク、CWE、OWASP Top 10 の分類、確度、見つけたものと直し方、続けて各箇所
+3. **ルールごとのページ**: タイトル、ID、リスク、CWE、OWASP Top 10 の分類、確度、見つけたものと修正方法、続けて各箇所
    (ファイルと行) とそのコード。100 箇所まで
 
 Semgrep のリスクは、`ERROR` が高、`WARNING` が中、`INFO` が低です。このパッケージのルールは、それぞれのリスクを
@@ -184,7 +186,7 @@ PHPStan では、ルールの識別子 ([ルール](rules.md)) を指定しま�
 $this->query('TRUNCATE ' . self::TABLE); // @phpstan-ignore securitySast.queryConcatenation
 ```
 
-パスごと除くときは `--exclude` を使います。設定の指摘は設定で直すか、`--config-check=0` で検査しないようにします。
+パスごと除くときは `--exclude` を使います。設定の指摘は設定で修正するか、`--config-check=0` で検査しないようにします。
 
 ## 自分のルール
 
