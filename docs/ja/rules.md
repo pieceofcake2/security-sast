@@ -1,6 +1,6 @@
 # ルール
 
-このパッケージの、CakePHP 2 アプリケーション向けのルールと、それぞれが見つけるもの、直し方です。どのルールも Semgrep
+このパッケージの、CakePHP 2 アプリケーション向けのルールと、それぞれが見つけるもの、修正方法です。どのルールも Semgrep
 ([resources/semgrep/cakephp2.yml](../../resources/semgrep/cakephp2.yml)) と PHPStan ([src/PHPStan/](../../src/PHPStan/))
 の両方で書いてあり、どちらのエンジンでも同じ箇所を見つけます。Semgrep では、Semgrep Registry の PHP のルール (デフォルトは
 `p/php`) も実行します。その内容は [semgrep.dev](https://semgrep.dev/p/php) をご覧ください。
@@ -18,7 +18,7 @@
 
 ルールが見るのはコードの書き方で、値がどこから来たかではありません。そのため、指摘は確かめるべき箇所であって、いつも
 脆弱性とは限りません。「リクエストの値」とは、`$this->request` (その `query()`、`data()`、`params` など) と、`$_GET`、
-`$_POST`、`$_REQUEST`、`$_COOKIE`、`$_FILES` のことです。報告書の進め方は [指摘を直す](fixing.md) を、設定のルールは
+`$_POST`、`$_REQUEST`、`$_COOKIE`、`$_FILES` のことです。報告書の進め方は [指摘を修正する](fixing.md) を、設定のルールは
 [設定](#設定) をご覧ください。
 
 ## cakephp2-query-concatenation
@@ -34,11 +34,11 @@
 $this->Post->query("SELECT * FROM posts WHERE title LIKE '%" . $q . "%'");
 $this->Post->query("SELECT * FROM posts WHERE id = $id");
 
-// 直し方: query() の値は、データベースのドライバーがエスケープします
+// 修正方法: query() の値は、データベースのドライバーがエスケープします
 $this->Post->query('SELECT * FROM posts WHERE title LIKE ?', ['%' . $q . '%']);
 $this->Post->query('SELECT * FROM posts WHERE id = ?', [$id]);
 
-// よりよい直し方: 条件の配列の find()。モデルのビヘイビアやコールバックも効きます
+// よりよい修正方法: 条件の配列の find()。モデルのビヘイビアやコールバックも効きます
 $this->Post->find('all', ['conditions' => ['Post.title LIKE' => '%' . $q . '%']]);
 ```
 
@@ -58,7 +58,7 @@ $posts = $this->Post->find('all', ['order' => [$sort => $direction]]);
 **安全な場合。** 変数がコードの定数か、直前に `(int)` で整数にしたものの場合です。それでもプレースホルダーを
 使ってください。使わない場合は、理由を書いて[除外](README.md#指摘を除外する)します。
 
-**直ったことの確かめ方。** もう一度チェックします。値にクォートを入れたアクションのテスト (`O'Brien`) で、クエリが
+**修正できたことの確かめ方。** もう一度チェックします。値にクォートを入れたアクションのテスト (`O'Brien`) で、クエリが
 動くことを確かめます。[pieceofcake2/security-dast](https://pieceofcake2.github.io/security-dast/ja/) のフルスキャンは、
 ページのパラメーターに SQL を送ります。
 
@@ -76,7 +76,7 @@ $this->Post->find('all', ['conditions' => "Post.title = '$title'"]);
 $this->Post->find('all', ['conditions' => ['Post.published' => 1, "Post.title = '" . $title . "'"]]);
 $this->Post->deleteAll("Post.user_id = $userId");
 
-// 直し方: すべての値を配列の値に
+// 修正方法: すべての値を配列の値に
 $this->Post->find('all', ['conditions' => ['Post.title' => $title]]);
 $this->Post->find('all', ['conditions' => ['Post.published' => 1, 'Post.title' => $title]]);
 $this->Post->deleteAll(['Post.user_id' => $userId]);
@@ -101,7 +101,7 @@ $this->Post->deleteAll(['Post.user_id' => $userId]);
 $this->render($this->request->query('page'));
 echo $this->element($this->request->params['pass'][0]);
 
-// 直し方: 値を、許可したビューの一覧に対応させる
+// 修正方法: 値を、許可したビューの一覧に対応させる
 $pages = ['terms' => 'terms', 'privacy' => 'privacy'];
 $page = $pages[$this->request->query('page')] ?? null;
 if ($page === null) {
@@ -127,7 +127,7 @@ $this->render($page);
 $data = unserialize($this->request->data('payload'));
 $cart = unserialize($_COOKIE['cart']);
 
-// 直し方: 配列とスカラーしか作らない JSON
+// 修正方法: 配列とスカラーしか作らない JSON
 $data = json_decode((string)$this->request->data('payload'), true);
 $cart = $this->Cookie->read('cart');
 ```
@@ -148,7 +148,7 @@ JSON で書きます。ユーザーのデータはそこか、セッションに
 // 見つかる書き方
 return $this->redirect($this->request->query('url'));
 
-// 直し方: アプリケーションのパスだけ
+// 修正方法: アプリケーションのパスだけ
 $url = (string)$this->request->query('url');
 if (!str_starts_with($url, '/') || str_starts_with($url, '//') || str_starts_with($url, '/\\')) {
     $url = '/';
@@ -175,7 +175,7 @@ return $this->redirect($url);
 // 見つかる書き方
 $xml = Xml::build($this->request->data('xml'));
 
-// 直し方: XML の文字列だけ
+// 修正方法: XML の文字列だけ
 $xml = Xml::build((string)$this->request->data('xml'), ['readFile' => false]);
 ```
 
@@ -202,7 +202,7 @@ public function beforeFilter()
     $this->Security->csrfCheck = false;
 }
 
-// 直し方: ほかのサイトからのリクエストを受けるアクションだけ。Webhook など
+// 修正方法: ほかのサイトからのリクエストを受けるアクションだけ。Webhook など
 public function beforeFilter()
 {
     parent::beforeFilter();
@@ -230,7 +230,7 @@ public function beforeFilter()
 <div><?= $post['Post']['body'] ?></div>
 <a href="<?= $url ?>">Next</a>
 
-<!-- 直し方 -->
+<!-- 修正方法 -->
 <div><?= h($post['Post']['body']) ?></div>
 <?= $this->Html->link('Next', $url) ?>
 ```
