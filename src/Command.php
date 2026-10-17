@@ -245,8 +245,8 @@ Options:
   --semgrep-image=IMAGE  Docker image of Semgrep (SECURITY_SAST_SEMGREP_IMAGE, default: semgrep/semgrep:latest)
   --docker=COMMAND       Docker command (SECURITY_SAST_DOCKER, default: docker)
   --phpstan=PATH         The phpstan script (SECURITY_SAST_PHPSTAN, default: the one of this package)
-  --view-extensions=LIST Extensions of the views, comma separated (SECURITY_SAST_VIEW_EXTENSIONS, default: ctp,php):
-                         .ctp files anywhere, the others in templates/ and View/
+  --view-extensions=LIST Extensions of the views, comma separated (SECURITY_SAST_VIEW_EXTENSIONS, default: ctp,php),
+                         in templates/ and View/
   --safe-view-variables=LIST
                          Variables that the views may print without h(), comma separated
                          (SECURITY_SAST_SAFE_VIEW_VARIABLES), e.g. body_html

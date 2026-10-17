@@ -144,8 +144,8 @@ public function beforeFilter()
 ## cakephp2-view-unescaped-output
 
 A variable printed in a view without `h()`, as `<?= $var ?>` or `<?php echo $var; ?>`. A value that contains
-HTML is run by the browser (XSS). The views are the `.ctp` files, and the files of the other extensions of the
-views in `templates/` and `View/` (see [What is Scanned](README.md#what-is-scanned)).
+HTML is run by the browser (XSS). The views are the files of the extensions of the views in `templates/` and
+`View/` (see [What is Scanned](README.md#what-is-scanned)).
 
 ```php
 <!-- Found -->

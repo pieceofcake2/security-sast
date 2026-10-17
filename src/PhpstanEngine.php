@@ -12,8 +12,8 @@ use RuntimeException;
  * Scans with PHPStan and the security rules of this package (`resources/phpstan/rules.neon`).
  *
  * PHPStan runs at level 0 with a configuration of its own, so the settings of the project do not change the
- * scan, and only the errors of the rules of this package are kept. The views (`.ctp` and the extensions given)
- * are scanned as PHP.
+ * scan, and only the errors of the rules of this package are kept. The views (the extensions given, in `templates/`
+ * and `View/`) are scanned as PHP.
  */
 final class PhpstanEngine implements Engine
 {

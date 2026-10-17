@@ -12,7 +12,7 @@ class ViewsTest extends TestCase
     public function testIsView(): void
     {
         $this->assertTrue(Views::isView('templates/Posts/view.ctp'));
-        $this->assertTrue(Views::isView('/app/src/Lib/legacy.ctp'));
+        $this->assertFalse(Views::isView('/app/src/Lib/legacy.ctp'));
         $this->assertTrue(Views::isView('/app/templates/Posts/index.php'));
         $this->assertTrue(Views::isView('app/View/Posts/index.php'));
         $this->assertTrue(Views::isView('plugins/Blog/templates/Posts/index.php'));
@@ -24,7 +24,7 @@ class ViewsTest extends TestCase
 
     public function testSemgrepIncludes(): void
     {
-        $this->assertSame(['*.ctp', '**/templates/**/*.php', '**/View/**/*.php'], Views::semgrepIncludes());
+        $this->assertSame(['**/templates/**/*.ctp', '**/View/**/*.ctp', '**/templates/**/*.php', '**/View/**/*.php'], Views::semgrepIncludes());
         $this->assertSame(['**/templates/**/*.html', '**/View/**/*.html'], Views::semgrepIncludes(['html']));
     }
 
@@ -32,7 +32,7 @@ class ViewsTest extends TestCase
     {
         $yaml = SemgrepEngine::rules(['ctp', 'html']);
 
-        $this->assertStringContainsString("    paths:\n      include:\n        - \"*.ctp\"\n        - \"**/templates/**/*.html\"\n        - \"**/View/**/*.html\"\n    metadata:", $yaml);
+        $this->assertStringContainsString("    paths:\n      include:\n        - \"**/templates/**/*.ctp\"\n        - \"**/View/**/*.ctp\"\n        - \"**/templates/**/*.html\"\n        - \"**/View/**/*.html\"\n    metadata:", $yaml);
         $this->assertSame(1, substr_count($yaml, 'include:'));
     }
 }
