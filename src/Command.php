@@ -8,6 +8,7 @@ use DateTimeZone;
 use InvalidArgumentException;
 use PieceOfCake2\Report\Environment;
 use PieceOfCake2\Report\ReportWriter;
+use RuntimeException;
 use Throwable;
 
 /**
@@ -30,6 +31,7 @@ final class Command
      * @param \PieceOfCake2\SecuritySast\Engine|null $engine Engine, default: the one of the settings
      * @param \PieceOfCake2\Report\ReportWriter|null $writer Writer of the PDF
      * @param \PieceOfCake2\Report\Environment|null $environment Environment, default: detected
+     * @param \PieceOfCake2\SecuritySast\ConfigCheck|null $configCheck Check of the configuration, default: with the settings
      */
     public function __construct(
         private $stdout = STDOUT,
@@ -37,6 +39,7 @@ final class Command
         private ?Engine $engine = null,
         private ?ReportWriter $writer = null,
         private ?Environment $environment = null,
+        private ?ConfigCheck $configCheck = null,
     ) {
     }
 
@@ -65,11 +68,31 @@ final class Command
         try {
             $timezone = new DateTimeZone(date_default_timezone_get());
             $startedAt = new DateTimeImmutable('now', $timezone);
-            $paths = $config->paths();
+            // The configuration of the application, for its check and for its layout
+            $values = null;
+            $loadError = null;
+            if (ConfigCheck::applies($config->project)) {
+                try {
+                    $values = ($this->configCheck ?? new ConfigCheck($config->configEnv))->load($config->project);
+                } catch (RuntimeException $e) {
+                    $loadError = $e->getMessage();
+                }
+            }
+            $layout = is_array($values['layout'] ?? null) ? $values['layout'] : null;
+
+            $paths = $config->paths($layout);
             if ($paths === []) {
                 throw new InvalidArgumentException(sprintf('Nothing to scan in %s: give the paths with --paths.', $config->project));
             }
-            $result = ($this->engine ?? $config->engine())->scan($config->project, $paths, $config->exclude);
+            $engine = $this->engine ?? $config->engine($config->viewExtensions($layout));
+            $result = $engine->scan($config->project, $paths, $config->exclude($layout));
+            if ($config->configCheck && $values !== null) {
+                $result->findings = array_merge($result->findings, ConfigCheck::findings($values, (string)realpath($config->project)));
+                $result->configEnv = $config->configEnv;
+            } elseif ($config->configCheck && $loadError !== null) {
+                $result->errors[] = $loadError;
+            }
+            $result->paths = $paths;
             $finishedAt = new DateTimeImmutable('now', $timezone);
 
             $translator = ReportBuilder::translator($config->language, $config->localeDir);
@@ -130,21 +153,37 @@ final class Command
             'semgrep-image' => $value('SECURITY_SAST_SEMGREP_IMAGE'),
             'docker' => $value('SECURITY_SAST_DOCKER'),
             'phpstan' => $value('SECURITY_SAST_PHPSTAN'),
+            'view-extensions' => $value('SECURITY_SAST_VIEW_EXTENSIONS'),
+            'safe-view-variables' => $value('SECURITY_SAST_SAFE_VIEW_VARIABLES'),
+            'config-check' => $value('SECURITY_SAST_CONFIG_CHECK'),
+            'config-env' => $value('SECURITY_SAST_CONFIG_ENV'),
             'language' => $value('SECURITY_REPORT_LANGUAGE'),
             'locale-dir' => $value('SECURITY_REPORT_LOCALE_DIR'),
             'title' => $value('SECURITY_SAST_TITLE'),
             'project-name' => $value('SECURITY_REPORT_PROJECT'),
             'note' => $value('SECURITY_SAST_NOTE'),
         ];
+        $arguments = [];
         foreach ($argv as $arg) {
             if ($arg === '--help' || $arg === '-h') {
                 return null;
             }
-            if (!preg_match('/\A--([a-z-]+)=(.*)\z/s', $arg, $matches) || !array_key_exists($matches[1], $options)) {
+            if (!preg_match('/\A--([a-z-]+)=(.*)\z/s', $arg, $matches) || (!array_key_exists($matches[1], $options) && $matches[1] !== 'settings')) {
                 throw new InvalidArgumentException(sprintf('Unknown option: %s', $arg));
             }
-            $options[$matches[1]] = $matches[2];
+            $arguments[$matches[1]] = $matches[2];
         }
+
+        // The options of the command, then the environment variables, then the settings file
+        $file = Settings::options((string)($arguments['project'] ?? '.'), 'sast', $arguments['settings'] ?? $value('SECURITY_SETTINGS'), 'security-sast.pdf');
+        foreach ($file as $name => $setting) {
+            if (!array_key_exists($name, $options) || $name === 'project') {
+                throw new InvalidArgumentException(sprintf('Unknown setting of the sast section: %s', $name));
+            }
+            $options[$name] ??= is_bool($setting) ? ($setting ? '1' : '0') : $setting;
+        }
+        unset($arguments['settings']);
+        $options = array_merge($options, $arguments);
 
         $engine = strtolower((string)($options['engine'] ?? 'semgrep'));
         if (!in_array($engine, Config::ENGINES, true)) {
@@ -167,6 +206,10 @@ final class Command
             (string)($options['semgrep-image'] ?? SemgrepEngine::IMAGE),
             (string)($options['docker'] ?? 'docker'),
             $options['phpstan'],
+            $options['view-extensions'] === null ? null : array_map(static fn(string $ext): string => strtolower(ltrim($ext, '.')), $list($options['view-extensions'])),
+            array_map(static fn(string $name): string => ltrim($name, '$'), $list($options['safe-view-variables'])),
+            filter_var($options['config-check'] ?? true, FILTER_VALIDATE_BOOLEAN),
+            (string)($options['config-env'] ?? 'prod'),
             (string)($options['language'] ?? 'en'),
             $options['locale-dir'],
             $options['title'],
@@ -202,11 +245,19 @@ Options:
   --semgrep-image=IMAGE  Docker image of Semgrep (SECURITY_SAST_SEMGREP_IMAGE, default: semgrep/semgrep:latest)
   --docker=COMMAND       Docker command (SECURITY_SAST_DOCKER, default: docker)
   --phpstan=PATH         The phpstan script (SECURITY_SAST_PHPSTAN, default: the one of this package)
+  --view-extensions=LIST Extensions of the views, comma separated (SECURITY_SAST_VIEW_EXTENSIONS, default: ctp,php):
+                         .ctp files anywhere, the others in templates/ and View/
+  --safe-view-variables=LIST
+                         Variables that the views may print without h(), comma separated
+                         (SECURITY_SAST_SAFE_VIEW_VARIABLES), e.g. body_html
+  --config-check=0       Do not check the configuration of the application (SECURITY_SAST_CONFIG_CHECK, default: 1)
+  --config-env=ENV       APP_ENV of the configuration to check (SECURITY_SAST_CONFIG_ENV, default: prod)
   --language=LANG        en or ja (SECURITY_REPORT_LANGUAGE, default: en)
   --locale-dir=DIR       Directory of <language>.json files (SECURITY_REPORT_LOCALE_DIR)
   --title=TITLE          Title of the report (SECURITY_SAST_TITLE)
   --project-name=NAME    Name of the project (SECURITY_REPORT_PROJECT, default: the name in composer.json)
   --note=TEXT            Note on the cover (SECURITY_SAST_NOTE)
+  --settings=FILE        Settings file (SECURITY_SETTINGS, default: config/security.php or app/Config/security.php)
   --help                 Show this help
 
 Exit code: 0 passed, 1 a finding reaches --fail-on, 2 error.

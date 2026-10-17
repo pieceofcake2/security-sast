@@ -15,10 +15,11 @@ final class Process
      *
      * @param array<string> $command Command and arguments
      * @param string $dir Working directory
+     * @param array<string, string> $env Environment variables besides those of this process
      * @return array{0: int, 1: string, 2: string} Exit code, output and error output
      * @throws \RuntimeException When the command cannot run
      */
-    public static function run(array $command, string $dir): array
+    public static function run(array $command, string $dir, array $env = []): array
     {
         $out = tmpfile();
         $err = tmpfile();
@@ -26,7 +27,7 @@ final class Process
             throw new RuntimeException('Cannot create the temporary files of a command.');
         }
         // Files instead of pipes, so that a large output of one does not block the other
-        $process = proc_open($command, [1 => $out, 2 => $err], $pipes, $dir);
+        $process = proc_open($command, [1 => $out, 2 => $err], $pipes, $dir, $env === [] ? null : array_merge(getenv(), $env));
         if (!is_resource($process)) {
             throw new RuntimeException(sprintf('Cannot run %s.', $command[0]));
         }

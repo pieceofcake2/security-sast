@@ -5,7 +5,7 @@ CakePHP 2 アプリケーションの静的アプリケーションセキュリ�
 報告書にします。報告書は [pieceofcake2/report](https://pieceofcake2.github.io/report/ja/) のデザインです。あるリスク以上の
 指摘があれば、終了コードで CI を失敗にします。
 
-- [ルール](rules.md): 各ルールが見つけるものと、直し方
+- [ルール](rules.md): 各ルールが見つけるものと直し方、設定の検査
 - [GitHub Actions での CI](ci.md)
 
 pieceofcake2 のセキュリティ診断の 1 つで、ほかに [pieceofcake2/security-sca](https://pieceofcake2.github.io/security-sca/ja/)
@@ -20,7 +20,7 @@ pieceofcake2/security-check で、すべてを実行できます。
 | --- | --- | --- |
 | 実行 | Docker (`semgrep/semgrep`) で | PHP で。このパッケージと一緒にインストールされます |
 | ルール | このパッケージの CakePHP 2 のルールと、Semgrep Registry の PHP のルール (`p/php`) など | このパッケージの CakePHP 2 のルールだけ |
-| ビュー (`.ctp`) | 検査します | 検査します |
+| ビュー (`.ctp`、`.php` など) | 検査します | 検査します |
 | 必要なもの | Docker と、Registry のルールを取得するためのネットワーク | ほかにはありません |
 | 箇所の除外 | `// nosemgrep: <ルール>` | `// @phpstan-ignore <識別子>` |
 
@@ -61,14 +61,39 @@ vendor/bin/security-sast --engine=phpstan --pdf=tmp/security-sast.pdf
 
 ### 検査する範囲
 
-デフォルトでは、アプリケーションの次のディレクトリのうち、存在するものを検査します。`src`、`templates`、`plugins`
-(新しい構成) と `app` (従来の構成) です。`vendor`、`tmp`、`logs`、`tests`、`node_modules`、`app/Vendor`、`app/tmp`、
-`app/Test` は除きます。PHP のファイル (`.php`) とビュー (`.ctp`) を検査します。
+パスは、二重に書かなくて済むよう、アプリケーションから取ります。プロジェクトに `config/core.php` (従来の構成では
+`app/Config/core.php`) と `vendor/autoload.php` があれば、アプリケーションと同じように CakePHP を読み込み、次を取得します。
+
+- アプリケーションのディレクトリ (`APP`)、ビューのパス (`App::path('View')`)、プラグインのパス (`App::path('Plugin')`)。
+  これらを検査します
+- Composer が `vendor` の外にインストールしたパッケージ (`plugins/DebugKit` など)。`vendor` と同じく除きます
+- `AppController` のビューの拡張子 (`$ext`)。`.ctp` 以外なら、その拡張子もビューとして検査します
+
+それ以外のときは、`src`、`templates`、`plugins` (新しい構成) と `app` (従来の構成) のうち、存在するディレクトリを
+検査します。`vendor`、`tmp`、`logs`、`tests`、`node_modules`、`app/Vendor`、`app/tmp`、`app/Test` は除きます。
 
 ```bash
 # src/ とビューだけを、テストも含めて
 vendor/bin/security-sast --paths=src,templates --exclude=vendor,tmp
 ```
+
+PHP のファイル (`.php`) とビューを検査します。ビューとは、どこにあっても `.ctp` のファイルと、`templates/` か `View/` の
+ディレクトリにある、ほかのビューの拡張子のファイルです。デフォルトの `ctp,php` では、`templates/Posts/index.php` は
+ビューで、`src/Controller/PostsController.php` はビューではありません。ビューの拡張子は `--view-extensions` で足せます。
+
+```bash
+vendor/bin/security-sast --view-extensions=ctp,php,html
+```
+
+### 設定
+
+同じく読み込んだ CakePHP で、アプリケーションの本番の設定も検査します。`APP_ENV=prod` (`--config-env`) の `.env`
+ファイルを読んで、`config/bootstrap.php` を実行したあとの `Configure` の値です。デバッグレベルが 0 でない、
+`Security.salt` が配布時の値やドキュメントのサンプルのまま、`cipher` の Cookie などを見つけます
+([設定](rules.md#設定))。指摘は `core.php` のその設定の行に付き、報告書の表紙には検査した `APP_ENV` が載ります。秘密の値は
+SHA-256 と長さで比べ、報告書には書きません。
+
+CakePHP のアプリケーションでないプロジェクトなどでは、`--config-check=0` で検査しないようにできます。
 
 ### オプション
 
@@ -84,16 +109,49 @@ vendor/bin/security-sast --paths=src,templates --exclude=vendor,tmp
 | `--semgrep-image=IMAGE` | `SECURITY_SAST_SEMGREP_IMAGE` | `semgrep/semgrep:latest` | Semgrep の Docker イメージ。バージョンを固定するときなどに |
 | `--docker=COMMAND` | `SECURITY_SAST_DOCKER` | `docker` | Docker のコマンド。`podman` など |
 | `--phpstan=PATH` | `SECURITY_SAST_PHPSTAN` | このパッケージのもの | `phpstan` のスクリプト |
+| `--view-extensions=LIST` | `SECURITY_SAST_VIEW_EXTENSIONS` | `ctp`、`php` と `AppController` の `$ext` | ビューの拡張子。カンマ区切り |
+| `--safe-view-variables=LIST` | `SECURITY_SAST_SAFE_VIEW_VARIABLES` | | ビューで `h()` を通さずに出力してよい変数。カンマ区切り ([ルール](rules.md#cakephp2-view-unescaped-output)) |
+| `--config-check=0` | `SECURITY_SAST_CONFIG_CHECK` | `1` | `0` で設定を検査しません |
+| `--config-env=ENV` | `SECURITY_SAST_CONFIG_ENV` | `prod` | 検査する設定の `APP_ENV` |
 | `--language=LANG` | `SECURITY_REPORT_LANGUAGE` | `en` | `en` か `ja`、または `--locale-dir` の言語 |
 | `--locale-dir=DIR` | `SECURITY_REPORT_LOCALE_DIR` | | メッセージを足したり置き換えたりする `<言語>.json` のディレクトリ |
 | `--title=TITLE` | `SECURITY_SAST_TITLE` | 言語のタイトル | 報告書のタイトル |
 | `--project-name=NAME` | `SECURITY_REPORT_PROJECT` | `composer.json` の名前 | タイトルの下のプロジェクト名 |
 | `--note=TEXT` | `SECURITY_SAST_NOTE` | | 表紙の注記 |
+| `--settings=FILE` | `SECURITY_SETTINGS` | `config/security.php` か `app/Config/security.php` | 設定ファイル |
+
+### 設定ファイル
+
+pieceofcake2 のセキュリティ診断の設定は、プロジェクトの `config/security.php` (従来の構成では `app/Config/security.php`)
+にまとめられます。診断ごとのセクション `sca`、`sast`、`dast` と、共通の `report` セクションを持つ配列を返します。
+
+```php
+<?php
+return [
+    'report' => [
+        'language' => 'ja',
+        'dir' => 'tmp/security',
+        'project' => 'Acme',
+    ],
+    'sast' => [
+        'engine' => 'phpstan',
+        'failOn' => 'medium',
+        'viewExtensions' => ['ctp', 'php', 'html'],
+        'safeViewVariables' => ['body_html'],
+    ],
+];
+```
+
+セクションのキーは、オプションをキャメルケースにしたものです (`--fail-on` は `failOn`)。リストは配列で書きます。`report`
+セクションには `language`、`localeDir`、`project` (プロジェクト名)、`note` と、報告書のディレクトリ `dir` があります (この例では
+`tmp/security/security-sast.pdf` に書き出します)。`sast` セクションに知らないキーがあるとエラーになります。
+
+オプションが環境変数より、環境変数が設定ファイルより優先されます。別のファイルは `--settings` で指定します。
 
 ## 報告書
 
-1. **表紙**: 結果、リスクごとの指摘の数、リポジトリ、ブランチ、コミット、検査したパスとファイルの数、ルール、不合格の
-   基準、実行の日時、環境、ソフトウェア (エンジンとそのバージョン)
+1. **表紙**: 結果、リスクごとの指摘の数、リポジトリ、ブランチ、コミット、検査したパスとファイルの数、ルール、設定の
+   `APP_ENV`、不合格の基準、実行の日時、環境、ソフトウェア (エンジンとそのバージョン)
 2. **リスク別の指摘**: 緊急、高、中、低、不明の順に、箇所を見つけたルールとその箇所の数。それぞれのページへのリンク付き
 3. **ルールごとのページ**: タイトル、ID、リスク、CWE、OWASP Top 10 の分類、確度、見つけたものと直し方、続けて各箇所
    (ファイルと行) とそのコード。100 箇所まで
@@ -121,7 +179,7 @@ PHPStan では、ルールの識別子 ([ルール](rules.md)) を指定しま�
 $this->query('TRUNCATE ' . self::TABLE); // @phpstan-ignore securitySast.queryConcatenation
 ```
 
-パスごと除くときは `--exclude` を使います。
+パスごと除くときは `--exclude` を使います。設定の指摘は設定で直すか、`--config-check=0` で検査しないようにします。
 
 ## 自分のルール
 
@@ -141,6 +199,10 @@ Docker を起動するか、`--engine=phpstan` を使ってください。
 
 **`Semgrep failed ... Failed to download configuration`**: Registry のルール (`p/php`) を取得できませんでした。
 `semgrep.dev` へのネットワークを許可するか、`--semgrep-config=` (空) でこのパッケージのルールだけを実行してください。
+
+**`The configuration could not be loaded`**: `APP_ENV=prod` で読み込んだとき、`config/bootstrap.php` か `core.php`
+が失敗しました。`.env` ファイルやデータベースが必要な場合などです。メッセージにエラーが出ます。`--config-env` で CI の
+環境を指定するか、`--config-check=0` で検査しないようにしてください。
 
 **`Nothing to scan in .`**: プロジェクトに `src`、`templates`、`plugins`、`app` のどれもありません。`--paths` でパスを
 指定してください。

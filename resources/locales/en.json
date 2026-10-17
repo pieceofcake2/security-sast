@@ -39,5 +39,22 @@
     "message.cakephp2-xml-build-variable": "Xml::build() is called with a variable: a URL or a path in it is read. Pass ['readFile' => false] for a string of XML, and do not pass values of the request.",
     "message.cakephp2-unserialize-request": "A value of the request is passed to unserialize(): it can create objects of any class. Use json_decode().",
     "message.cakephp2-security-csrf-disabled": "The CSRF check or the form tampering check of SecurityComponent is turned off. Turn it off only for the actions that need it, e.g. with unlockedActions.",
-    "message.cakephp2-view-unescaped-output": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes."
+    "message.cakephp2-view-unescaped-output": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
+    "rule.cakephp2-config-debug": "Debug level above 0 in production",
+    "message.cakephp2-config-debug": "The debug level is not 0 in production. Error pages show the code, the SQL and the configuration. Set APP_DEBUG to 0, or leave it unset, in production.",
+    "rule.cakephp2-config-salt": "Default, sample or short Security.salt",
+    "message.cakephp2-config-salt": "Security.salt is the default of the distribution or a sample of the documentation, or shorter than 32 characters. The hashes and the signed values (e.g. the tokens of forms) can be forged. Set SECURITY_SALT to a random value of 32 bytes or more.",
+    "rule.cakephp2-config-cipher-seed": "Default or sample Security.cipherSeed",
+    "message.cakephp2-config-cipher-seed": "Security.cipherSeed is the default of the distribution or a sample of the documentation. It is used by the 'cipher' type of CookieComponent. Set SECURITY_CIPHER_SEED to a random number, and move the cookies to the 'aes' type.",
+    "rule.cakephp2-config-cookie-cipher": "Cookies encrypted with 'cipher'",
+    "message.cakephp2-config-cookie-cipher": "CookieComponent encrypts with the 'cipher' type (Cookie.type is not set, or is 'cipher'), which is not secure. Set Cookie.type to 'aes', Cookie.key to a random value of 32 bytes or more, and Security.useOpenSsl to true.",
+    "rule.cakephp2-config-cookie-key": "Sample or short Cookie.key",
+    "message.cakephp2-config-cookie-key": "Cookie.key, the key of the 'aes' cookies, is a sample of the documentation or shorter than 32 bytes. Set COOKIE_KEY to a random value of 32 bytes or more.",
+    "rule.cakephp2-config-openssl": "Security.useOpenSsl not enabled",
+    "message.cakephp2-config-openssl": "Security.useOpenSsl is not true: Security::encrypt() and the 'aes' cookies use mcrypt, which is not maintained and not bundled with PHP 7.2+. Set Security.useOpenSsl to true.",
+    "rule.cakephp2-config-session-cookie": "Session cookie without HttpOnly or Secure",
+    "message.cakephp2-config-session-cookie": "The session cookie is configured without HttpOnly or Secure (session.cookie_httponly or session.cookie_secure is false in Session.ini). CakePHP sets both by default (Secure on HTTPS); remove the settings that turn them off.",
+    "field.config": "Configuration",
+    "config.env": "Checked with APP_ENV={env}",
+    "config.none": "Not checked"
 }

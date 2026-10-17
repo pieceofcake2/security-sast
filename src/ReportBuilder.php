@@ -79,13 +79,14 @@ final class ReportBuilder
         }
 
         $target = $cover->target($environment);
-        $target[] = new Row($this->t('field.paths'), implode('　', $config->paths()), monoValue: true);
+        $target[] = new Row($this->t('field.paths'), implode('　', $result->paths !== [] ? $result->paths : $config->paths()), monoValue: true);
         $target[] = new Row($this->t('field.files'), (string)$result->files);
         $rules = ['pieceofcake2/security-sast (CakePHP 2)'];
         if ($config->engine === 'semgrep') {
             array_push($rules, ...$config->semgrepConfigs);
         }
         $target[] = new Row($this->t('field.rules'), implode('　', $rules));
+        $target[] = new Row($this->t('field.config'), $result->configEnv !== null ? $this->t('config.env', ['env' => $result->configEnv]) : $this->t('config.none'));
         $target[] = new Row($this->t('field.threshold'), $config->failOn === 'none'
             ? $this->t('threshold.none')
             : $this->t('threshold.value', ['severity' => $this->t('severity.' . $config->failOn)]));
