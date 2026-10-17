@@ -8,7 +8,7 @@
     "require": {
         "php": ">=8.0",
         "phpstan/phpstan": "^2.1",
-        "pieceofcake2/report": "^1.0"
+        "pieceofcake2/report": "^1.0.1"
     },
     "require-dev": {
         "cakephp/cakephp-codesniffer": "^5.0",
