@@ -166,8 +166,8 @@ file with `--settings`.
 
 ## The Report
 
-- [Sample report (English, PDF)](/report-sample.pdf)
-- [Sample report (Japanese, PDF)](/report-sample-ja.pdf)
+- [Sample report (English, PDF)](https://pieceofcake2.github.io/security-sast/report-sample.pdf)
+- [Sample report (Japanese, PDF)](https://pieceofcake2.github.io/security-sast/report-sample-ja.pdf)
 
 ![The cover, the findings by risk and the pages of two rules, of the code and of the configuration](img/report-sample.png)
 
