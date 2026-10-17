@@ -162,6 +162,11 @@ file with `--settings`.
 
 ## The Report
 
+- [Sample report (English, PDF)](/report-sample.pdf)
+- [Sample report (Japanese, PDF)](/report-sample-ja.pdf)
+
+![The cover, the findings by risk and the pages of two rules, of the code and of the configuration](img/report-sample.png)
+
 1. **Cover**: the result, the numbers of findings by risk, the repository, branch and commit, the scanned paths
    and the number of files, the rules, the `APP_ENV` of the configuration, the threshold, and the date,
    environment and software of the run (the engine and its version)
