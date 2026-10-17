@@ -5,11 +5,13 @@ CakePHP 2 アプリケーションの静的アプリケーションセキュリ�
 報告書にします。報告書は [pieceofcake2/report](https://pieceofcake2.github.io/report/ja/) のデザインです。あるリスク以上の
 指摘があれば、終了コードで CI を失敗にします。
 
-- [ルール](rules.md): 各ルールが見つけるものと直し方、設定の検査
+- [ルール](rules.md): 各ルールが見つけるもの、なぜ危ないか、直し方と、設定の検査
+- [指摘を直す](fixing.md): 最初のスキャンから、CI で問題のない状態を保つまでの進め方
 - [GitHub Actions での CI](ci.md)
 
 pieceofcake2 のセキュリティ診断の 1 つで、ほかに [pieceofcake2/security-sca](https://pieceofcake2.github.io/security-sca/ja/)
-(Composer のパッケージの既知の脆弱性) と pieceofcake2/security-dast (動いているアプリケーション) があります。
+(Composer のパッケージの既知の脆弱性) と [pieceofcake2/security-dast](https://pieceofcake2.github.io/security-dast/ja/)
+(動いているアプリケーション) があります。
 pieceofcake2/security-check で、すべてを実行できます。
 
 ## 2 つのエンジン
