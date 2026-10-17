@@ -5,8 +5,7 @@ namespace PieceOfCake2\SecuritySast;
 
 /**
  * Which files are views, for the rule of the variables printed without `h()`: the files of the extensions of the
- * views in a directory of views (`templates/`, `View/`), and the `.ctp` files anywhere, as `.ctp` is the
- * extension of the views of CakePHP 2 only.
+ * views in a directory of views (`templates/`, `View/`).
  */
 final class Views
 {
@@ -39,9 +38,6 @@ final class Views
         if (!in_array($extension, array_map('strtolower', $extensions), true)) {
             return false;
         }
-        if ($extension === 'ctp') {
-            return true;
-        }
         foreach (self::DIRECTORIES as $directory) {
             if (str_contains($path, '/' . $directory . '/')) {
                 return true;
@@ -61,10 +57,6 @@ final class Views
     {
         $patterns = [];
         foreach ($extensions as $extension) {
-            if ($extension === 'ctp') {
-                $patterns[] = '*.ctp';
-                continue;
-            }
             foreach (self::DIRECTORIES as $directory) {
                 $patterns[] = '**/' . $directory . '/**/*.' . $extension;
             }

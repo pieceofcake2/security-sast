@@ -143,7 +143,7 @@ public function beforeFilter()
 ## cakephp2-view-unescaped-output
 
 ビューで、変数を `h()` を通さずに `<?= $var ?>` や `<?php echo $var; ?>` で出力しています。HTML を含む値は、ブラウザで
-実行されます (XSS)。ビューとは、`.ctp` のファイルと、`templates/` と `View/` にある、ほかのビューの拡張子のファイルです
+実行されます (XSS)。ビューとは、`templates/` と `View/` にある、ビューの拡張子のファイルです
 ([検査する範囲](README.md#検査する範囲))。
 
 ```php

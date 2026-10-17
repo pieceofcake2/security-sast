@@ -77,8 +77,8 @@ vendor/bin/security-sast --engine=phpstan --pdf=tmp/security-sast.pdf
 vendor/bin/security-sast --paths=src,templates --exclude=vendor,tmp
 ```
 
-PHP のファイル (`.php`) とビューを検査します。ビューとは、どこにあっても `.ctp` のファイルと、`templates/` か `View/` の
-ディレクトリにある、ほかのビューの拡張子のファイルです。デフォルトの `ctp,php` では、`templates/Posts/index.php` は
+PHP のファイル (`.php`) とビューを検査します。ビューとは、`templates/` か `View/` のディレクトリにある、ビューの
+拡張子のファイルです。デフォルトの `ctp,php` では、`templates/Posts/index.php` は
 ビューで、`src/Controller/PostsController.php` はビューではありません。ビューの拡張子は `--view-extensions` で足せます。
 
 ```bash

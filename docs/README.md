@@ -84,8 +84,8 @@ legacy layout) are scanned. `vendor`, `tmp`, `logs`, `tests`, `node_modules`, `a
 vendor/bin/security-sast --paths=src,templates --exclude=vendor,tmp
 ```
 
-The PHP files (`.php`) and the views are scanned. A view is a `.ctp` file anywhere, or a file of another
-extension of the views in a `templates/` or `View/` directory: with the default `ctp,php`,
+The PHP files (`.php`) and the views are scanned. A view is a file of an extension of the views in a
+`templates/` or `View/` directory: with the default `ctp,php`,
 `templates/Posts/index.php` is a view and `src/Controller/PostsController.php` is not. Add the extensions of
 your views with `--view-extensions`:
 
