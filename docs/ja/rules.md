@@ -142,8 +142,9 @@ public function beforeFilter()
 
 ## cakephp2-view-unescaped-output
 
-ビュー (`.ctp`) で、変数を `h()` を通さずに `<?= $var ?>` や `<?php echo $var; ?>` で出力しています。HTML を含む値は、
-ブラウザで実行されます (XSS)。
+ビューで、変数を `h()` を通さずに `<?= $var ?>` や `<?php echo $var; ?>` で出力しています。HTML を含む値は、ブラウザで
+実行されます (XSS)。ビューとは、`.ctp` のファイルと、`templates/` と `View/` にある、ほかのビューの拡張子のファイルです
+([検査する範囲](README.md#検査する範囲))。
 
 ```php
 <!-- 見つかる書き方 -->
@@ -153,6 +154,89 @@ public function beforeFilter()
 <div><?= h($post['Post']['body']) ?></div>
 ```
 
-ヘルパーの出力 (`$this->Html->link()`、`$this->Form->input()` など) は指摘しません。ヘルパーが値をエスケープするから
-です。サニタイズする Markdown パーサーの結果など、わざと HTML を入れた変数は、コメントで除外できます
-([指摘を除外する](README.md#指摘を除外する))。
+指摘が多くなりすぎないよう、次は指摘しません。
+
+- ヘルパー (`$this->Html->link()`、`$this->Form->input()` など) や関数の呼び出しの出力。ヘルパーは値をエスケープします
+- 出力する前にビューの中で、ヘルパーの出力、`h()`、`count()`、`(int)` や `(float)` の数値を入れた変数
+- レイアウトの HTML である `$content_for_layout` と `$scripts_for_layout`
+- `--safe-view-variables` の変数。わざと HTML を入れた変数など
+
+```php
+<?php $link = $this->Html->link('Back', '/'); ?>
+<?= $link ?>            <!-- 指摘しない: ヘルパー -->
+<?php $count = count($posts); ?>
+<?= $count ?>           <!-- 指摘しない: 数値 -->
+<?= $content_for_layout ?>  <!-- 指摘しない: レイアウト -->
+<?= $post['Post']['body'] ?>  <!-- 指摘する -->
+```
+
+サニタイズする Markdown パーサーの結果など、わざと HTML を入れた変数は、`--safe-view-variables` か設定ファイルで、`$`
+を除いた名前を指定すると、すべてのビューで安全として扱います (そのキーやプロパティも含みます)。
+
+```php
+// config/security.php
+return [
+    'sast' => ['safeViewVariables' => ['body_html']],
+];
+```
+
+1 箇所だけなら、コメントで除外することもできます ([指摘を除外する](README.md#指摘を除外する))。コントローラーが
+セットした変数の中身までは追わないため、このルールの確度は低です。
+
+## 設定
+
+設定のルールは、`APP_ENV=prod` のときのアプリケーションの `Configure` の値を検査します ([設定](README.md#設定))。どちらの
+エンジンでも実行し、`--config-check=0` で止められます。指摘は `core.php` のその設定の行に付きます。
+
+| ルール | リスク | CWE | OWASP Top 10 (2021) |
+| --- | --- | --- | --- |
+| [`cakephp2-config-debug`](#cakephp2-config-debug) | 高 | CWE-489 | A05 セキュリティの設定ミス |
+| [`cakephp2-config-salt`](#cakephp2-config-salt) | 高 | CWE-1188、CWE-330 | A02 暗号化の失敗 |
+| [`cakephp2-config-cipher-seed`](#cakephp2-config-cipher-seed) | 中 (`aes` の Cookie なら低) | CWE-1188 | A02 暗号化の失敗 |
+| [`cakephp2-config-cookie-cipher`](#cakephp2-config-cookie-cipher) | 中 | CWE-327 | A02 暗号化の失敗 |
+| [`cakephp2-config-cookie-key`](#cakephp2-config-cookie-key) | 中 | CWE-321、CWE-326 | A02 暗号化の失敗 |
+| [`cakephp2-config-session-cookie`](#cakephp2-config-session-cookie) | 中 | CWE-1004、CWE-614 | A05 セキュリティの設定ミス |
+| [`cakephp2-config-openssl`](#cakephp2-config-openssl) | 低 | CWE-1104 | A06 脆弱で古くなったコンポーネント |
+
+秘密の値は、CakePHP 2 と pieceofcake2 の配布時の値と、それらのドキュメントのサンプルと、SHA-256 と長さで比べます。報告書
+には書きません。
+
+### cakephp2-config-debug
+
+`debug` が 0 ではありません。エラーページにコード、SQL、設定が表示されます。本番では `APP_DEBUG` を 0 にするか、設定
+しないでください。
+
+### cakephp2-config-salt
+
+`Security.salt` が配布時の値かドキュメントのサンプルのまま、または 32 文字より短い値です。ハッシュや、フォームの
+トークンなどの署名した値を偽造できます。`SECURITY_SALT` に 32 バイト以上のランダムな値を設定してください。
+
+```bash
+php -r 'echo bin2hex(random_bytes(32)), PHP_EOL;'
+```
+
+### cakephp2-config-cipher-seed
+
+`Security.cipherSeed` が配布時の値かドキュメントのサンプルのままです。`CookieComponent` の `cipher` の Cookie の鍵です。
+`SECURITY_CIPHER_SEED` にランダムな数字を設定し、Cookie を `aes` に移してください。Cookie が `aes` ならリスクは低です。
+
+### cakephp2-config-cookie-cipher
+
+`CookieComponent` が `cipher` で暗号化しています (`Cookie.type` が未設定か `cipher`)。`cipher` は安全ではありません。
+`Cookie.type` を `aes` に、`Cookie.key` を 32 バイト以上のランダムな値に、`Security.useOpenSsl` を `true` にしてください。
+
+### cakephp2-config-cookie-key
+
+`aes` の Cookie の鍵 `Cookie.key` が、ドキュメントのサンプルのまま、または 32 バイトより短い値です。`COOKIE_KEY` に
+32 バイト以上のランダムな値を設定してください。
+
+### cakephp2-config-session-cookie
+
+セッションの Cookie に `HttpOnly` か `Secure` が付きません。`Session.ini` で `session.cookie_httponly` か
+`session.cookie_secure` が false になっています。CakePHP はどちらもデフォルトで付けます (`Secure` は HTTPS のとき)。
+それを無効にしている設定を消してください。
+
+### cakephp2-config-openssl
+
+`Security.useOpenSsl` が `true` ではありません。`Security::encrypt()` と `aes` の Cookie が mcrypt を使います。mcrypt は
+メンテナンスされておらず、PHP 7.2 以降には同梱されていません。`Security.useOpenSsl` を `true` にしてください。

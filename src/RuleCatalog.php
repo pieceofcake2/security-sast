@@ -4,8 +4,9 @@ declare(strict_types=1);
 namespace PieceOfCake2\SecuritySast;
 
 /**
- * The rules of this package for CakePHP 2 applications: the same checks for Semgrep
- * (`resources/semgrep/cakephp2.yml`) and PHPStan (`resources/phpstan/rules.neon`).
+ * The rules of this package for CakePHP 2 applications: the same checks of the code for Semgrep
+ * (`resources/semgrep/cakephp2.yml`) and PHPStan (`resources/phpstan/rules.neon`), and the checks of the
+ * configuration (`ConfigCheck`, `cakephp2-config-*`), which have no PHPStan identifier.
  */
 final class RuleCatalog
 {
@@ -81,6 +82,62 @@ final class RuleCatalog
             'confidence' => 'LOW',
             'message' => 'A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.',
         ],
+        'cakephp2-config-debug' => [
+            'identifier' => '',
+            'severity' => Severity::HIGH,
+            'cwe' => ['CWE-489: Active Debug Code'],
+            'owasp' => ['A05:2021 - Security Misconfiguration'],
+            'confidence' => 'HIGH',
+            'message' => 'The debug level is not 0 in production. Error pages show the code, the SQL and the configuration. Set APP_DEBUG to 0, or leave it unset, in production.',
+        ],
+        'cakephp2-config-salt' => [
+            'identifier' => '',
+            'severity' => Severity::HIGH,
+            'cwe' => ['CWE-1188: Initialization of a Resource with an Insecure Default', 'CWE-330: Use of Insufficiently Random Values'],
+            'owasp' => ['A02:2021 - Cryptographic Failures'],
+            'confidence' => 'HIGH',
+            'message' => 'Security.salt is the default of the distribution or a sample of the documentation, or shorter than 32 characters. The hashes and the signed values (e.g. the tokens of forms) can be forged. Set SECURITY_SALT to a random value of 32 bytes or more.',
+        ],
+        'cakephp2-config-cipher-seed' => [
+            'identifier' => '',
+            'severity' => Severity::MEDIUM,
+            'cwe' => ['CWE-1188: Initialization of a Resource with an Insecure Default'],
+            'owasp' => ['A02:2021 - Cryptographic Failures'],
+            'confidence' => 'HIGH',
+            'message' => 'Security.cipherSeed is the default of the distribution or a sample of the documentation. It is used by the \'cipher\' type of CookieComponent. Set SECURITY_CIPHER_SEED to a random number, and move the cookies to the \'aes\' type.',
+        ],
+        'cakephp2-config-cookie-cipher' => [
+            'identifier' => '',
+            'severity' => Severity::MEDIUM,
+            'cwe' => ['CWE-327: Use of a Broken or Risky Cryptographic Algorithm'],
+            'owasp' => ['A02:2021 - Cryptographic Failures'],
+            'confidence' => 'HIGH',
+            'message' => 'CookieComponent encrypts with the \'cipher\' type (Cookie.type is not set, or is \'cipher\'), which is not secure. Set Cookie.type to \'aes\', Cookie.key to a random value of 32 bytes or more, and Security.useOpenSsl to true.',
+        ],
+        'cakephp2-config-cookie-key' => [
+            'identifier' => '',
+            'severity' => Severity::MEDIUM,
+            'cwe' => ['CWE-321: Use of Hard-coded Cryptographic Key', 'CWE-326: Inadequate Encryption Strength'],
+            'owasp' => ['A02:2021 - Cryptographic Failures'],
+            'confidence' => 'HIGH',
+            'message' => 'Cookie.key, the key of the \'aes\' cookies, is a sample of the documentation or shorter than 32 bytes. Set COOKIE_KEY to a random value of 32 bytes or more.',
+        ],
+        'cakephp2-config-openssl' => [
+            'identifier' => '',
+            'severity' => Severity::LOW,
+            'cwe' => ['CWE-1104: Use of Unmaintained Third Party Components'],
+            'owasp' => ['A06:2021 - Vulnerable and Outdated Components'],
+            'confidence' => 'HIGH',
+            'message' => 'Security.useOpenSsl is not true: Security::encrypt() and the \'aes\' cookies use mcrypt, which is not maintained and not bundled with PHP 7.2+. Set Security.useOpenSsl to true.',
+        ],
+        'cakephp2-config-session-cookie' => [
+            'identifier' => '',
+            'severity' => Severity::MEDIUM,
+            'cwe' => ['CWE-1004: Sensitive Cookie Without \'HttpOnly\' Flag', 'CWE-614: Sensitive Cookie in HTTPS Session Without \'Secure\' Attribute'],
+            'owasp' => ['A05:2021 - Security Misconfiguration'],
+            'confidence' => 'HIGH',
+            'message' => 'The session cookie is configured without HttpOnly or Secure (session.cookie_httponly or session.cookie_secure is false in Session.ini). CakePHP sets both by default (Secure on HTTPS); remove the settings that turn them off.',
+        ],
     ];
 
     /**
@@ -92,7 +149,7 @@ final class RuleCatalog
     public static function idOf(string $identifier): ?string
     {
         foreach (self::RULES as $id => $rule) {
-            if ($rule['identifier'] === $identifier) {
+            if ($rule['identifier'] !== '' && $rule['identifier'] === $identifier) {
                 return $id;
             }
         }

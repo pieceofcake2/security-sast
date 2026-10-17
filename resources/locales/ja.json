@@ -39,5 +39,22 @@
     "message.cakephp2-xml-build-variable": "Xml::build() に変数を渡しています。変数が URL やパスなら、その中身が読み込まれます。XML の文字列には ['readFile' => false] を渡し、リクエストの値は渡さないでください。",
     "message.cakephp2-unserialize-request": "リクエストの値を unserialize() に渡しています。どのクラスのオブジェクトでも作られます。json_decode() にしてください。",
     "message.cakephp2-security-csrf-disabled": "SecurityComponent の CSRF のチェック、またはフォームの改ざんのチェックを無効にしています。unlockedActions などで、必要なアクションだけ無効にしてください。",
-    "message.cakephp2-view-unescaped-output": "ビューで変数を h() を通さずに出力しています。h() でエスケープするか、エスケープするヘルパーを使ってください。"
+    "message.cakephp2-view-unescaped-output": "ビューで変数を h() を通さずに出力しています。h() でエスケープするか、エスケープするヘルパーを使ってください。",
+    "rule.cakephp2-config-debug": "本番環境で 0 でない debug",
+    "message.cakephp2-config-debug": "本番環境で debug が 0 になっていません。エラーページにコード、SQL、設定が表示されます。本番環境では APP_DEBUG を 0 にするか、設定しないでください。",
+    "rule.cakephp2-config-salt": "既定値、サンプル、または短い Security.salt",
+    "message.cakephp2-config-salt": "Security.salt が、配布時の既定値かドキュメントのサンプルの値、または 32 文字未満です。ハッシュや署名した値 (フォームのトークンなど) を偽造できます。SECURITY_SALT に 32 バイト以上のランダムな値を設定してください。",
+    "rule.cakephp2-config-cipher-seed": "既定値またはサンプルの Security.cipherSeed",
+    "message.cakephp2-config-cipher-seed": "Security.cipherSeed が、配布時の既定値かドキュメントのサンプルの値です。CookieComponent の 'cipher' で使われます。SECURITY_CIPHER_SEED にランダムな数を設定し、Cookie を 'aes' に移してください。",
+    "rule.cakephp2-config-cookie-cipher": "'cipher' で暗号化した Cookie",
+    "message.cakephp2-config-cookie-cipher": "CookieComponent が 'cipher' で暗号化しています (Cookie.type が未設定か 'cipher')。'cipher' は安全ではありません。Cookie.type を 'aes'、Cookie.key を 32 バイト以上のランダムな値、Security.useOpenSsl を true にしてください。",
+    "rule.cakephp2-config-cookie-key": "サンプルまたは短い Cookie.key",
+    "message.cakephp2-config-cookie-key": "'aes' の Cookie の鍵 Cookie.key が、ドキュメントのサンプルの値か、32 バイト未満です。COOKIE_KEY に 32 バイト以上のランダムな値を設定してください。",
+    "rule.cakephp2-config-openssl": "有効でない Security.useOpenSsl",
+    "message.cakephp2-config-openssl": "Security.useOpenSsl が true ではありません。Security::encrypt() と 'aes' の Cookie が、メンテナンスされておらず PHP 7.2 以降に同梱されない mcrypt を使います。Security.useOpenSsl を true にしてください。",
+    "rule.cakephp2-config-session-cookie": "HttpOnly や Secure のないセッションの Cookie",
+    "message.cakephp2-config-session-cookie": "セッションの Cookie の HttpOnly か Secure を無効にしています (Session.ini の session.cookie_httponly か session.cookie_secure が false)。CakePHP はどちらも既定で付けます (Secure は HTTPS のとき)。無効にしている設定を削除してください。",
+    "field.config": "設定",
+    "config.env": "APP_ENV={env} で検査",
+    "config.none": "検査していません"
 }

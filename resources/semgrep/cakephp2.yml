@@ -150,11 +150,37 @@ rules:
       confidence: MEDIUM
 
   - id: cakephp2-view-unescaped-output
-    languages: [generic]
+    languages: [php]
     severity: WARNING
     message: >-
       A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.
-    pattern-regex: <\?(?:=|php\s+echo)\s+\$(?!this->)[A-Za-z_][^;?]*(?:;|\?>)
+    patterns:
+      - pattern: echo $X;
+      # A variable, with its keys and properties, printed as it is; not $this, a call or the HTML variables of
+      # the layouts. SecuritySast\SemgrepEngine adds the safe variables of the settings to the names.
+      - metavariable-regex:
+          metavariable: $X
+          regex: '\A\$(?!this\b)(?!(?:content_for_layout|scripts_for_layout)\b)[A-Za-z_]\w*(?:\[[^\]]*\]|->\w+)*\z'
+      # A variable that holds the output of a helper, an escaped value or a number
+      - pattern-not-inside: |
+          $X = $this->$HELPER->$METHOD(...);
+          ...
+      - pattern-not-inside: |
+          $X = h(...);
+          ...
+      # Escaped unless an option says not to, as the Flash elements of CakePHP do
+      - pattern-not-inside: |
+          if (...) { ... $X = h(...); ... }
+          ...
+      - pattern-not-inside: |
+          $X = count(...);
+          ...
+      - pattern-not-inside: |
+          $X = (int)$Y;
+          ...
+      - pattern-not-inside: |
+          $X = (float)$Y;
+          ...
     paths:
       include:
         - "*.ctp"

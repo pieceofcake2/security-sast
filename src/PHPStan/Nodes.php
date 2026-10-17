@@ -103,10 +103,16 @@ final class Nodes
      * The error of a rule of the catalog
      *
      * @param string $id ID of the rule
+     * @param int|null $line Line, when not the line of the node
      * @return \PHPStan\Rules\IdentifierRuleError
      */
-    public static function error(string $id): IdentifierRuleError
+    public static function error(string $id, ?int $line = null): IdentifierRuleError
     {
-        return RuleErrorBuilder::message(RuleCatalog::message($id))->identifier(RuleCatalog::RULES[$id]['identifier'])->build();
+        $error = RuleErrorBuilder::message(RuleCatalog::message($id))->identifier(RuleCatalog::RULES[$id]['identifier']);
+        if ($line !== null) {
+            $error = $error->line($line);
+        }
+
+        return $error->build();
     }
 }

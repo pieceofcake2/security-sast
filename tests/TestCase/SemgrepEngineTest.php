@@ -24,6 +24,9 @@ class SemgrepEngineTest extends TestCase
         'cakephp2-security-csrf-disabled src/Controller/PostsController.php:12',
         'cakephp2-security-csrf-disabled src/Controller/PostsController.php:13',
         'cakephp2-unserialize-request src/Controller/PostsController.php:46',
+        'cakephp2-view-unescaped-output templates/Posts/edit.ctp:10',
+        'cakephp2-view-unescaped-output templates/Posts/edit.ctp:12',
+        'cakephp2-view-unescaped-output templates/Posts/index.php:2',
         'cakephp2-view-unescaped-output templates/Posts/view.ctp:2',
         'cakephp2-view-unescaped-output templates/Posts/view.ctp:3',
         'cakephp2-xml-build-variable src/Controller/PostsController.php:44',
@@ -57,7 +60,8 @@ class SemgrepEngineTest extends TestCase
         $command = implode(' ', $commands[0]);
         $this->assertStringStartsWith('docker run --rm -v ' . realpath(self::APP) . ':/src:ro -v ', $command);
         $this->assertStringContainsString(':/rules:ro -w /src semgrep/semgrep:1.180.0 semgrep scan --json --metrics=off', $command);
-        $this->assertStringContainsString('--config /rules/cakephp2.yml --config p/php --config /src/rules/app.yml --exclude vendor src templates', $command);
+        $this->assertStringContainsString(' --scan-unknown-extensions ', $command);
+        $this->assertStringContainsString('--config /rules/cakephp2.yml --config p/php --config /src/rules/app.yml --include src --include templates --exclude vendor . templates/Posts/edit.ctp templates/Posts/index.php templates/Posts/view.ctp', $command);
     }
 
     public function testResult(): void
@@ -66,7 +70,7 @@ class SemgrepEngineTest extends TestCase
         $result = SemgrepEngine::result($data, (string)realpath(self::APP));
 
         $this->assertSame(self::EXPECTED, self::places($result->findings));
-        $this->assertSame(3, $result->files);
+        $this->assertSame(6, $result->files);
         $this->assertStringStartsWith('Semgrep 1.', $result->engine);
         $this->assertSame([], $result->errors);
 
@@ -75,6 +79,21 @@ class SemgrepEngineTest extends TestCase
         $this->assertSame('$posts = $this->Post->query("SELECT * FROM posts WHERE title LIKE \'%" . $q . "%\'");', $query->code);
         $this->assertSame(['A03:2021 - Injection'], $query->owasp);
         $this->assertSame('MEDIUM', $query->confidence);
+    }
+
+    public function testResultOfAViewGivenTwice(): void
+    {
+        $result = ['check_id' => 'cakephp2-view-unescaped-output', 'path' => 'templates/Posts/view.ctp', 'start' => ['line' => 2, 'col' => 6], 'end' => ['line' => 2], 'extra' => ['severity' => 'WARNING', 'message' => 'Message']];
+        $result = SemgrepEngine::result(['results' => [$result, $result]], (string)realpath(self::APP));
+
+        $this->assertCount(1, $result->findings);
+    }
+
+    public function testRulesWithSafeViewVariables(): void
+    {
+        $rules = SemgrepEngine::rules(['ctp'], ['body_html', '$raw']);
+
+        $this->assertStringContainsString('(?!(?:content_for_layout|scripts_for_layout|body_html|raw)\\b)', $rules);
     }
 
     public function testResultOfAnotherRule(): void
@@ -122,5 +141,10 @@ class SemgrepEngineTest extends TestCase
         $result = (new SemgrepEngine())->scan(self::APP, ['src', 'templates']);
 
         $this->assertSame(self::EXPECTED, self::places(array_filter($result->findings, static fn($finding): bool => str_starts_with($finding->rule, 'cakephp2-'))));
+
+        $result = (new SemgrepEngine(safeViewVariables: ['body_html']))->scan(self::APP, ['templates']);
+
+        $this->assertNotContains('cakephp2-view-unescaped-output templates/Posts/edit.ctp:10', self::places($result->findings));
+        $this->assertContains('cakephp2-view-unescaped-output templates/Posts/edit.ctp:12', self::places($result->findings));
     }
 }

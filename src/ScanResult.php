@@ -15,12 +15,16 @@ final class ScanResult
      * @param int $files Number of the scanned files
      * @param string $engine Engine and its version, e.g. `Semgrep 1.180.0`
      * @param array<string> $errors Errors of the engine that did not stop the scan, e.g. files it could not parse
+     * @param string|null $configEnv `APP_ENV` of the checked configuration, or null when it was not checked
+     * @param array<string> $paths Scanned paths, relative to the project
      */
     public function __construct(
         public array $findings = [],
         public int $files = 0,
         public string $engine = '',
         public array $errors = [],
+        public ?string $configEnv = null,
+        public array $paths = [],
     ) {
     }
 

@@ -41,6 +41,61 @@ class CommandTest extends TestCase
         $this->assertSame(['p/php'], $config->semgrepConfigs);
     }
 
+    public function testSettingsFile(): void
+    {
+        $project = __DIR__ . DS . '..' . DS . 'fixtures' . DS . 'settings';
+        $config = Command::config(['--project=' . $project, '--fail-on=low'], ['SECURITY_SAST_ENGINE' => 'semgrep']);
+
+        $this->assertNotNull($config);
+        // The option and the environment variable win over the file
+        $this->assertSame('low', $config->failOn);
+        $this->assertSame('semgrep', $config->engine);
+        $this->assertSame(['src', 'templates'], $config->paths);
+        $this->assertSame(['ctp', 'php', 'html'], $config->viewExtensions);
+        $this->assertSame(['body_html'], $config->safeViewVariables);
+        $this->assertSame('ja', $config->language);
+        $this->assertSame('Acme', $config->projectName);
+        $this->assertSame('tmp/security/security-sast.pdf', $config->pdf);
+    }
+
+    public function testSettingsFileOption(): void
+    {
+        $file = TMP . 'security.php';
+        file_put_contents($file, "<?php\nreturn ['sast' => ['engine' => 'phpstan', 'unknown' => 1]];\n");
+        try {
+            $this->expectException(InvalidArgumentException::class);
+            $this->expectExceptionMessage('Unknown setting of the sast section: unknown');
+            Command::config(['--settings=' . $file]);
+        } finally {
+            unlink($file);
+        }
+    }
+
+    public function testMissingSettingsFile(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('is not found');
+        Command::config(['--settings=/nowhere/security.php']);
+    }
+
+    public function testLayoutOfTheApplication(): void
+    {
+        $config = Command::config(['--project=' . SemgrepEngineTest::APP]);
+        $this->assertNotNull($config);
+        $layout = ['app' => 'src', 'views' => ['src/View', 'templates'], 'plugins' => ['plugins'], 'viewExtension' => 'html', 'installed' => ['plugins/DebugKit']];
+
+        // Only the paths that exist
+        $this->assertSame(['src', 'templates'], $config->paths($layout));
+        $this->assertSame(['ctp', 'php', 'html'], $config->viewExtensions($layout));
+        $this->assertContains('plugins/DebugKit', $config->exclude($layout));
+        $this->assertSame(['ctp', 'php'], $config->viewExtensions());
+
+        $config = Command::config(['--paths=src', '--view-extensions=.CTP']);
+        $this->assertNotNull($config);
+        $this->assertSame(['src'], $config->paths($layout));
+        $this->assertSame(['ctp'], $config->viewExtensions($layout));
+    }
+
     public function testInvalidOptions(): void
     {
         $this->assertNull(Command::config(['--help']));
@@ -85,7 +140,7 @@ class CommandTest extends TestCase
         $output = '';
         try {
             $this->assertSame(Command::FAILURE, self::runCommand(['--pdf=' . $pdf], $output));
-            $this->assertStringContainsString('12 findings (5 high, 7 medium) of 8 rules in 3 files (PHPStan 2.', $output);
+            $this->assertStringContainsString('15 findings (5 high, 10 medium) of 8 rules in 6 files (PHPStan 2.', $output);
             $this->assertStringStartsWith('%PDF', (string)file_get_contents($pdf));
 
             $this->assertSame(Command::SUCCESS, self::runCommand(['--pdf=' . $pdf, '--fail-on=critical']));

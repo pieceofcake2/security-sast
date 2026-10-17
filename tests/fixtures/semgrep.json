@@ -323,6 +323,102 @@
   },
   {
    "check_id": "rules.cakephp2-view-unescaped-output",
+   "path": "templates/Posts/edit.ctp",
+   "start": {
+    "line": 10,
+    "col": 6,
+    "offset": 288
+   },
+   "end": {
+    "line": 10,
+    "col": 23,
+    "offset": 305
+   },
+   "extra": {
+    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-view-unescaped-output",
+   "path": "templates/Posts/edit.ctp",
+   "start": {
+    "line": 12,
+    "col": 4,
+    "offset": 361
+   },
+   "end": {
+    "line": 12,
+    "col": 19,
+    "offset": 376
+   },
+   "extra": {
+    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-view-unescaped-output",
+   "path": "templates/Posts/index.php",
+   "start": {
+    "line": 2,
+    "col": 4,
+    "offset": 18
+   },
+   "end": {
+    "line": 2,
+    "col": 17,
+    "offset": 31
+   },
+   "extra": {
+    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-view-unescaped-output",
    "path": "templates/Posts/view.ctp",
    "start": {
     "line": 2,
@@ -358,8 +454,8 @@
    "path": "templates/Posts/view.ctp",
    "start": {
     "line": 3,
-    "col": 4,
-    "offset": 85
+    "col": 10,
+    "offset": 91
    },
    "end": {
     "line": 3,
@@ -389,19 +485,22 @@
  "errors": [],
  "paths": {
   "scanned": [
+   "src/Controller/ExportController.php",
    "src/Controller/PostsController.php",
    "src/Model/Post.php",
+   "templates/Posts/edit.ctp",
+   "templates/Posts/index.php",
    "templates/Posts/view.ctp"
   ]
  },
  "time": {
   "rules": [],
-  "rules_parse_time": 0.018074989318847656,
+  "rules_parse_time": 0.017881155014038086,
   "profiling_times": {
-   "config_time": 1.9068193435668945,
-   "core_time": 1.4398095607757568,
-   "ignores_time": 0.00018215179443359375,
-   "total_time": 3.3667104244232178
+   "config_time": 0.7007265090942383,
+   "core_time": 0.7805976867675781,
+   "ignores_time": 0.0006458759307861328,
+   "total_time": 1.5017058849334717
   },
   "parsing_time": {
    "total_time": 0.0,
@@ -416,10 +515,10 @@
    "very_slow_files": []
   },
   "scanning_time": {
-   "total_time": 0.30077576637268066,
+   "total_time": 0.30807018280029297,
    "per_file_time": {
-    "mean": 0.10025858879089355,
-    "std_dev": 0.004573905546787198
+    "mean": 0.05134503046671549,
+    "std_dev": 7.644251139835332e-05
    },
    "very_slow_stats": {
     "time_ratio": 0.0,
@@ -456,13 +555,13 @@
    "project_level_time": 0.0,
    "file_level_time": 0.0,
    "rules_with_project_prefilters_ratio": 0.0,
-   "rules_with_file_prefilters_ratio": 0.9672131147540983,
-   "rules_selected_ratio": 0.14754098360655737,
-   "rules_matched_ratio": 0.14754098360655737
+   "rules_with_file_prefilters_ratio": 0.9508196721311475,
+   "rules_selected_ratio": 0.08196721311475409,
+   "rules_matched_ratio": 0.08196721311475409
   },
   "targets": [],
   "total_bytes": 0,
-  "max_memory_bytes": 113984448
+  "max_memory_bytes": 131947136
  },
  "engine_requested": "OSS",
  "skipped_rules": [],

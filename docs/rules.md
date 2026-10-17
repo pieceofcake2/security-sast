@@ -143,8 +143,9 @@ public function beforeFilter()
 
 ## cakephp2-view-unescaped-output
 
-A variable printed in a view (`.ctp`) without `h()`, as `<?= $var ?>` or `<?php echo $var; ?>`. A value that
-contains HTML is run by the browser (XSS).
+A variable printed in a view without `h()`, as `<?= $var ?>` or `<?php echo $var; ?>`. A value that contains
+HTML is run by the browser (XSS). The views are the `.ctp` files, and the files of the other extensions of the
+views in `templates/` and `View/` (see [What is Scanned](README.md#what-is-scanned)).
 
 ```php
 <!-- Found -->
@@ -154,6 +155,96 @@ contains HTML is run by the browser (XSS).
 <div><?= h($post['Post']['body']) ?></div>
 ```
 
-The output of the helpers (`$this->Html->link()`, `$this->Form->input()`, ...) is not reported: they escape the
-values. A variable that holds HTML on purpose, e.g. the result of a Markdown parser that sanitizes it, can be
-suppressed with a comment (see [Suppressing a Finding](README.md#suppressing-a-finding)).
+To keep the number of findings small, these are not reported:
+
+- the output of a helper (`$this->Html->link()`, `$this->Form->input()`, ...) or of a function call: the
+  helpers escape the values
+- a variable set in the view, before it is printed, to the output of a helper, to `h()`, to `count()`, or to
+  a number with `(int)` or `(float)`
+- `$content_for_layout` and `$scripts_for_layout`, the HTML of the layouts
+- the variables of `--safe-view-variables`, e.g. variables that hold HTML on purpose
+
+```php
+<?php $link = $this->Html->link('Back', '/'); ?>
+<?= $link ?>            <!-- not reported: a helper -->
+<?php $count = count($posts); ?>
+<?= $count ?>           <!-- not reported: a number -->
+<?= $content_for_layout ?>  <!-- not reported: the layout -->
+<?= $post['Post']['body'] ?>  <!-- reported -->
+```
+
+A variable that holds HTML on purpose, e.g. the result of a Markdown parser that sanitizes it, is set safe for
+all the views with `--safe-view-variables` or the settings file, by its name without `$` (its keys and
+properties are included):
+
+```php
+// config/security.php
+return [
+    'sast' => ['safeViewVariables' => ['body_html']],
+];
+```
+
+Or suppress one place with a comment (see [Suppressing a Finding](README.md#suppressing-a-finding)). The
+confidence of the rule is low: the variables set by the controller are not followed.
+
+## The Configuration
+
+The rules of the configuration check the values of `Configure` of the application, as they are with
+`APP_ENV=prod` (see [The Configuration](README.md#the-configuration)). They are run by both engines, and are
+turned off with `--config-check=0`. They are placed at the line of the setting in `core.php`.
+
+| Rule | Risk | CWE | OWASP Top 10 (2021) |
+| --- | --- | --- | --- |
+| [`cakephp2-config-debug`](#cakephp2-config-debug) | High | CWE-489 | A05 Security Misconfiguration |
+| [`cakephp2-config-salt`](#cakephp2-config-salt) | High | CWE-1188, CWE-330 | A02 Cryptographic Failures |
+| [`cakephp2-config-cipher-seed`](#cakephp2-config-cipher-seed) | Medium (Low with `aes` cookies) | CWE-1188 | A02 Cryptographic Failures |
+| [`cakephp2-config-cookie-cipher`](#cakephp2-config-cookie-cipher) | Medium | CWE-327 | A02 Cryptographic Failures |
+| [`cakephp2-config-cookie-key`](#cakephp2-config-cookie-key) | Medium | CWE-321, CWE-326 | A02 Cryptographic Failures |
+| [`cakephp2-config-session-cookie`](#cakephp2-config-session-cookie) | Medium | CWE-1004, CWE-614 | A05 Security Misconfiguration |
+| [`cakephp2-config-openssl`](#cakephp2-config-openssl) | Low | CWE-1104 | A06 Vulnerable and Outdated Components |
+
+The secrets are compared with the values of the distributions of CakePHP 2 and pieceofcake2 and the samples of
+their documentation, as their SHA-256 and length; they are not written to the report.
+
+### cakephp2-config-debug
+
+`debug` is not 0. Error pages show the code, the SQL and the configuration. Set `APP_DEBUG` to 0 in
+production, or leave it unset.
+
+### cakephp2-config-salt
+
+`Security.salt` is the default of the distribution, a sample of the documentation, or shorter than 32
+characters. The hashes and the signed values, e.g. the tokens of the forms, can be forged. Set
+`SECURITY_SALT` to a random value of 32 bytes or more:
+
+```bash
+php -r 'echo bin2hex(random_bytes(32)), PHP_EOL;'
+```
+
+### cakephp2-config-cipher-seed
+
+`Security.cipherSeed` is the default of the distribution or a sample of the documentation. It is the key of the
+`cipher` cookies of `CookieComponent`. Set `SECURITY_CIPHER_SEED` to a random number, and move the cookies to
+`aes`. Its risk is low when the cookies are `aes`.
+
+### cakephp2-config-cookie-cipher
+
+`CookieComponent` encrypts with `cipher` (`Cookie.type` is not set, or is `cipher`), which is not secure.
+Set `Cookie.type` to `aes`, `Cookie.key` to a random value of 32 bytes or more, and `Security.useOpenSsl` to
+`true`.
+
+### cakephp2-config-cookie-key
+
+`Cookie.key`, the key of the `aes` cookies, is a sample of the documentation or shorter than 32 bytes. Set
+`COOKIE_KEY` to a random value of 32 bytes or more.
+
+### cakephp2-config-session-cookie
+
+The session cookie is set without `HttpOnly` or `Secure`: `session.cookie_httponly` or
+`session.cookie_secure` is false in `Session.ini`. CakePHP sets both by default (`Secure` on HTTPS); remove
+the settings that turn them off.
+
+### cakephp2-config-openssl
+
+`Security.useOpenSsl` is not `true`: `Security::encrypt()` and the `aes` cookies use mcrypt, which is not
+maintained and not bundled with PHP 7.2+. Set `Security.useOpenSsl` to `true`.

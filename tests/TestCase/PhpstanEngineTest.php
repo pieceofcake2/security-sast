@@ -15,27 +15,62 @@ class PhpstanEngineTest extends TestCase
 
         // The same places as the Semgrep rules, and no other error of PHPStan
         $this->assertSame(SemgrepEngineTest::EXPECTED, SemgrepEngineTest::places($result->findings));
-        $this->assertSame(3, $result->files);
+        $this->assertSame(6, $result->files);
         $this->assertStringStartsWith('PHPStan 2.', $result->engine);
         $view = array_values(array_filter($result->findings, static fn($finding): bool => $finding->file === 'templates/Posts/view.ctp'))[0];
         $this->assertSame('<div><?= $post[\'Post\'][\'body\'] ?></div>', $view->code);
         $this->assertSame('medium', $view->severity);
     }
 
+    public function testScanViewsOfMoreExtensions(): void
+    {
+        $result = (new PhpstanEngine(null, null, ['ctp', 'php', 'html']))->scan(SemgrepEngineTest::APP, ['src', 'templates']);
+
+        $views = array_values(array_filter(SemgrepEngineTest::places($result->findings), static fn(string $place): bool => str_starts_with($place, 'cakephp2-view')));
+        $this->assertSame([
+            'cakephp2-view-unescaped-output templates/Elements/banner.html:1',
+            'cakephp2-view-unescaped-output templates/Posts/edit.ctp:10',
+            'cakephp2-view-unescaped-output templates/Posts/edit.ctp:12',
+            'cakephp2-view-unescaped-output templates/Posts/index.php:2',
+            'cakephp2-view-unescaped-output templates/Posts/view.ctp:2',
+            'cakephp2-view-unescaped-output templates/Posts/view.ctp:3',
+        ], $views);
+        $this->assertSame(7, $result->files);
+    }
+
+    public function testScanWithSafeViewVariables(): void
+    {
+        $result = (new PhpstanEngine(null, null, ['ctp'], ['body_html']))->scan(SemgrepEngineTest::APP, ['templates']);
+
+        $this->assertNotContains('cakephp2-view-unescaped-output templates/Posts/edit.ctp:10', SemgrepEngineTest::places($result->findings));
+        $this->assertContains('cakephp2-view-unescaped-output templates/Posts/edit.ctp:12', SemgrepEngineTest::places($result->findings));
+    }
+
     public function testConfig(): void
     {
-        $neon = PhpstanEngine::config('/app', ['src', 'templates'], ['vendor', "it's"]);
+        $app = (string)realpath(SemgrepEngineTest::APP);
+        mkdir($app . DS . "it's");
+        try {
+            $neon = PhpstanEngine::config($app, ['src', 'templates'], ['vendor', "it's"]);
+        } finally {
+            rmdir($app . DS . "it's");
+        }
 
         $this->assertStringContainsString('rules.neon', $neon);
         $this->assertStringContainsString("    level: 0\n", $neon);
-        $this->assertStringContainsString("        - '/app/src'\n        - '/app/templates'\n", $neon);
-        $this->assertStringContainsString("            - '/app/vendor (?)'\n            - '/app/it''s (?)'\n", $neon);
+        $this->assertStringContainsString("        arguments: [['ctp', 'php'], []]\n", $neon);
+        $this->assertStringContainsString("    fileExtensions:\n        - 'php'\n        - 'ctp'\n", $neon);
+        $this->assertStringContainsString("        - '{$app}/src'\n        - '{$app}/templates'\n", $neon);
+        // Only the paths that exist are left out
+        $this->assertStringContainsString("        analyseAndScan:\n            - '{$app}/it''s'\n", $neon);
+        $this->assertStringNotContainsString('/vendor', $neon);
     }
 
     public function testCountFiles(): void
     {
-        $this->assertSame(3, PhpstanEngine::countFiles(SemgrepEngineTest::APP, ['src', 'templates']));
-        $this->assertSame(2, PhpstanEngine::countFiles(SemgrepEngineTest::APP, ['src', 'templates'], ['src/Model']));
+        $this->assertSame(6, PhpstanEngine::countFiles(SemgrepEngineTest::APP, ['src', 'templates']));
+        $this->assertSame(5, PhpstanEngine::countFiles(SemgrepEngineTest::APP, ['src', 'templates'], ['src/Model']));
+        $this->assertSame(7, PhpstanEngine::countFiles(SemgrepEngineTest::APP, ['src', 'templates'], [], ['ctp', 'php', 'html']));
         $this->assertSame(1, PhpstanEngine::countFiles(SemgrepEngineTest::APP, ['templates/Posts/view.ctp']));
     }
 
