@@ -1,0 +1,45 @@
+# .github/workflows/security-sast.yml: static application security testing of the code, as a PDF report
+name: Security (SAST)
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  schedule:
+    # Every Monday: the rules of the Semgrep Registry change
+    - cron: '0 0 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  sast:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - run: composer install --no-interaction --no-progress
+
+      # Japanese fonts for a Japanese report
+      - run: sudo apt-get install -y fonts-noto-cjk
+
+      # Semgrep runs in Docker, which the Ubuntu runners have
+      - name: Scan the code
+        run: vendor/bin/security-sast --pdf=tmp/security-sast.pdf --fail-on=high --language=ja
+
+      - name: Upload the report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          path: tmp/security-sast.pdf
+          archive: false
+          retention-days: 30

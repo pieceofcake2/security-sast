@@ -1,0 +1,36 @@
+{
+    "name": "pieceofcake2/security-sast",
+    "description": "Static application security testing of a CakePHP 2 application with Semgrep or PHPStan, as a PDF report by rule and risk",
+    "type": "library",
+    "keywords": ["security", "sast", "semgrep", "phpstan", "cakephp", "cakephp2", "owasp", "report", "pdf"],
+    "license": "MIT",
+    "homepage": "https://pieceofcake2.github.io/security-sast/",
+    "require": {
+        "php": ">=8.0",
+        "phpstan/phpstan": "^2.1",
+        "pieceofcake2/report": "^1.0"
+    },
+    "require-dev": {
+        "cakephp/cakephp-codesniffer": "^5.0",
+        "phpunit/phpunit": "^9.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "PieceOfCake2\\SecuritySast\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PieceOfCake2\\SecuritySast\\Test\\": "tests/TestCase/"
+        }
+    },
+    "bin": [
+        "bin/security-sast"
+    ],
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    }
+}

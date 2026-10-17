@@ -1,0 +1,165 @@
+# Semgrep rules for CakePHP 2 applications (pieceofcake2/security-sast)
+rules:
+  - id: cakephp2-query-concatenation
+    languages: [php]
+    severity: ERROR
+    message: >-
+      SQL built from a string with a variable is passed to Model::query(). Use the values array of query()
+      ($this->Model->query('... WHERE id = ?', [$id])) or find() with conditions arrays.
+    pattern-either:
+      - patterns:
+          - pattern: $M->query($V, ...)
+          - pattern-not: $this->request->query(...)
+          - metavariable-pattern:
+              metavariable: $V
+              pattern-either:
+                - pattern: '"..." . $X'
+                - pattern: '$X . "..."'
+      - patterns:
+          - pattern: $M->query($V, ...)
+          - pattern-not: $this->request->query(...)
+          # A double-quoted string with a variable in it
+          - metavariable-regex:
+              metavariable: $V
+              regex: '\A"(?:[^"\\]|\\.)*\$[A-Za-z_{]'
+    metadata:
+      cwe: ["CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"]
+      owasp: ["A03:2021 - Injection"]
+      category: security
+      confidence: MEDIUM
+
+  - id: cakephp2-conditions-string
+    languages: [php]
+    severity: ERROR
+    message: >-
+      A conditions string with a variable is passed to find(). Use a conditions array
+      (['Post.title' => $title]) so that the value is escaped.
+    pattern-either:
+      - patterns:
+          - pattern: "['conditions' => $V, ...]"
+          - metavariable-pattern:
+              metavariable: $V
+              pattern-either:
+                - pattern: '"..." . $X'
+                - pattern: '$X . "..."'
+      - patterns:
+          - pattern: "['conditions' => $V, ...]"
+          # A double-quoted string with a variable in it
+          - metavariable-regex:
+              metavariable: $V
+              regex: '\A"(?:[^"\\]|\\.)*\$[A-Za-z_{]'
+      - patterns:
+          - pattern: "['conditions' => [..., $V, ...], ...]"
+          - metavariable-pattern:
+              metavariable: $V
+              pattern-either:
+                - pattern: '"..." . $X'
+                - pattern: '$X . "..."'
+      - patterns:
+          - pattern: "['conditions' => [..., $V, ...], ...]"
+          # A double-quoted string with a variable in it
+          - metavariable-regex:
+              metavariable: $V
+              regex: '\A"(?:[^"\\]|\\.)*\$[A-Za-z_{]'
+    metadata:
+      cwe: ["CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"]
+      owasp: ["A03:2021 - Injection"]
+      category: security
+      confidence: MEDIUM
+
+  - id: cakephp2-redirect-request
+    languages: [php]
+    severity: WARNING
+    message: >-
+      A value of the request is passed to redirect(). Redirect only to paths of the application, e.g. with
+      Router::url() of a route array, or check the URL against a list.
+    pattern-either:
+      - pattern: $this->redirect(<... $this->request->$P ...>, ...)
+      - pattern: $this->redirect(<... $_GET ...>, ...)
+      - pattern: $this->redirect(<... $_POST ...>, ...)
+      - pattern: $this->redirect(<... $_REQUEST ...>, ...)
+    metadata:
+      cwe: ["CWE-601: URL Redirection to Untrusted Site ('Open Redirect')"]
+      owasp: ["A01:2021 - Broken Access Control"]
+      category: security
+      confidence: HIGH
+
+  - id: cakephp2-render-request
+    languages: [php]
+    severity: ERROR
+    message: >-
+      A value of the request is passed to render() or element(). A path in it can render any template. Map the
+      value to a list of allowed views.
+    pattern-either:
+      - pattern: $this->render(<... $this->request->$P ...>, ...)
+      - pattern: $this->element(<... $this->request->$P ...>, ...)
+      - pattern: $this->render(<... $_GET ...>, ...)
+      - pattern: $this->render(<... $_POST ...>, ...)
+    metadata:
+      cwe: ["CWE-22: Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal')"]
+      owasp: ["A01:2021 - Broken Access Control"]
+      category: security
+      confidence: HIGH
+
+  - id: cakephp2-xml-build-variable
+    languages: [php]
+    severity: WARNING
+    message: >-
+      Xml::build() is called with a variable: a URL or a path in it is read. Pass ['readFile' => false] for a
+      string of XML, and do not pass values of the request.
+    patterns:
+      - pattern: Xml::build($X, ...)
+      - pattern-not: Xml::build("...", ...)
+      - pattern-not: Xml::build($X, [..., 'readFile' => false, ...])
+    metadata:
+      cwe: ["CWE-918: Server-Side Request Forgery (SSRF)"]
+      owasp: ["A10:2021 - Server-Side Request Forgery (SSRF)"]
+      category: security
+      confidence: MEDIUM
+
+  - id: cakephp2-unserialize-request
+    languages: [php]
+    severity: ERROR
+    message: >-
+      A value of the request is passed to unserialize(): it can create objects of any class. Use json_decode().
+    pattern-either:
+      - pattern: unserialize(<... $this->request->$P ...>, ...)
+      - pattern: unserialize(<... $_GET ...>, ...)
+      - pattern: unserialize(<... $_POST ...>, ...)
+      - pattern: unserialize(<... $_COOKIE ...>, ...)
+      - pattern: unserialize(<... $_REQUEST ...>, ...)
+    metadata:
+      cwe: ["CWE-502: Deserialization of Untrusted Data"]
+      owasp: ["A08:2021 - Software and Data Integrity Failures"]
+      category: security
+      confidence: HIGH
+
+  - id: cakephp2-security-csrf-disabled
+    languages: [php]
+    severity: WARNING
+    message: >-
+      The CSRF check or the form tampering check of SecurityComponent is turned off. Turn it off only for the
+      actions that need it, e.g. with unlockedActions.
+    pattern-either:
+      - pattern: $this->Security->csrfCheck = false;
+      - pattern: $this->Security->validatePost = false;
+    metadata:
+      cwe: ["CWE-352: Cross-Site Request Forgery (CSRF)"]
+      owasp: ["A01:2021 - Broken Access Control"]
+      category: security
+      confidence: MEDIUM
+
+  - id: cakephp2-view-unescaped-output
+    languages: [generic]
+    severity: WARNING
+    message: >-
+      A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.
+    pattern-regex: <\?(?:=|php\s+echo)\s+\$(?!this->)[A-Za-z_][^;?]*(?:;|\?>)
+    paths:
+      include:
+        - "*.ctp"
+    metadata:
+      cwe: ["CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"]
+      owasp: ["A03:2021 - Injection"]
+      category: security
+      confidence: LOW

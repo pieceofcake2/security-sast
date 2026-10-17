@@ -1,0 +1,14 @@
+# The security rules of pieceofcake2/security-sast for CakePHP 2 applications
+parameters:
+    fileExtensions:
+        - php
+        - ctp
+rules:
+    - PieceOfCake2\SecuritySast\PHPStan\ConditionsStringRule
+    - PieceOfCake2\SecuritySast\PHPStan\QueryConcatenationRule
+    - PieceOfCake2\SecuritySast\PHPStan\RedirectRequestRule
+    - PieceOfCake2\SecuritySast\PHPStan\RenderRequestRule
+    - PieceOfCake2\SecuritySast\PHPStan\SecurityCsrfDisabledRule
+    - PieceOfCake2\SecuritySast\PHPStan\UnserializeRequestRule
+    - PieceOfCake2\SecuritySast\PHPStan\ViewUnescapedOutputRule
+    - PieceOfCake2\SecuritySast\PHPStan\XmlBuildVariableRule
