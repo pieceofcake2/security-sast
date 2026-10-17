@@ -124,6 +124,13 @@ final class Command
             $config->pdf,
         ));
 
+        // The configuration was not checked: the report says so, and the run does not pass
+        if ($config->configCheck && $loadError !== null) {
+            fwrite($this->stderr, sprintf("security-sast: the configuration was not checked: %s\nFix the error, or turn the check off with --config-check=0.\n", $loadError));
+
+            return self::ERROR;
+        }
+
         return $result->fails($config->failOn) ? self::FAILURE : self::SUCCESS;
     }
 

@@ -58,12 +58,27 @@ class PhpstanEngineTest extends TestCase
 
         $this->assertStringContainsString('rules.neon', $neon);
         $this->assertStringContainsString("    level: 0\n", $neon);
-        $this->assertStringContainsString("        arguments: [['ctp', 'php'], []]\n", $neon);
+        $this->assertStringContainsString("        arguments: [['ctp', 'php'], [], '{$app}']\n", $neon);
         $this->assertStringContainsString("    fileExtensions:\n        - 'php'\n        - 'ctp'\n", $neon);
         $this->assertStringContainsString("        - '{$app}/src'\n        - '{$app}/templates'\n", $neon);
         // Only the paths that exist are left out
         $this->assertStringContainsString("        analyseAndScan:\n            - '{$app}/it''s'\n", $neon);
         $this->assertStringNotContainsString('/vendor', $neon);
+    }
+
+    public function testProjectInADirectoryOfViews(): void
+    {
+        // The directories of the project itself are not those of views
+        $project = TMP . 'templates' . DS . 'app';
+        is_dir($project . DS . 'src') || mkdir($project . DS . 'src', 0777, true);
+        file_put_contents($project . DS . 'src' . DS . 'Export.php', "<?php\n\$csv = 'id';\necho \$csv;\n");
+        $temp = glob(sys_get_temp_dir() . DS . 'security-sast-*');
+
+        $result = (new PhpstanEngine())->scan($project, ['src']);
+
+        $this->assertSame([], $result->findings);
+        // No temporary file is left
+        $this->assertSame($temp, glob(sys_get_temp_dir() . DS . 'security-sast-*'));
     }
 
     public function testCountFiles(): void

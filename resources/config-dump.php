@@ -46,7 +46,8 @@ try {
         'salt' => $secret(Configure::read('Security.salt')),
         'cipherSeed' => $secret(Configure::read('Security.cipherSeed')),
         'cookieType' => Configure::read('Cookie.type'),
-        'cookieKey' => $secret(Configure::read('Cookie.key')),
+        // CookieComponent uses Security.salt when Cookie.key is empty
+        'cookieKey' => Configure::read('Cookie.key') === '' ? null : $secret(Configure::read('Cookie.key')),
         'useOpenSsl' => (bool)Configure::read('Security.useOpenSsl'),
         'sessionHttpOnly' => array_key_exists('session.cookie_httponly', $ini) ? (bool)$ini['session.cookie_httponly'] : null,
         'sessionSecure' => array_key_exists('session.cookie_secure', $ini) ? (bool)$ini['session.cookie_secure'] : null,

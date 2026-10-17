@@ -32,7 +32,7 @@ final class RuleCatalog
             'cwe' => [self::SQL],
             'owasp' => ['A03:2021 - Injection'],
             'confidence' => 'MEDIUM',
-            'message' => "A conditions string with a variable is passed to find(). Use a conditions array (['Post.title' => \$title]) so that the value is escaped.",
+            'message' => "A conditions string with a variable is passed to find(), deleteAll() or updateAll(). Use a conditions array (['Post.title' => \$title]) so that the value is escaped.",
         ],
         'cakephp2-redirect-request' => [
             'identifier' => 'securitySast.redirectRequest',

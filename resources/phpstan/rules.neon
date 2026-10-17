@@ -2,6 +2,7 @@
 # PieceOfCake2\SecuritySast\PHPStan\ViewUnescapedOutputRule, is added by PhpstanEngine with the extensions of the
 # views, which are also scanned (fileExtensions).
 rules:
+    - PieceOfCake2\SecuritySast\PHPStan\ConditionsArgumentRule
     - PieceOfCake2\SecuritySast\PHPStan\ConditionsStringRule
     - PieceOfCake2\SecuritySast\PHPStan\QueryConcatenationRule
     - PieceOfCake2\SecuritySast\PHPStan\RedirectRequestRule

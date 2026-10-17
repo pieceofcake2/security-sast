@@ -10,6 +10,7 @@ use PieceOfCake2\Report\PdfPrinter;
 use PieceOfCake2\Report\ReportWriter;
 use PieceOfCake2\SecuritySast\Command;
 use PieceOfCake2\SecuritySast\Config;
+use PieceOfCake2\SecuritySast\ConfigCheck;
 use PieceOfCake2\SecuritySast\PhpstanEngine;
 
 class CommandTest extends TestCase
@@ -140,7 +141,7 @@ class CommandTest extends TestCase
         $output = '';
         try {
             $this->assertSame(Command::FAILURE, self::runCommand(['--pdf=' . $pdf], $output));
-            $this->assertStringContainsString('15 findings (5 high, 10 medium) of 8 rules in 6 files (PHPStan 2.', $output);
+            $this->assertStringContainsString('23 findings (12 high, 11 medium) of 8 rules in 6 files (PHPStan 2.', $output);
             $this->assertStringStartsWith('%PDF', (string)file_get_contents($pdf));
 
             $this->assertSame(Command::SUCCESS, self::runCommand(['--pdf=' . $pdf, '--fail-on=critical']));
@@ -150,6 +151,32 @@ class CommandTest extends TestCase
                 rmdir(dirname($pdf));
             }
         }
+    }
+
+    public function testRunWhenTheConfigurationCannotBeLoaded(): void
+    {
+        if (PdfPrinter::findChrome() === null && empty($_SERVER['REPORT_CHROME_BINARY'])) {
+            $this->markTestSkipped('Chrome is not installed.');
+        }
+        $project = TMP . 'broken';
+        foreach (['config', 'vendor', 'src'] as $dir) {
+            is_dir($project . DS . $dir) || mkdir($project . DS . $dir, 0777, true);
+        }
+        file_put_contents($project . DS . 'config' . DS . 'core.php', "<?php\n");
+        file_put_contents($project . DS . 'vendor' . DS . 'autoload.php', "<?php\n");
+        file_put_contents($project . DS . 'src' . DS . 'A.php', "<?php\n");
+        $stdout = fopen('php://memory', 'w+');
+        $stderr = fopen('php://memory', 'w+');
+        $check = new ConfigCheck('prod', static fn(array $command, string $dir, array $env): array => [0, '{"error":"Error: Class not found"}', '']);
+        $command = new Command($stdout, $stderr, new PhpstanEngine(), new ReportWriter(PdfPrinter::fromEnv($_SERVER)), new Environment(), $check);
+
+        // The report is written, but the run does not pass
+        $code = $command->run(['--project=' . $project, '--pdf=' . $project . DS . 'report.pdf', '--fail-on=none']);
+
+        rewind($stderr);
+        $this->assertSame(Command::ERROR, $code);
+        $this->assertStringContainsString('the configuration was not checked: The configuration could not be loaded: Error: Class not found', (string)stream_get_contents($stderr));
+        $this->assertFileExists($project . DS . 'report.pdf');
     }
 
     public function testRunWithAnInvalidOption(): void

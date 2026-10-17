@@ -38,8 +38,10 @@ final class ViewUnescapedOutputRule implements Rule
      *
      * @param array<string> $extensions Extensions of the views, without the dot
      * @param array<string> $safeVariables Variables that the views may print without h(), e.g. `body_html`
+     * @param string $project Directory of the project: the directories of views are those of the paths in it, not
+     *  those of the project itself, e.g. /home/templates/app
      */
-    public function __construct(private array $extensions = Views::EXTENSIONS, private array $safeVariables = [])
+    public function __construct(private array $extensions = Views::EXTENSIONS, private array $safeVariables = [], private string $project = '')
     {
     }
 
@@ -56,7 +58,12 @@ final class ViewUnescapedOutputRule implements Rule
      */
     public function processNode(Node $node, Scope $scope): array
     {
-        if (!Views::isView($scope->getFile(), $this->extensions)) {
+        $file = $scope->getFile();
+        $prefix = rtrim($this->project, '/\\') . DIRECTORY_SEPARATOR;
+        if ($this->project !== '' && str_starts_with($file, $prefix)) {
+            $file = substr($file, strlen($prefix));
+        }
+        if (!Views::isView($file, $this->extensions)) {
             return [];
         }
         $safeNames = array_merge(Views::SAFE_VARIABLES, array_map(static fn(string $name): string => ltrim($name, '$'), $this->safeVariables));

@@ -16,14 +16,22 @@ class SemgrepEngineTest extends TestCase
      */
     public const EXPECTED = [
         'cakephp2-conditions-string src/Controller/PostsController.php:22',
+        'cakephp2-conditions-string src/Controller/PostsController.php:53',
+        'cakephp2-conditions-string src/Controller/PostsController.php:54',
+        'cakephp2-conditions-string src/Controller/PostsController.php:60',
         'cakephp2-query-concatenation src/Controller/PostsController.php:19',
         'cakephp2-query-concatenation src/Controller/PostsController.php:20',
+        'cakephp2-query-concatenation src/Controller/PostsController.php:57',
+        'cakephp2-query-concatenation src/Controller/PostsController.php:58',
         'cakephp2-redirect-request src/Controller/PostsController.php:29',
         'cakephp2-redirect-request src/Controller/PostsController.php:34',
+        'cakephp2-redirect-request src/Controller/PostsController.php:71',
         'cakephp2-render-request src/Controller/PostsController.php:39',
+        'cakephp2-render-request src/Controller/PostsController.php:67',
         'cakephp2-security-csrf-disabled src/Controller/PostsController.php:12',
         'cakephp2-security-csrf-disabled src/Controller/PostsController.php:13',
         'cakephp2-unserialize-request src/Controller/PostsController.php:46',
+        'cakephp2-unserialize-request src/Controller/PostsController.php:68',
         'cakephp2-view-unescaped-output templates/Posts/edit.ctp:10',
         'cakephp2-view-unescaped-output templates/Posts/edit.ctp:12',
         'cakephp2-view-unescaped-output templates/Posts/index.php:2',
@@ -61,7 +69,7 @@ class SemgrepEngineTest extends TestCase
         $this->assertStringStartsWith('docker run --rm -v ' . realpath(self::APP) . ':/src:ro -v ', $command);
         $this->assertStringContainsString(':/rules:ro -w /src semgrep/semgrep:1.180.0 semgrep scan --json --metrics=off', $command);
         $this->assertStringContainsString(' --scan-unknown-extensions ', $command);
-        $this->assertStringContainsString('--config /rules/cakephp2.yml --config p/php --config /src/rules/app.yml --include src --include templates --exclude vendor . templates/Posts/edit.ctp templates/Posts/index.php templates/Posts/view.ctp', $command);
+        $this->assertStringContainsString('--config /rules/cakephp2.yml --config p/php --config /src/rules/app.yml --include /src --include /templates --exclude /vendor . templates/Posts/edit.ctp templates/Posts/index.php templates/Posts/view.ctp', $command);
     }
 
     public function testResult(): void
@@ -124,6 +132,36 @@ class SemgrepEngineTest extends TestCase
         $this->expectExceptionMessage('Semgrep failed (exit code 125): Cannot connect to the Docker daemon');
 
         $engine->scan(self::APP, ['src']);
+    }
+
+    public function testFailureOfARule(): void
+    {
+        // A config of the Registry that could not be loaded: Semgrep returns its JSON, with an error
+        $output = (string)json_encode(['results' => [], 'errors' => [['code' => 7, 'level' => 'error', 'type' => 'SemgrepError', 'message' => 'invalid configuration file found (1 configs were invalid)']]]);
+        $engine = new SemgrepEngine(run: static fn(array $command, string $dir): array => [7, $output, '']);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Semgrep failed (exit code 7): SemgrepError: invalid configuration file found (1 configs were invalid)');
+
+        $engine->scan(self::APP, ['src']);
+    }
+
+    public function testFailureWithAnExitCode(): void
+    {
+        $engine = new SemgrepEngine(run: static fn(array $command, string $dir): array => [2, '{"results": [], "errors": []}', 'Killed']);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Semgrep failed (exit code 2): Killed');
+
+        $engine->scan(self::APP, ['src']);
+    }
+
+    public function testWarningsDoNotFail(): void
+    {
+        $output = (string)json_encode(['results' => [], 'errors' => [['level' => 'warn', 'type' => 'Syntax error', 'message' => 'at line 3']]]);
+        $engine = new SemgrepEngine(run: static fn(array $command, string $dir): array => [0, $output, '']);
+
+        $this->assertSame(['Syntax error: at line 3'], $engine->scan(self::APP, ['src'])->errors);
     }
 
     /**
