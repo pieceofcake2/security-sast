@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Unreleased
+## 1.0.0
 
 - First release: `vendor/bin/security-sast` scans the code of a CakePHP 2 application with Semgrep (in Docker,
   with the PHP rules of the Semgrep Registry) or PHPStan, with 8 security rules for CakePHP 2, and writes a PDF
