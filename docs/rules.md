@@ -21,6 +21,11 @@ vulnerability. A value "of the request" is `$this->request` (its `query()`, `dat
 `$_GET`, `$_POST`, `$_REQUEST`, `$_COOKIE` and `$_FILES`. See [Fixing the Findings](fixing.md) for the way
 through a report, and [The Configuration](#the-configuration) for the rules of the settings.
 
+A string "with a variable" is a concatenation with a value that is not a string literal (a variable, a constant,
+a call), or a double-quoted string with a variable in it; a concatenation in the arguments of a call, e.g. of
+`sprintf()`, is not one. The `(string)` casts of the fixes below keep an array of the request, e.g.
+`?sort[]=x`, from failing the action. Semgrep and PHPStan find the same places with the rules of this package.
+
 ## cakephp2-query-concatenation
 
 SQL built from a string with a variable, by concatenation or in a double-quoted string, passed to
@@ -49,7 +54,7 @@ the SQL:
 
 ```php
 $columns = ['title' => 'Post.title', 'created' => 'Post.created'];
-$sort = $columns[$this->request->query('sort')] ?? 'Post.created';
+$sort = $columns[(string)$this->request->query('sort')] ?? 'Post.created';
 $direction = $this->request->query('direction') === 'asc' ? 'ASC' : 'DESC';
 $posts = $this->Post->find('all', ['order' => [$sort => $direction]]);
 ```
@@ -67,7 +72,8 @@ sends SQL to the parameters of the pages.
 ## cakephp2-conditions-string
 
 A conditions string with a variable, as `'conditions' => "..."` or as an item of a conditions array without a
-key, e.g. in the options of `find()`, of `paginate`, of `updateAll()` or `deleteAll()`.
+key, e.g. in the options of `find()` or of `paginate`, or as the conditions of `deleteAll()` (its first argument)
+and `updateAll()` (its second argument).
 
 **Why it matters.** CakePHP escapes the values of a conditions array, `['Post.title' => $title]`, but takes a
 string as SQL: the same SQL injection as with `query()`.
@@ -106,7 +112,7 @@ echo $this->element($this->request->params['pass'][0]);
 
 // Fixed: map the value to the allowed views
 $pages = ['terms' => 'terms', 'privacy' => 'privacy'];
-$page = $pages[$this->request->query('page')] ?? null;
+$page = $pages[(string)$this->request->query('page')] ?? null;
 if ($page === null) {
     throw new NotFoundException();
 }
@@ -330,9 +336,12 @@ breaks:
 
 - **The passwords of the `Simple` hasher of `AuthComponent`** (the default): it hashes `salt . password`, so
   no user can log in with the new salt. Move to the `Blowfish` hasher first (below).
-- **The values of `Security::encrypt()`**, the `aes` cookies of `CookieComponent` too: their HMAC uses the salt
-  (and their key is the salt when `Cookie.key` is not set). They can no longer be read: the users lose these
-  cookies once, and the data encrypted in the database must be decrypted and encrypted again.
+- **The values of `Security::encrypt()`**: their HMAC uses the salt. They can no longer be read: the data
+  encrypted in the database must be decrypted and encrypted again.
+- **The cookies of `CookieComponent`** (`aes`, `rijndael` and `cipher`) when `Cookie.key` is not set or empty:
+  their key is the salt. The users lose these cookies once (and log in again for "remember me").
+- **The sessions**, with `Session.checkAgent` (the default): CakePHP checks a hash of the user agent and the
+  salt, so every user is logged out once.
 - **The forms open at the time of the change** are black-holed once; the users send them again.
 
 To move the passwords, use a hasher that checks the old hashes and makes new ones with Blowfish, and keep the
@@ -391,9 +400,14 @@ Configure::write('Security.useOpenSsl', true);
 The `cipher` cookies cannot be read after the switch: the values in them are lost once (e.g. "remember me"
 logs out, a cart is emptied). Plan the switch with a release.
 
+`rijndael` passes this rule, but it needs the mcrypt extension, which is not bundled with PHP 7.2+: move it to
+`aes` as well. Its cookies cannot be read with `aes` either.
+
 ### cakephp2-config-cookie-key
 
-`Cookie.key`, the key of the `aes` cookies, is a sample of the documentation or shorter than 32 bytes. Anyone
+`Cookie.key`, the key of the `aes` and `rijndael` cookies, is a sample of the documentation or shorter than 32
+bytes. When it is not set or empty, the key is `Security.salt`, which
+[cakephp2-config-salt](#cakephp2-config-salt) checks. Anyone
 who knows the key can read and forge the cookies, e.g. a "remember me" cookie with the id of another user.
 
 Set `COOKIE_KEY` in the environment of production to a random value of 32 bytes or more. The cookies encrypted
@@ -422,5 +436,5 @@ Behind a proxy that ends HTTPS, CakePHP sets `Secure` only when it sees the requ
 
 `Security.useOpenSsl` is not `true`: `Security::encrypt()` and the `aes` cookies use mcrypt, which is not
 maintained and not bundled with PHP 7.2+. Set `Security.useOpenSsl` to `true`. The OpenSSL implementation of
-CakePHP is compatible with the one of mcrypt (AES-128-CBC): the values encrypted before the switch are read
+CakePHP is compatible with the one of mcrypt (AES-256-CBC: Rijndael-128 with a key of 32 bytes): the values encrypted before the switch are read
 after it.

@@ -47,7 +47,8 @@ final class PhpstanEngine implements Engine
     {
         $project = (string)realpath($project);
         $phpstan = $this->phpstan ?? (string)InstalledVersions::getInstallPath('phpstan/phpstan') . DIRECTORY_SEPARATOR . 'phpstan';
-        $config = tempnam(sys_get_temp_dir(), 'security-sast-') . '.neon';
+        // A name of its own: PHPStan reads the configuration by its extension, .neon
+        $config = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'security-sast-' . bin2hex(random_bytes(6)) . '.neon';
         file_put_contents($config, self::config($project, $paths, $exclude, $this->viewExtensions, $this->safeViewVariables));
         try {
             [$code, $output, $error] = ($this->run)([PHP_BINARY, $phpstan, 'analyse', '--configuration=' . $config, '--error-format=json', '--no-progress', '--no-interaction', '--memory-limit=1G'], $project);
@@ -84,7 +85,7 @@ final class PhpstanEngine implements Engine
     {
         $neon = "includes:\n    - " . self::neon((string)realpath(self::RULES)) . "\n";
         $neon .= "services:\n    -\n        class: PieceOfCake2\\SecuritySast\\PHPStan\\ViewUnescapedOutputRule\n";
-        $neon .= '        arguments: [[' . implode(', ', array_map([self::class, 'neon'], $viewExtensions)) . '], [' . implode(', ', array_map([self::class, 'neon'], $safeViewVariables)) . "]]\n        tags: [phpstan.rules.rule]\n";
+        $neon .= '        arguments: [[' . implode(', ', array_map([self::class, 'neon'], $viewExtensions)) . '], [' . implode(', ', array_map([self::class, 'neon'], $safeViewVariables)) . '], ' . self::neon($project) . "]\n        tags: [phpstan.rules.rule]\n";
         $neon .= "parameters:\n    level: 0\n    reportUnmatchedIgnoredErrors: false\n    fileExtensions:\n";
         foreach (array_unique(array_merge(['php'], $viewExtensions)) as $extension) {
             $neon .= '        - ' . self::neon($extension) . "\n";

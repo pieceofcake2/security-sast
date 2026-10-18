@@ -149,7 +149,7 @@ final class ConfigCheck
             $add('cakephp2-config-cookie-cipher', "'Cookie.type'");
         }
         $key = is_array($values['cookieKey'] ?? null) ? $values['cookieKey'] : null;
-        if (($values['cookieType'] ?? null) === 'aes' && $key !== null && ((int)$key['length'] < 32 || self::isKnown($key, self::KNOWN_COOKIE_KEYS))) {
+        if (!$cipher && $key !== null && ((int)$key['length'] < 32 || self::isKnown($key, self::KNOWN_COOKIE_KEYS))) {
             $add('cakephp2-config-cookie-key', "'Cookie.key'");
         }
         if (empty($values['useOpenSsl'])) {

@@ -10,18 +10,26 @@ rules:
       - patterns:
           - pattern: $M->query($V, ...)
           - pattern-not: $this->request->query(...)
+          # A concatenation with a value that is not a string literal, as the value itself (not in a call)
           - metavariable-pattern:
               metavariable: $V
-              pattern-either:
-                - pattern: '"..." . $X'
-                - pattern: '$X . "..."'
+              patterns:
+                - pattern: $A . $B
+                - pattern-not-inside: $F(...)
+                - pattern-not-inside: $O->$F(...)
+                - pattern-not-inside: $C::$F(...)
+                - pattern-not-inside: '[...]'
+          # Not an item with a key, and not of string literals only
+          - metavariable-regex:
+              metavariable: $V
+              regex: '\A(?!\s*(?:''(?:[^''\\]|\\.)*''|"(?:[^"\\]|\\.)*")\s*=>)(?!\s*(?:''(?:[^''\\]|\\.)*''|"(?:[^"\\$]|\\.)*"|\d+(?:\.\d+)?)(?:\s*\.\s*(?:''(?:[^''\\]|\\.)*''|"(?:[^"\\$]|\\.)*"|\d+(?:\.\d+)?))*\s*\z)'
       - patterns:
           - pattern: $M->query($V, ...)
           - pattern-not: $this->request->query(...)
-          # A double-quoted string with a variable in it
+          # A double-quoted string with a variable in it, not an item with a key
           - metavariable-regex:
               metavariable: $V
-              regex: '\A"(?:[^"\\]|\\.)*\$[A-Za-z_{]'
+              regex: '\A(?!\s*(?:''(?:[^''\\]|\\.)*''|"(?:[^"\\]|\\.)*")\s*=>)"(?:[^"\\]|\\.)*\$[A-Za-z_{]'
     metadata:
       cwe: ["CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"]
       owasp: ["A03:2021 - Injection"]
@@ -32,35 +40,38 @@ rules:
     languages: [php]
     severity: ERROR
     message: >-
-      A conditions string with a variable is passed to find(). Use a conditions array
+      A conditions string with a variable is passed to find(), deleteAll() or updateAll(). Use a conditions array
       (['Post.title' => $title]) so that the value is escaped.
     pattern-either:
       - patterns:
-          - pattern: "['conditions' => $V, ...]"
+          - pattern-either:
+              - pattern: "['conditions' => $V, ...]"
+              - pattern: "['conditions' => [..., $V, ...], ...]"
+              - pattern: $M->deleteAll($V, ...)
+              - pattern: $M->updateAll($F, $V, ...)
+          # A concatenation with a value that is not a string literal, as the value itself (not in a call)
           - metavariable-pattern:
               metavariable: $V
-              pattern-either:
-                - pattern: '"..." . $X'
-                - pattern: '$X . "..."'
-      - patterns:
-          - pattern: "['conditions' => $V, ...]"
-          # A double-quoted string with a variable in it
+              patterns:
+                - pattern: $A . $B
+                - pattern-not-inside: $F(...)
+                - pattern-not-inside: $O->$F(...)
+                - pattern-not-inside: $C::$F(...)
+                - pattern-not-inside: '[...]'
+          # Not an item with a key, and not of string literals only
           - metavariable-regex:
               metavariable: $V
-              regex: '\A"(?:[^"\\]|\\.)*\$[A-Za-z_{]'
+              regex: '\A(?!\s*(?:''(?:[^''\\]|\\.)*''|"(?:[^"\\]|\\.)*")\s*=>)(?!\s*(?:''(?:[^''\\]|\\.)*''|"(?:[^"\\$]|\\.)*"|\d+(?:\.\d+)?)(?:\s*\.\s*(?:''(?:[^''\\]|\\.)*''|"(?:[^"\\$]|\\.)*"|\d+(?:\.\d+)?))*\s*\z)'
       - patterns:
-          - pattern: "['conditions' => [..., $V, ...], ...]"
-          - metavariable-pattern:
-              metavariable: $V
-              pattern-either:
-                - pattern: '"..." . $X'
-                - pattern: '$X . "..."'
-      - patterns:
-          - pattern: "['conditions' => [..., $V, ...], ...]"
-          # A double-quoted string with a variable in it
+          - pattern-either:
+              - pattern: "['conditions' => $V, ...]"
+              - pattern: "['conditions' => [..., $V, ...], ...]"
+              - pattern: $M->deleteAll($V, ...)
+              - pattern: $M->updateAll($F, $V, ...)
+          # A double-quoted string with a variable in it, not an item with a key
           - metavariable-regex:
               metavariable: $V
-              regex: '\A"(?:[^"\\]|\\.)*\$[A-Za-z_{]'
+              regex: '\A(?!\s*(?:''(?:[^''\\]|\\.)*''|"(?:[^"\\]|\\.)*")\s*=>)"(?:[^"\\]|\\.)*\$[A-Za-z_{]'
     metadata:
       cwe: ["CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"]
       owasp: ["A03:2021 - Injection"]
@@ -73,11 +84,14 @@ rules:
     message: >-
       A value of the request is passed to redirect(). Redirect only to paths of the application, e.g. with
       Router::url() of a route array, or check the URL against a list.
+    # The values of the request, as PHPStan finds them: $this->request and the superglobals of the request
     pattern-either:
       - pattern: $this->redirect(<... $this->request->$P ...>, ...)
       - pattern: $this->redirect(<... $_GET ...>, ...)
       - pattern: $this->redirect(<... $_POST ...>, ...)
       - pattern: $this->redirect(<... $_REQUEST ...>, ...)
+      - pattern: $this->redirect(<... $_COOKIE ...>, ...)
+      - pattern: $this->redirect(<... $_FILES ...>, ...)
     metadata:
       cwe: ["CWE-601: URL Redirection to Untrusted Site ('Open Redirect')"]
       owasp: ["A01:2021 - Broken Access Control"]
@@ -90,11 +104,20 @@ rules:
     message: >-
       A value of the request is passed to render() or element(). A path in it can render any template. Map the
       value to a list of allowed views.
+    # The values of the request, as PHPStan finds them: $this->request and the superglobals of the request
     pattern-either:
       - pattern: $this->render(<... $this->request->$P ...>, ...)
-      - pattern: $this->element(<... $this->request->$P ...>, ...)
       - pattern: $this->render(<... $_GET ...>, ...)
       - pattern: $this->render(<... $_POST ...>, ...)
+      - pattern: $this->render(<... $_REQUEST ...>, ...)
+      - pattern: $this->render(<... $_COOKIE ...>, ...)
+      - pattern: $this->render(<... $_FILES ...>, ...)
+      - pattern: $this->element(<... $this->request->$P ...>, ...)
+      - pattern: $this->element(<... $_GET ...>, ...)
+      - pattern: $this->element(<... $_POST ...>, ...)
+      - pattern: $this->element(<... $_REQUEST ...>, ...)
+      - pattern: $this->element(<... $_COOKIE ...>, ...)
+      - pattern: $this->element(<... $_FILES ...>, ...)
     metadata:
       cwe: ["CWE-22: Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal')"]
       owasp: ["A01:2021 - Broken Access Control"]
@@ -122,12 +145,14 @@ rules:
     severity: ERROR
     message: >-
       A value of the request is passed to unserialize(): it can create objects of any class. Use json_decode().
+    # The values of the request, as PHPStan finds them: $this->request and the superglobals of the request
     pattern-either:
       - pattern: unserialize(<... $this->request->$P ...>, ...)
       - pattern: unserialize(<... $_GET ...>, ...)
       - pattern: unserialize(<... $_POST ...>, ...)
-      - pattern: unserialize(<... $_COOKIE ...>, ...)
       - pattern: unserialize(<... $_REQUEST ...>, ...)
+      - pattern: unserialize(<... $_COOKIE ...>, ...)
+      - pattern: unserialize(<... $_FILES ...>, ...)
     metadata:
       cwe: ["CWE-502: Deserialization of Untrusted Data"]
       owasp: ["A08:2021 - Software and Data Integrity Failures"]

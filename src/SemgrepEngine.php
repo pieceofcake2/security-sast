@@ -78,14 +78,15 @@ final class SemgrepEngine implements Engine
             $command[] = self::isLocal($config) ? '/src/' . ltrim($config, '/') : $config;
         }
         // The project is the target, so that the paths of the rules (e.g. templates/ of the views) are relative to
-        // it; the paths to scan are included
+        // it; the paths to scan are included. A leading / anchors a pattern to the project: src is not also
+        // plugins/Blog/src
         foreach ($paths as $path) {
             $command[] = '--include';
-            $command[] = $path;
+            $command[] = self::anchored($path);
         }
         foreach ($exclude as $path) {
             $command[] = '--exclude';
-            $command[] = $path;
+            $command[] = self::anchored($path);
         }
         $command[] = '.';
         // The views, given one by one: Semgrep reads a file of an extension it does not know (.ctp) as PHP only
@@ -109,6 +110,12 @@ final class SemgrepEngine implements Engine
         }
         if (!is_array($data)) {
             throw new RuntimeException('Semgrep did not return a JSON object.');
+        }
+        // 0 without and 1 with findings; another code, or an error that is not a warning (e.g. a rule or a config
+        // of the Registry that could not be loaded), means that the scan did not run as configured
+        $fatal = self::errors($data, 'error');
+        if ($code > 1 || $fatal !== []) {
+            throw new RuntimeException(sprintf('Semgrep failed (exit code %d): %s', $code, $fatal !== [] ? implode(' ', $fatal) : trim($error !== '' ? $error : $output)));
         }
 
         return self::result($data, $project);
@@ -182,20 +189,44 @@ final class SemgrepEngine implements Engine
             );
         }
 
-        $errors = [];
-        foreach (is_array($data['errors'] ?? null) ? $data['errors'] : [] as $error) {
-            if (is_array($error)) {
-                $errors[] = trim((string)($error['type'] ?? 'Error') . ': ' . (string)($error['message'] ?? $error['long_msg'] ?? ''));
-            }
-        }
         $scanned = $data['paths']['scanned'] ?? [];
 
         return new ScanResult(
             $findings,
             is_array($scanned) ? count($scanned) : 0,
             'Semgrep' . (is_string($data['version'] ?? null) ? ' ' . $data['version'] : ''),
-            $errors,
+            self::errors($data),
         );
+    }
+
+    /**
+     * The errors of the JSON of Semgrep
+     *
+     * @param array<string, mixed> $data JSON
+     * @param string|null $level Only the errors of this level (`error`, `warn`), default: all
+     * @return array<string>
+     */
+    public static function errors(array $data, ?string $level = null): array
+    {
+        $errors = [];
+        foreach (is_array($data['errors'] ?? null) ? $data['errors'] : [] as $error) {
+            if (is_array($error) && ($level === null || ($error['level'] ?? null) === $level)) {
+                $errors[] = trim((string)($error['type'] ?? 'Error') . ': ' . trim((string)($error['message'] ?? $error['long_msg'] ?? '')));
+            }
+        }
+
+        return $errors;
+    }
+
+    /**
+     * A path of the project as a pattern of Semgrep anchored to the project
+     *
+     * @param string $path Path, relative to the project
+     * @return string
+     */
+    private static function anchored(string $path): string
+    {
+        return '/' . trim(str_replace('\\', '/', $path), '/');
     }
 
     /**

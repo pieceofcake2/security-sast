@@ -21,6 +21,11 @@
 `$_POST`、`$_REQUEST`、`$_COOKIE`、`$_FILES` のことです。報告書の進め方は [指摘を修正する](fixing.md) を、設定のルールは
 [設定](#設定) をご覧ください。
 
+「変数を含む」文字列とは、文字列リテラルでない値 (変数、定数、呼び出し) との連結か、変数を埋め込んだダブルクォートの
+文字列です。`sprintf()` などの呼び出しの引数の中の連結は含みません。下の修正例の `(string)` のキャストは、`?sort[]=x`
+のようなリクエストの配列でアクションが失敗しないようにするものです。このパッケージのルールでは、Semgrep と PHPStan は
+同じ箇所を見つけます。
+
 ## cakephp2-query-concatenation
 
 連結やダブルクォートの文字列で変数を埋め込んで組み立てた SQL を、`Model::query()` に渡しています。
@@ -47,7 +52,7 @@ $this->Post->find('all', ['conditions' => ['Post.title LIKE' => '%' . $q . '%']]
 
 ```php
 $columns = ['title' => 'Post.title', 'created' => 'Post.created'];
-$sort = $columns[$this->request->query('sort')] ?? 'Post.created';
+$sort = $columns[(string)$this->request->query('sort')] ?? 'Post.created';
 $direction = $this->request->query('direction') === 'asc' ? 'ASC' : 'DESC';
 $posts = $this->Post->find('all', ['order' => [$sort => $direction]]);
 ```
@@ -64,8 +69,8 @@ $posts = $this->Post->find('all', ['order' => [$sort => $direction]]);
 
 ## cakephp2-conditions-string
 
-変数を含む条件の文字列を、`'conditions' => "..."` や、条件の配列のキーのない要素として渡しています。`find()`、
-`paginate`、`updateAll()`、`deleteAll()` のオプションなどです。
+変数を含む条件の文字列を、`'conditions' => "..."` や、条件の配列のキーのない要素として渡しています。`find()` や
+`paginate` のオプション、`deleteAll()` (1 つ目の引数) と `updateAll()` (2 つ目の引数) の条件などです。
 
 **なぜ危ないか。** CakePHP は条件の配列 `['Post.title' => $title]` の値をエスケープしますが、文字列は SQL として
 そのまま使います。`query()` と同じ SQL インジェクションになります。
@@ -103,7 +108,7 @@ echo $this->element($this->request->params['pass'][0]);
 
 // 修正方法: 値を、許可したビューの一覧に対応させる
 $pages = ['terms' => 'terms', 'privacy' => 'privacy'];
-$page = $pages[$this->request->query('page')] ?? null;
+$page = $pages[(string)$this->request->query('page')] ?? null;
 if ($page === null) {
     throw new NotFoundException();
 }
@@ -321,9 +326,12 @@ Cookie、開いているページのフォームなどです。以下の各節�
 
 - **`AuthComponent` の `Simple` ハッシャー (デフォルト) のパスワード**: `salt . password` をハッシュするので、新しい salt
   では誰もログインできなくなります。先に `Blowfish` ハッシャーに移ってください (下記)。
-- **`Security::encrypt()` の値**: `CookieComponent` の `aes` の Cookie もです。HMAC に salt を使う (`Cookie.key` が
-  なければ鍵も salt) ので、読めなくなります。ユーザーはこれらの Cookie を一度失い、データベースで暗号化したデータは
-  復号して暗号化し直す必要があります。
+- **`Security::encrypt()` の値**: HMAC に salt を使うので、読めなくなります。データベースで暗号化したデータは、復号して
+  暗号化し直す必要があります。
+- **`CookieComponent` の Cookie** (`aes`、`rijndael`、`cipher`): `Cookie.key` が未設定か空のときは、鍵が salt です。
+  ユーザーはこれらの Cookie を一度失います (「ログインしたままにする」ならもう一度ログインします)。
+- **セッション**: `Session.checkAgent` (デフォルト) では、CakePHP はユーザーエージェントと salt のハッシュを確かめるので、
+  すべてのユーザーが一度ログアウトします。
 - **変えたときに開いていたフォーム**: 一度だけ弾かれます。ユーザーはもう一度送ります。
 
 パスワードを移すには、古いハッシュを確かめて新しいハッシュを Blowfish で作るハッシャーを使い、すべてのユーザーが一度
@@ -382,9 +390,13 @@ Configure::write('Security.useOpenSsl', true);
 切り替えると `cipher` の Cookie は読めなくなり、中の値を一度失います (「ログインしたままにする」が切れる、カートが空に
 なる、など)。リリースに合わせて切り替えてください。
 
+`rijndael` はこのルールには当てはまりませんが、PHP 7.2 以降に同梱されていない mcrypt 拡張が必要です。これも `aes` に
+移してください。その Cookie も `aes` では読めません。
+
 ### cakephp2-config-cookie-key
 
-`aes` の Cookie の鍵 `Cookie.key` が、ドキュメントのサンプルのまま、または 32 バイトより短い値です。鍵を知っていれば、
+`aes` と `rijndael` の Cookie の鍵 `Cookie.key` が、ドキュメントのサンプルのまま、または 32 バイトより短い値です。
+未設定か空のときは鍵が `Security.salt` で、それは [cakephp2-config-salt](#cakephp2-config-salt) が確かめます。鍵を知っていれば、
 Cookie を読んだり偽造したりできます。ほかのユーザーの ID を入れた「ログインしたままにする」の Cookie などです。
 
 本番の環境で `COOKIE_KEY` に 32 バイト以上のランダムな値を設定してください。古い鍵で暗号化した Cookie は読めなくなります
@@ -413,4 +425,4 @@ HTTPS を終端するプロキシの後ろでは、CakePHP はリクエストを
 
 `Security.useOpenSsl` が `true` ではありません。`Security::encrypt()` と `aes` の Cookie が mcrypt を使います。mcrypt は
 メンテナンスされておらず、PHP 7.2 以降には同梱されていません。`Security.useOpenSsl` を `true` にしてください。CakePHP の
-OpenSSL の実装は mcrypt のもの (AES-128-CBC) と互換なので、切り替える前に暗号化した値も、切り替えたあとに読めます。
+OpenSSL の実装は mcrypt のもの (AES-256-CBC。32 バイトの鍵の Rijndael-128) と互換なので、切り替える前に暗号化した値も、切り替えたあとに読めます。

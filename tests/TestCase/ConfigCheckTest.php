@@ -90,6 +90,17 @@ class ConfigCheckTest extends TestCase
         ], self::rules($findings));
     }
 
+    public function testKeyOfRijndaelCookies(): void
+    {
+        $secret = static fn(string $value): array => ['sha256' => hash('sha256', $value), 'length' => strlen($value)];
+        $findings = ConfigCheck::findings(self::values(['cookieType' => 'rijndael', 'cookieKey' => $secret('short'), 'core' => null]), (string)realpath(self::PROJECT));
+
+        $this->assertSame(['cakephp2-config-cookie-key medium config/core.php:0'], self::rules($findings));
+
+        // An empty Cookie.key is not set: CookieComponent uses the salt
+        $this->assertSame([], ConfigCheck::findings(self::values(['cookieKey' => null, 'core' => null]), (string)realpath(self::PROJECT)));
+    }
+
     public function testLoad(): void
     {
         $commands = [];

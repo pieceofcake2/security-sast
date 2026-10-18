@@ -75,7 +75,7 @@ vendor/bin/security-sast --engine=phpstan --pdf=tmp/security-sast.pdf
 検査します。`vendor`、`tmp`、`logs`、`tests`、`node_modules`、`app/Vendor`、`app/tmp`、`app/Test` は除きます。
 
 ```bash
-# src/ とビューだけを、テストも含めて
+# src/ とビューだけ
 vendor/bin/security-sast --paths=src,templates --exclude=vendor,tmp
 ```
 
@@ -95,7 +95,8 @@ vendor/bin/security-sast --view-extensions=ctp,php,html
 ([設定](rules.md#設定))。指摘は `core.php` のその設定の行に付き、報告書の表紙には検査した `APP_ENV` が載ります。秘密の値は
 SHA-256 と長さで比べ、報告書には書きません。
 
-CakePHP のアプリケーションでないプロジェクトなどでは、`--config-check=0` で検査しないようにできます。
+設定を読み込めないときは、報告書にそう載り、`--fail-on` に関係なく終了コード `2` で終わります。設定を検査していない
+からです。CakePHP のアプリケーションでないプロジェクトなどでは、`--config-check=0` で検査しないようにできます。
 
 ### オプション
 
@@ -105,7 +106,7 @@ CakePHP のアプリケーションでないプロジェクトなどでは、`--
 | `--pdf=PATH` | `SECURITY_SAST_PDF` | `tmp/security-sast.pdf` | PDF の報告書 |
 | `--fail-on=RISK` | `SECURITY_SAST_FAIL_ON` | `high` | 不合格にする最も低いリスク。`critical`、`high`、`medium`、`low`、`none` |
 | `--project=DIR` | | カレントディレクトリ | アプリケーションのディレクトリ |
-| `--paths=LIST` | `SECURITY_SAST_PATHS` | 存在する `src`、`templates`、`plugins`、`app` | 検査するパス。カンマ区切りで、プロジェクトからの相対パス |
+| `--paths=LIST` | `SECURITY_SAST_PATHS` | 存在する `src`、`templates`、`plugins`、`app` | 検査するパス。カンマ区切りで、プロジェクトからの相対パス。`src` は `plugins/Blog/src` を含みません |
 | `--exclude=LIST` | `SECURITY_SAST_EXCLUDE` | 上記のとおり | 除くパス。カンマ区切り。空にすると何も除きません |
 | `--semgrep-config=LIST` | `SECURITY_SAST_SEMGREP_CONFIG` | `p/php` | このパッケージのルールのほかに使う Semgrep のルール。Registry の名前 (`p/owasp-top-ten`)、URL、プロジェクトの YAML ファイル |
 | `--semgrep-image=IMAGE` | `SECURITY_SAST_SEMGREP_IMAGE` | `semgrep/semgrep:latest` | Semgrep の Docker イメージ。バージョンを固定するときなどに |
@@ -152,8 +153,8 @@ return [
 
 ## 報告書
 
-- [見本の報告書 (日本語、PDF)](/report-sample-ja.pdf)
-- [見本の報告書 (英語、PDF)](/report-sample.pdf)
+- [見本の報告書 (日本語、PDF)](https://pieceofcake2.github.io/security-sast/report-sample-ja.pdf)
+- [見本の報告書 (英語、PDF)](https://pieceofcake2.github.io/security-sast/report-sample.pdf)
 
 ![表紙、リスク別の指摘、コードと設定の 2 つのルールのページ](../img/report-sample-ja.png)
 
@@ -203,6 +204,10 @@ vendor/bin/security-sast --semgrep-config=p/php,config/semgrep/app.yml
 
 **`Semgrep failed (exit code 125): Cannot connect to the Docker daemon`**: Docker が動いていないか、そのユーザーが使えません。
 Docker を起動するか、`--engine=phpstan` を使ってください。
+
+**`Semgrep failed (exit code 7): ... invalid configuration`**: ルールを読み込めませんでした。`--semgrep-config` の YAML
+ファイルの誤りや、存在しない Registry の名前などです。メッセージにどれかが出ます。一部のルールなしの検査は、それを
+確かめずに合格してしまうので、検査を止めます。
 
 **`Semgrep failed ... Failed to download configuration`**: Registry のルール (`p/php`) を取得できませんでした。
 `semgrep.dev` へのネットワークを許可するか、`--semgrep-config=` (空) でこのパッケージのルールだけを実行してください。

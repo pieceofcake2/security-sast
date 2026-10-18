@@ -143,7 +143,7 @@
     "offset": 734
    },
    "extra": {
-    "message": "A conditions string with a variable is passed to find(). Use a conditions array (['Post.title' => $title]) so that the value is escaped.",
+    "message": "A conditions string with a variable is passed to find(), deleteAll() or updateAll(). Use a conditions array (['Post.title' => $title]) so that the value is escaped.",
     "metadata": {
      "cwe": [
       "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
@@ -315,6 +315,262 @@
      "confidence": "HIGH"
     },
     "severity": "ERROR",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-conditions-string",
+   "path": "src/Controller/PostsController.php",
+   "start": {
+    "line": 53,
+    "col": 9,
+    "offset": 1539
+   },
+   "end": {
+    "line": 53,
+    "col": 53,
+    "offset": 1583
+   },
+   "extra": {
+    "message": "A conditions string with a variable is passed to find(), deleteAll() or updateAll(). Use a conditions array (['Post.title' => $title]) so that the value is escaped.",
+    "metadata": {
+     "cwe": [
+      "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "MEDIUM"
+    },
+    "severity": "ERROR",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-conditions-string",
+   "path": "src/Controller/PostsController.php",
+   "start": {
+    "line": 54,
+    "col": 9,
+    "offset": 1593
+   },
+   "end": {
+    "line": 54,
+    "col": 81,
+    "offset": 1665
+   },
+   "extra": {
+    "message": "A conditions string with a variable is passed to find(), deleteAll() or updateAll(). Use a conditions array (['Post.title' => $title]) so that the value is escaped.",
+    "metadata": {
+     "cwe": [
+      "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "MEDIUM"
+    },
+    "severity": "ERROR",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-query-concatenation",
+   "path": "src/Controller/PostsController.php",
+   "start": {
+    "line": 57,
+    "col": 9,
+    "offset": 1801
+   },
+   "end": {
+    "line": 57,
+    "col": 81,
+    "offset": 1873
+   },
+   "extra": {
+    "message": "SQL built from a string with a variable is passed to Model::query(). Use the values array of query() ($this->Model->query('... WHERE id = ?', [$id])) or find() with conditions arrays.",
+    "metadata": {
+     "cwe": [
+      "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "MEDIUM"
+    },
+    "severity": "ERROR",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-query-concatenation",
+   "path": "src/Controller/PostsController.php",
+   "start": {
+    "line": 58,
+    "col": 9,
+    "offset": 1883
+   },
+   "end": {
+    "line": 58,
+    "col": 47,
+    "offset": 1921
+   },
+   "extra": {
+    "message": "SQL built from a string with a variable is passed to Model::query(). Use the values array of query() ($this->Model->query('... WHERE id = ?', [$id])) or find() with conditions arrays.",
+    "metadata": {
+     "cwe": [
+      "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "MEDIUM"
+    },
+    "severity": "ERROR",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-conditions-string",
+   "path": "src/Controller/PostsController.php",
+   "start": {
+    "line": 60,
+    "col": 34,
+    "offset": 2040
+   },
+   "end": {
+    "line": 60,
+    "col": 95,
+    "offset": 2101
+   },
+   "extra": {
+    "message": "A conditions string with a variable is passed to find(), deleteAll() or updateAll(). Use a conditions array (['Post.title' => $title]) so that the value is escaped.",
+    "metadata": {
+     "cwe": [
+      "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "MEDIUM"
+    },
+    "severity": "ERROR",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-render-request",
+   "path": "src/Controller/PostsController.php",
+   "start": {
+    "line": 67,
+    "col": 9,
+    "offset": 2330
+   },
+   "end": {
+    "line": 67,
+    "col": 41,
+    "offset": 2362
+   },
+   "extra": {
+    "message": "A value of the request is passed to render() or element(). A path in it can render any template. Map the value to a list of allowed views.",
+    "metadata": {
+     "cwe": [
+      "CWE-22: Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal')"
+     ],
+     "owasp": [
+      "A01:2021 - Broken Access Control"
+     ],
+     "category": "security",
+     "confidence": "HIGH"
+    },
+    "severity": "ERROR",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-unserialize-request",
+   "path": "src/Controller/PostsController.php",
+   "start": {
+    "line": 68,
+    "col": 17,
+    "offset": 2380
+   },
+   "end": {
+    "line": 68,
+    "col": 46,
+    "offset": 2409
+   },
+   "extra": {
+    "message": "A value of the request is passed to unserialize(): it can create objects of any class. Use json_decode().",
+    "metadata": {
+     "cwe": [
+      "CWE-502: Deserialization of Untrusted Data"
+     ],
+     "owasp": [
+      "A08:2021 - Software and Data Integrity Failures"
+     ],
+     "category": "security",
+     "confidence": "HIGH"
+    },
+    "severity": "ERROR",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-redirect-request",
+   "path": "src/Controller/PostsController.php",
+   "start": {
+    "line": 71,
+    "col": 16,
+    "offset": 2464
+   },
+   "end": {
+    "line": 71,
+    "col": 50,
+    "offset": 2498
+   },
+   "extra": {
+    "message": "A value of the request is passed to redirect(). Redirect only to paths of the application, e.g. with Router::url() of a route array, or check the URL against a list.",
+    "metadata": {
+     "cwe": [
+      "CWE-601: URL Redirection to Untrusted Site ('Open Redirect')"
+     ],
+     "owasp": [
+      "A01:2021 - Broken Access Control"
+     ],
+     "category": "security",
+     "confidence": "HIGH"
+    },
+    "severity": "WARNING",
     "fingerprint": "requires login",
     "lines": "requires login",
     "validation_state": "NO_VALIDATOR",
@@ -495,12 +751,12 @@
  },
  "time": {
   "rules": [],
-  "rules_parse_time": 0.017881155014038086,
+  "rules_parse_time": 0.0016069412231445312,
   "profiling_times": {
-   "config_time": 0.7007265090942383,
-   "core_time": 0.7805976867675781,
-   "ignores_time": 0.0006458759307861328,
-   "total_time": 1.5017058849334717
+   "config_time": 0.3439819812774658,
+   "core_time": 0.6664049625396729,
+   "ignores_time": 0.00010848045349121094,
+   "total_time": 1.0201356410980225
   },
   "parsing_time": {
    "total_time": 0.0,
@@ -515,10 +771,10 @@
    "very_slow_files": []
   },
   "scanning_time": {
-   "total_time": 0.30807018280029297,
+   "total_time": 0.37117958068847656,
    "per_file_time": {
-    "mean": 0.05134503046671549,
-    "std_dev": 7.644251139835332e-05
+    "mean": 0.06186326344807943,
+    "std_dev": 9.49572441615803e-05
    },
    "very_slow_stats": {
     "time_ratio": 0.0,
@@ -555,13 +811,13 @@
    "project_level_time": 0.0,
    "file_level_time": 0.0,
    "rules_with_project_prefilters_ratio": 0.0,
-   "rules_with_file_prefilters_ratio": 0.9508196721311475,
-   "rules_selected_ratio": 0.08196721311475409,
-   "rules_matched_ratio": 0.08196721311475409
+   "rules_with_file_prefilters_ratio": 0.8,
+   "rules_selected_ratio": 0.3333333333333333,
+   "rules_matched_ratio": 0.3333333333333333
   },
   "targets": [],
   "total_bytes": 0,
-  "max_memory_bytes": 131947136
+  "max_memory_bytes": 115345472
  },
  "engine_requested": "OSS",
  "skipped_rules": [],

@@ -46,4 +46,28 @@ class PostsController extends AppController
         $data = unserialize($this->request->data('payload'));
         $this->set(compact('xml', 'safe', 'data'));
     }
+
+    public function remove()
+    {
+        $id = $this->request->query('id');
+        $this->Post->deleteAll("Post.user_id = $id");
+        $this->Post->updateAll(['Post.published' => 0], 'Post.user_id = ' . $id);
+        $this->Post->deleteAll(['Post.user_id' => $id]);
+        $this->Post->query('SELECT * FROM ' . 'posts' . " WHERE 1");
+        $this->Post->query('SELECT * FROM posts WHERE id = ' . $id . ' LIMIT 1');
+        $this->Post->query($this->table . $id);
+        $this->Post->query(sprintf('SELECT * FROM posts WHERE id = %d', (int)$id));
+        $this->Post->find('all', ['conditions' => ['Post.published' => 1, 'Post.id = ' . $id]]);
+        $this->Post->find('all', ['conditions' => ['Post.title LIKE' => '%' . $id . '%']]);
+        $this->Post->find('all', ['conditions' => ['Post.title' => "x$id"]]);
+    }
+
+    public function superglobals()
+    {
+        $this->element($_GET['element']);
+        $data = unserialize($_COOKIE['data']);
+        $this->set(compact('data'));
+
+        return $this->redirect($_REQUEST['back']);
+    }
 }

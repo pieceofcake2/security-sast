@@ -82,7 +82,7 @@ legacy layout) are scanned. `vendor`, `tmp`, `logs`, `tests`, `node_modules`, `a
 `app/Test` are left out.
 
 ```bash
-# Only src/ and the views, with the tests
+# Only src/ and the views
 vendor/bin/security-sast --paths=src,templates --exclude=vendor,tmp
 ```
 
@@ -104,7 +104,9 @@ of the documentation, or the `cipher` cookies (see [The Configuration](rules.md#
 findings are placed at the line of the setting in `core.php`, and the cover of the report shows the `APP_ENV`
 that was checked. The secrets are compared as their SHA-256 and length; they are not written to the report.
 
-Turn the check off with `--config-check=0`, e.g. for a project that is not a CakePHP application.
+When the configuration cannot be loaded, the report says so and the command exits with `2`, whatever
+`--fail-on`: the configuration was not checked. Turn the check off with `--config-check=0`, e.g. for a project
+that is not a CakePHP application.
 
 ### Options
 
@@ -114,7 +116,7 @@ Turn the check off with `--config-check=0`, e.g. for a project that is not a Cak
 | `--pdf=PATH` | `SECURITY_SAST_PDF` | `tmp/security-sast.pdf` | The PDF report |
 | `--fail-on=RISK` | `SECURITY_SAST_FAIL_ON` | `high` | The lowest risk that fails: `critical`, `high`, `medium`, `low` or `none` |
 | `--project=DIR` | | the current directory | The directory of the application |
-| `--paths=LIST` | `SECURITY_SAST_PATHS` | `src`, `templates`, `plugins`, `app` that exist | Paths to scan, comma separated, relative to the project |
+| `--paths=LIST` | `SECURITY_SAST_PATHS` | `src`, `templates`, `plugins`, `app` that exist | Paths to scan, comma separated, relative to the project: `src` is not also `plugins/Blog/src` |
 | `--exclude=LIST` | `SECURITY_SAST_EXCLUDE` | see above | Paths to leave out, comma separated; empty for none |
 | `--semgrep-config=LIST` | `SECURITY_SAST_SEMGREP_CONFIG` | `p/php` | Semgrep rules besides those of this package: names of the Registry (`p/owasp-top-ten`), URLs, or YAML files of the project |
 | `--semgrep-image=IMAGE` | `SECURITY_SAST_SEMGREP_IMAGE` | `semgrep/semgrep:latest` | The Docker image of Semgrep, e.g. a fixed version |
@@ -164,8 +166,8 @@ file with `--settings`.
 
 ## The Report
 
-- [Sample report (English, PDF)](/report-sample.pdf)
-- [Sample report (Japanese, PDF)](/report-sample-ja.pdf)
+- [Sample report (English, PDF)](https://pieceofcake2.github.io/security-sast/report-sample.pdf)
+- [Sample report (Japanese, PDF)](https://pieceofcake2.github.io/security-sast/report-sample-ja.pdf)
 
 ![The cover, the findings by risk and the pages of two rules, of the code and of the configuration](img/report-sample.png)
 
@@ -218,6 +220,10 @@ See the [Semgrep rule syntax](https://semgrep.dev/docs/writing-rules/rule-syntax
 
 **`Semgrep failed (exit code 125): Cannot connect to the Docker daemon`**: Docker is not running, or the user
 cannot use it. Start Docker, or use `--engine=phpstan`.
+
+**`Semgrep failed (exit code 7): ... invalid configuration`**: a rule could not be loaded, e.g. a YAML file of
+`--semgrep-config` with an error, or a name of the Registry that does not exist. The message shows which one.
+The scan stops: a scan without some of its rules would pass without checking them.
 
 **`Semgrep failed ... Failed to download configuration`**: the rules of the Registry (`p/php`) could not be
 downloaded. Allow the network to `semgrep.dev`, or run only the rules of this package with
