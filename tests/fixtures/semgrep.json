@@ -1536,6 +1536,70 @@
     "validation_state": "NO_VALIDATOR",
     "engine_kind": "OSS"
    }
+  },
+  {
+   "check_id": "rules.cakephp2-view-raw-output",
+   "path": "templates/Posts/raw.ctp",
+   "start": {
+    "line": 2,
+    "col": 1,
+    "offset": 0
+   },
+   "end": {
+    "line": 2,
+    "col": 50,
+    "offset": 0
+   },
+   "extra": {
+    "message": "HTML is printed without escaping on purpose with raw(). Check that it is built by the application or sanitized, never a value of the request.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "INFO",
+    "fingerprint": "requires login",
+    "lines": "<div><?= raw($post['Post']['body_html']) ?></div>",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-view-raw-output",
+   "path": "templates/Posts/raw.ctp",
+   "start": {
+    "line": 3,
+    "col": 1,
+    "offset": 0
+   },
+   "end": {
+    "line": 3,
+    "col": 75,
+    "offset": 0
+   },
+   "extra": {
+    "message": "HTML is printed without escaping on purpose with raw(). Check that it is built by the application or sanitized, never a value of the request.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "INFO",
+    "fingerprint": "requires login",
+    "lines": "<?php echo raw($this->Text->autoParagraph($post['Post']['body_html'])); ?>",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
   }
  ],
  "errors": [],
@@ -1553,7 +1617,8 @@
    "templates/Posts/parity.ctp",
    "src/Controller/ApiController.php",
    "src/View/AppView.php",
-   "src/View/Helper/PostHelper.php"
+   "src/View/Helper/PostHelper.php",
+   "templates/Posts/raw.ctp"
   ]
  },
  "time": {

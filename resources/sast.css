@@ -1,7 +1,7 @@
 /* The risks of the findings and the places in the code, added to the CSS of pieceofcake2/report */
 :root { --critical: #7a0f12; --high: #b3261e; --medium: #c25e00; --low: #8a6d00; --unknown: #6b6b6b; }
 .badge.critical { background: var(--critical); } .badge.high { background: var(--high); } .badge.medium { background: var(--medium); }
-.badge.low { background: var(--low); } .badge.unknown, .badge.suppressed { background: var(--unknown); }
+.badge.low { background: var(--low); } .badge.unknown, .badge.suppressed { background: var(--unknown); } .badge.info { background: #2f6f9f; }
 .t-critical { color: var(--critical); } .t-high { color: var(--high); } .t-medium { color: var(--medium); } .t-low { color: var(--low); }
 /* The number of places in the last column of the list, and the longer labels of the tables of the pages */
 .list col.time { width: 20mm; }

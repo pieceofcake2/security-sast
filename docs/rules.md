@@ -18,6 +18,7 @@ of the Semgrep Registry (`p/php` by default), which are described on [semgrep.de
 | [`cakephp2-xml-build-variable`](#cakephp2-xml-build-variable) | Medium | `securitySast.xmlBuildVariable` | CWE-918 | A10 Server-Side Request Forgery |
 | [`cakephp2-security-csrf-disabled`](#cakephp2-security-csrf-disabled) | Medium | `securitySast.securityCsrfDisabled` | CWE-352 | A01 Broken Access Control |
 | [`cakephp2-view-unescaped-output`](#cakephp2-view-unescaped-output) | Medium | `securitySast.viewUnescapedOutput` | CWE-79 | A03 Injection |
+| [`cakephp2-view-raw-output`](#cakephp2-view-raw-output) | Info | `securitySast.viewRawOutput` | CWE-79 | A03 Injection |
 
 The rules look at the code, not at where the values come from, so a finding is a place to check, not always a
 vulnerability. A value "of the request" is `$this->request` (its `query()`, `data()`, `params`, ...) or
@@ -328,6 +329,19 @@ Or suppress one place with a comment (see [Suppressing a Finding](README.md#supp
 confidence of the rule is low: the variables set by the controller are not followed, so a variable that the
 controller already escaped is reported too. Escape in the view anyway: it is where the context (HTML, attribute,
 JavaScript) is known.
+
+
+## cakephp2-view-raw-output
+
+HTML printed in a view with `raw()`, the function of pieceofcake2/cakephp 2.12.10+ that prints a value without
+escaping on purpose: `<?= raw($post['Post']['body_html']) ?>`.
+
+**Why it is listed.** `raw()` says that the HTML is printed as it is on purpose, so it is not reported as a
+variable printed without `h()`. It is still a place where a mistake is an XSS: the risk is Info, which never
+fails the scan, so that a review sees every such place.
+
+**What to check.** The HTML is built by the application, e.g. with helpers, or sanitized with a maintained
+library when it is saved or before it is printed; it is never a value of the request.
 
 ## The Configuration
 

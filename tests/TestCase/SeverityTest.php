@@ -22,5 +22,8 @@ class SeverityTest extends TestCase
         $this->assertFalse(Severity::reaches('medium', 'high'));
         $this->assertTrue(Severity::reaches('medium', 'medium'));
         $this->assertFalse(Severity::reaches('high', 'none'));
+        // Information never fails the scan
+        $this->assertFalse(Severity::reaches('info', 'low'));
+        $this->assertSame('info', Severity::normalize('INFO'));
     }
 }

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- New rule `cakephp2-view-raw-output` of a new risk, Info, which never fails the scan: HTML printed in a view with
+  `raw()`, the function of pieceofcake2/cakephp 2.12.10+ that prints a value without escaping on purpose, so that
+  a review sees every such place
 - The example workflows of the docs are in the Composer package, which `docs/ci.md` links to
 - New rule `cakephp2-order-request` (High): a value of the request as the `order`, `fields` or `group` of `find()`
   or `paginate`, which goes into the SQL as a name

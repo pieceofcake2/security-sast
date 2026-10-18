@@ -15,9 +15,14 @@ final class Severity
     public const UNKNOWN = 'unknown';
 
     /**
+     * Information, e.g. HTML printed with raw() on purpose, to check: it never fails the scan
+     */
+    public const INFO = 'info';
+
+    /**
      * The risks from the highest
      */
-    public const ALL = [self::CRITICAL, self::HIGH, self::MEDIUM, self::LOW, self::UNKNOWN];
+    public const ALL = [self::CRITICAL, self::HIGH, self::MEDIUM, self::LOW, self::UNKNOWN, self::INFO];
 
     /**
      * The risk of a value of an advisory, `unknown` when it has none
@@ -73,7 +78,7 @@ final class Severity
      */
     public static function reaches(string $severity, string $threshold): bool
     {
-        if ($threshold === 'none') {
+        if ($threshold === 'none' || $severity === self::INFO) {
             return false;
         }
         if ($severity === self::UNKNOWN) {

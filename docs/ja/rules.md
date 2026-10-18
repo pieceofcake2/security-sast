@@ -18,6 +18,7 @@
 | [`cakephp2-xml-build-variable`](#cakephp2-xml-build-variable) | 中 | `securitySast.xmlBuildVariable` | CWE-918 | A10 サーバーサイドリクエストフォージェリ |
 | [`cakephp2-security-csrf-disabled`](#cakephp2-security-csrf-disabled) | 中 | `securitySast.securityCsrfDisabled` | CWE-352 | A01 アクセス制御の不備 |
 | [`cakephp2-view-unescaped-output`](#cakephp2-view-unescaped-output) | 中 | `securitySast.viewUnescapedOutput` | CWE-79 | A03 インジェクション |
+| [`cakephp2-view-raw-output`](#cakephp2-view-raw-output) | 情報 | `securitySast.viewRawOutput` | CWE-79 | A03 インジェクション |
 
 ルールが見るのはコードの書き方で、値がどこから来たかではありません。そのため、指摘は確かめるべき箇所であって、いつも
 脆弱性とは限りません。「リクエストの値」とは、`$this->request` (その `query()`、`data()`、`params` など) と、`$_GET`、
@@ -320,6 +321,19 @@ return [
 1 箇所だけなら、コメントで除外することもできます ([指摘を除外する](README.md#指摘を除外する))。コントローラーが
 セットした変数の中身までは追わないため、このルールの確度は低です。コントローラーでエスケープ済みの変数も指摘します。
 それでも、文脈 (HTML、属性、JavaScript) がわかるビューでエスケープしてください。
+
+
+## cakephp2-view-raw-output
+
+ビューで、`raw()` を使って HTML を出力しています。`raw()` は pieceofcake2/cakephp 2.12.10 以降の関数で、値をわざと
+エスケープせずに出力します: `<?= raw($post['Post']['body_html']) ?>`。
+
+**なぜ載せるか。** `raw()` は、HTML をわざとそのまま出力すると示すので、`h()` を通さない変数の出力としては指摘しません。
+それでも、間違えれば XSS になる箇所です。リスクは「情報」で、検査を不合格にはしませんが、確かめるときにすべての箇所が
+見えるように載せます。
+
+**確かめること。** HTML をアプリケーションがヘルパーなどで組み立てているか、保存するときか出力する前にメンテナンス
+されているライブラリで無害化していること。リクエストの値ではないこと。
 
 ## 設定
 
