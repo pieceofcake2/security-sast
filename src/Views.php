@@ -25,6 +25,11 @@ final class Views
     public const DIRECTORIES = ['templates', 'View'];
 
     /**
+     * The directories of views that are not HTML: the text mails
+     */
+    public const TEXT_DIRECTORIES = ['Emails/text'];
+
+    /**
      * Whether a file is a view
      *
      * @param string $path Path of the file
@@ -37,6 +42,11 @@ final class Views
         $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
         if (!in_array($extension, array_map('strtolower', $extensions), true)) {
             return false;
+        }
+        foreach (self::TEXT_DIRECTORIES as $directory) {
+            if (str_contains($path, '/' . $directory . '/')) {
+                return false;
+            }
         }
         foreach (self::DIRECTORIES as $directory) {
             if (str_contains($path, '/' . $directory . '/')) {

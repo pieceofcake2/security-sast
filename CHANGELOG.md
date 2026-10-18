@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## Unreleased
+
+- `cakephp2-view-unescaped-output` no longer reports a variable set in the view to a string literal or to a
+  translation of string literals only (`__('...')`, `__d('...', '...')`, `__x()`, `__dx()`), and leaves out the
+  text mails of `Emails/text/`, which are not HTML. A translation with values, e.g. `__('Hello %s', $name)`, is
+  still reported
+
 ## 1.0.1
 
 - `cakephp2-conditions-string` also finds the conditions strings of `deleteAll()` and `updateAll()`, as the
