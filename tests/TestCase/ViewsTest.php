@@ -28,11 +28,18 @@ class ViewsTest extends TestCase
         $this->assertSame(['**/templates/**/*.html', '**/View/**/*.html'], Views::semgrepIncludes(['html']));
     }
 
+    public function testTextMails(): void
+    {
+        $this->assertFalse(Views::isView('templates/Emails/text/default.ctp'));
+        $this->assertFalse(Views::isView('app/View/Emails/text/default.ctp'));
+        $this->assertTrue(Views::isView('templates/Emails/html/default.ctp'));
+    }
+
     public function testRulesOfSemgrep(): void
     {
         $yaml = SemgrepEngine::rules(['ctp', 'html']);
 
-        $this->assertStringContainsString("    paths:\n      include:\n        - \"**/templates/**/*.ctp\"\n        - \"**/View/**/*.ctp\"\n        - \"**/templates/**/*.html\"\n        - \"**/View/**/*.html\"\n    metadata:", $yaml);
+        $this->assertStringContainsString("    paths:\n      include:\n        - \"**/templates/**/*.ctp\"\n        - \"**/View/**/*.ctp\"\n        - \"**/templates/**/*.html\"\n        - \"**/View/**/*.html\"\n      # The text mails are not HTML\n      exclude:\n        - \"**/Emails/text/**\"\n    metadata:", $yaml);
         $this->assertSame(1, substr_count($yaml, 'include:'));
     }
 }

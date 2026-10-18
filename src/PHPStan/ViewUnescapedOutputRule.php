@@ -15,6 +15,7 @@ use PhpParser\Node\Expr\PropertyFetch;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
+use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\Echo_;
 use PhpParser\NodeFinder;
 use PhpParser\PrettyPrinter\Standard;
@@ -33,6 +34,12 @@ use PieceOfCake2\SecuritySast\Views;
  */
 final class ViewUnescapedOutputRule implements Rule
 {
+    /**
+     * The translation functions whose value is safe when their arguments are string literals, with their number of
+     * arguments: a translation is HTML of the application, and with more arguments it would hold their values
+     */
+    private const TRANSLATIONS = ['__' => 1, '__d' => 2, '__x' => 2, '__dx' => 3];
+
     /**
      * Constructor
      *
@@ -101,18 +108,26 @@ final class ViewUnescapedOutputRule implements Rule
     }
 
     /**
-     * Whether a value is safe to print: the output of a helper, an escaped value or a number
+     * Whether a value is safe to print: the output of a helper, an escaped value, a number, a string literal or a
+     * translation of string literals
      *
      * @param \PhpParser\Node\Expr $expr Value
      * @return bool
      */
     private static function isSafe(Expr $expr): bool
     {
-        if ($expr instanceof Int_ || $expr instanceof Double) {
+        if ($expr instanceof Int_ || $expr instanceof Double || $expr instanceof String_) {
             return true;
         }
         if ($expr instanceof FuncCall && $expr->name instanceof Name) {
-            return in_array(strtolower($expr->name->toString()), ['h', 'count'], true);
+            $name = strtolower($expr->name->toString());
+            if (isset(self::TRANSLATIONS[$name])) {
+                $args = $expr->getArgs();
+
+                return count($args) === self::TRANSLATIONS[$name] && array_filter($args, static fn($arg): bool => !$arg->value instanceof String_) === [];
+            }
+
+            return in_array($name, ['h', 'count'], true);
         }
 
         return $expr instanceof MethodCall && $expr->var instanceof PropertyFetch

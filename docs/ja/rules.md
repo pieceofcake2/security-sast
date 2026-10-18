@@ -224,7 +224,8 @@ public function beforeFilter()
 ## cakephp2-view-unescaped-output
 
 ビューで、変数を `h()` を通さずに `<?= $var ?>` や `<?php echo $var; ?>` で出力しています。ビューとは、`templates/` と
-`View/` にある、ビューの拡張子のファイルです ([検査する範囲](README.md#検査する範囲))。
+`View/` にある、ビューの拡張子のファイルです ([検査する範囲](README.md#検査する範囲))。HTML ではない `Emails/text/` の
+テキストメールは除きます。
 
 **なぜ危ないか。** HTML を含む値は、ブラウザで実行されます。名前、コメント、パラメーターの `<script>` が、ページを
 開いた各ユーザーのセッションで動き、ページを読んだり、ユーザーになりすましてフォームを送ったりできます (XSS)。
@@ -252,7 +253,9 @@ public function beforeFilter()
 指摘が多くなりすぎないよう、次は指摘しません。
 
 - ヘルパーや関数の呼び出しの出力
-- 出力する前にビューの中で、ヘルパーの出力、`h()`、`count()`、`(int)` や `(float)` の数値を入れた変数
+- 出力する前にビューの中で、ヘルパーの出力、`h()`、`count()`、`(int)` や `(float)` の数値、文字列リテラル、文字列
+  リテラルだけの翻訳 (`__('...')`、`__d('...', '...')`、`__x('...', '...')`、`__dx('...', '...', '...')`) を入れた
+  変数。`__('Hello %s', $name)` のように値を含む翻訳は指摘します
 - レイアウトの HTML である `$content_for_layout` と `$scripts_for_layout`
 - `--safe-view-variables` の変数。サニタイズした HTML を入れた変数など
 
@@ -261,6 +264,8 @@ public function beforeFilter()
 <?= $link ?>            <!-- 指摘しない: ヘルパー -->
 <?php $count = count($posts); ?>
 <?= $count ?>           <!-- 指摘しない: 数値 -->
+<?php $docsUrl = 'https://example.com/docs/'; ?>
+<?= $docsUrl ?>         <!-- 指摘しない: 文字列リテラル -->
 <?= $content_for_layout ?>  <!-- 指摘しない: レイアウト -->
 <?= $post['Post']['body'] ?>  <!-- 指摘する -->
 ```

@@ -579,6 +579,38 @@
   },
   {
    "check_id": "rules.cakephp2-view-unescaped-output",
+   "path": "templates/Emails/html/default.ctp",
+   "start": {
+    "line": 1,
+    "col": 7,
+    "offset": 6
+   },
+   "end": {
+    "line": 1,
+    "col": 21,
+    "offset": 20
+   },
+   "extra": {
+    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-view-unescaped-output",
    "path": "templates/Posts/edit.ctp",
    "start": {
     "line": 10,
@@ -675,6 +707,102 @@
   },
   {
    "check_id": "rules.cakephp2-view-unescaped-output",
+   "path": "templates/Posts/links.ctp",
+   "start": {
+    "line": 11,
+    "col": 7,
+    "offset": 271
+   },
+   "end": {
+    "line": 11,
+    "col": 18,
+    "offset": 282
+   },
+   "extra": {
+    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-view-unescaped-output",
+   "path": "templates/Posts/links.ctp",
+   "start": {
+    "line": 12,
+    "col": 7,
+    "offset": 292
+   },
+   "end": {
+    "line": 12,
+    "col": 22,
+    "offset": 307
+   },
+   "extra": {
+    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-view-unescaped-output",
+   "path": "templates/Posts/links.ctp",
+   "start": {
+    "line": 13,
+    "col": 7,
+    "offset": 317
+   },
+   "end": {
+    "line": 13,
+    "col": 19,
+    "offset": 329
+   },
+   "extra": {
+    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-view-unescaped-output",
    "path": "templates/Posts/view.ctp",
    "start": {
     "line": 2,
@@ -744,19 +872,21 @@
    "src/Controller/ExportController.php",
    "src/Controller/PostsController.php",
    "src/Model/Post.php",
+   "templates/Emails/html/default.ctp",
    "templates/Posts/edit.ctp",
    "templates/Posts/index.php",
+   "templates/Posts/links.ctp",
    "templates/Posts/view.ctp"
   ]
  },
  "time": {
   "rules": [],
-  "rules_parse_time": 0.0016069412231445312,
+  "rules_parse_time": 0.0017910003662109375,
   "profiling_times": {
-   "config_time": 0.3439819812774658,
-   "core_time": 0.6664049625396729,
-   "ignores_time": 0.00010848045349121094,
-   "total_time": 1.0201356410980225
+   "config_time": 0.5954880714416504,
+   "core_time": 1.2810394763946533,
+   "ignores_time": 0.0001499652862548828,
+   "total_time": 1.8904061317443848
   },
   "parsing_time": {
    "total_time": 0.0,
@@ -771,10 +901,10 @@
    "very_slow_files": []
   },
   "scanning_time": {
-   "total_time": 0.37117958068847656,
+   "total_time": 1.2737822532653809,
    "per_file_time": {
-    "mean": 0.06186326344807943,
-    "std_dev": 9.49572441615803e-05
+    "mean": 0.1592227816581726,
+    "std_dev": 0.004326244217363495
    },
    "very_slow_stats": {
     "time_ratio": 0.0,
@@ -811,13 +941,13 @@
    "project_level_time": 0.0,
    "file_level_time": 0.0,
    "rules_with_project_prefilters_ratio": 0.0,
-   "rules_with_file_prefilters_ratio": 0.8,
-   "rules_selected_ratio": 0.3333333333333333,
-   "rules_matched_ratio": 0.3333333333333333
+   "rules_with_file_prefilters_ratio": 0.7868852459016393,
+   "rules_selected_ratio": 0.3114754098360656,
+   "rules_matched_ratio": 0.3114754098360656
   },
   "targets": [],
   "total_bytes": 0,
-  "max_memory_bytes": 115345472
+  "max_memory_bytes": 119015488
  },
  "engine_requested": "OSS",
  "skipped_rules": [],

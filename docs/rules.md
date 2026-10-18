@@ -229,7 +229,8 @@ public function beforeFilter()
 ## cakephp2-view-unescaped-output
 
 A variable printed in a view without `h()`, as `<?= $var ?>` or `<?php echo $var; ?>`. The views are the files of
-the extensions of the views in `templates/` and `View/` (see [What is Scanned](README.md#what-is-scanned)).
+the extensions of the views in `templates/` and `View/` (see [What is Scanned](README.md#what-is-scanned)), but not
+the text mails of `Emails/text/`, which are not HTML.
 
 **Why it matters.** A value that contains HTML is run by the browser: a `<script>` in a name, a comment or a
 parameter runs with the session of each user who opens the page, and can read the page, send forms in the name of
@@ -257,8 +258,10 @@ too.
 To keep the number of findings small, these are not reported:
 
 - the output of a helper or of a function call
-- a variable set in the view, before it is printed, to the output of a helper, to `h()`, to `count()`, or to
-  a number with `(int)` or `(float)`
+- a variable set in the view, before it is printed, to the output of a helper, to `h()`, to `count()`, to
+  a number with `(int)` or `(float)`, to a string literal, or to a translation of string literals only
+  (`__('...')`, `__d('...', '...')`, `__x('...', '...')`, `__dx('...', '...', '...')`); a translation with
+  values, e.g. `__('Hello %s', $name)`, is reported
 - `$content_for_layout` and `$scripts_for_layout`, the HTML of the layouts
 - the variables of `--safe-view-variables`, e.g. variables that hold sanitized HTML
 
@@ -267,6 +270,8 @@ To keep the number of findings small, these are not reported:
 <?= $link ?>            <!-- not reported: a helper -->
 <?php $count = count($posts); ?>
 <?= $count ?>           <!-- not reported: a number -->
+<?php $docsUrl = 'https://example.com/docs/'; ?>
+<?= $docsUrl ?>         <!-- not reported: a string literal -->
 <?= $content_for_layout ?>  <!-- not reported: the layout -->
 <?= $post['Post']['body'] ?>  <!-- reported -->
 ```
