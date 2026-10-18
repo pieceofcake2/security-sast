@@ -16,7 +16,9 @@ pieceofcake2/security-check で、すべてを実行できます。
 
 ## 2 つのエンジン
 
-このパッケージの CakePHP 2 向けのルールは、どちらのエンジンでも書いてあり、同じ箇所を見つけます。`--engine` で選びます。
+このパッケージの CakePHP 2 向けのルールは、どちらのエンジンでも書いてあり、同じコードで同じ箇所を見つけることを
+テストしています。Semgrep はコードのテキストで照合するので、いくつかの書き方では違います ([ルール](rules.md))。
+`--engine` で選びます。
 
 | | Semgrep (デフォルト) | PHPStan |
 | --- | --- | --- |
@@ -34,6 +36,8 @@ Semgrep は Registry のルールの分だけ多くを見つけます。PHPStan 
 - PHP 8.0 以上
 - Semgrep: Docker。最初の実行で `semgrep/semgrep` のイメージを取得します
 - PHPStan: ほかには不要です (`phpstan/phpstan` はこのパッケージの依存です)
+- 設定の検査には、[pieceofcake2/cakephp](https://github.com/pieceofcake2/cakephp) で動き、パッケージをインストール
+  したアプリケーション (`vendor/autoload.php`)。本家の `cakephp/cakephp` では `--config-check=0` を使ってください
 - PDF を印刷するための Google Chrome または Chromium 131 以上。日本語の報告書には、Linux では `fonts-noto-cjk`
 
 ## インストール
@@ -96,7 +100,9 @@ vendor/bin/security-sast --view-extensions=ctp,php,html
 SHA-256 と長さで比べ、報告書には書きません。
 
 設定を読み込めないときは、報告書にそう載り、`--fail-on` に関係なく終了コード `2` で終わります。設定を検査していない
-からです。CakePHP のアプリケーションでないプロジェクトなどでは、`--config-check=0` で検査しないようにできます。
+からです。`--config-check=0` でも、アプリケーションのディレクトリを知るために設定は読み込みます (検査はしません)。
+`--paths` も指定すると、アプリケーションのコードを一切実行しません。CI では本番の秘密の値をジョブに渡してください
+([CI](ci.md#ci-での設定の検査))。CakePHP のアプリケーションでないプロジェクトなどでは、`--config-check=0` で検査しないようにできます。
 
 ### オプション
 
@@ -228,8 +234,9 @@ Docker を起動するか、`--engine=phpstan` を使ってください。
 **`Nothing to scan in .`**: プロジェクトに `src`、`templates`、`plugins`、`app` のどれもありません。`--paths` でパスを
 指定してください。
 
-**報告書に「エンジンがエラーを報告しました」と出る**: PHP の構文エラーなどで、読めないファイルがありました。ほかの
-ファイルは検査しています。
+**報告書に「エンジンがエラーを報告しました」と出る**: PHP の構文エラーなどで、読めないファイルがあり、そのファイルは
+検査していません。メッセージにファイルが出ます。ほかのファイルは検査しています。ファイルを修正するか、`--exclude` で
+除いてください。
 
 **`Chrome is needed to print the report`**: Chrome か Chromium をインストールするか、`REPORT_CHROME_BINARY` を設定して
 ください ([pieceofcake2/report](https://pieceofcake2.github.io/report/ja/))。

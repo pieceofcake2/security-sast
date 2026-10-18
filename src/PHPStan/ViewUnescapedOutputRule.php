@@ -41,6 +41,11 @@ final class ViewUnescapedOutputRule implements Rule
     private const TRANSLATIONS = ['__' => 1, '__d' => 2, '__x' => 2, '__dx' => 3];
 
     /**
+     * The values of the request and of the session, as code: not the output of a helper, though they are of `$this`
+     */
+    public const REQUEST = '/\A\$this->(?:(?:request|data|params|passedArgs)\b|Session->read\()/';
+
+    /**
      * Constructor
      *
      * @param array<string> $extensions Extensions of the views, without the dot
@@ -89,6 +94,10 @@ final class ViewUnescapedOutputRule implements Rule
                 continue;
             }
             foreach ($statement->exprs as $expr) {
+                if (preg_match(self::REQUEST, $printer->prettyPrintExpr($expr))) {
+                    $errors[] = Nodes::error('cakephp2-view-unescaped-output', $statement->getStartLine());
+                    break;
+                }
                 $root = $expr;
                 while ($root instanceof ArrayDimFetch || ($root instanceof PropertyFetch && $root->name instanceof Identifier)) {
                     $root = $root->var;
@@ -116,6 +125,9 @@ final class ViewUnescapedOutputRule implements Rule
      */
     private static function isSafe(Expr $expr): bool
     {
+        if (preg_match(self::REQUEST, (new Standard())->prettyPrintExpr($expr))) {
+            return false;
+        }
         if ($expr instanceof Int_ || $expr instanceof Double || $expr instanceof String_) {
             return true;
         }

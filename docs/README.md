@@ -18,7 +18,8 @@ application); pieceofcake2/security-check runs them all.
 
 ## Two Engines
 
-The rules of this package for CakePHP 2 are written for both engines, and find the same places. Choose one with
+The rules of this package for CakePHP 2 are written for both engines, and are tested on the same code to find the
+same places; Semgrep matches the text of the code, so a few constructs differ (see [Rules](rules.md)). Choose one with
 `--engine`:
 
 | | Semgrep (default) | PHPStan |
@@ -38,6 +39,8 @@ package.
 - PHP 8.0+
 - Semgrep: Docker. The image `semgrep/semgrep` is pulled on the first run
 - PHPStan: nothing else (`phpstan/phpstan` is a dependency of this package)
+- For the check of the configuration: an application on [pieceofcake2/cakephp](https://github.com/pieceofcake2/cakephp)
+  with its packages installed (`vendor/autoload.php`); on the original `cakephp/cakephp`, use `--config-check=0`
 - Google Chrome or Chromium 131+ to print the PDF, and on Linux `fonts-noto-cjk` for a Japanese report
 
 ## Installation
@@ -105,7 +108,10 @@ findings are placed at the line of the setting in `core.php`, and the cover of t
 that was checked. The secrets are compared as their SHA-256 and length; they are not written to the report.
 
 When the configuration cannot be loaded, the report says so and the command exits with `2`, whatever
-`--fail-on`: the configuration was not checked. Turn the check off with `--config-check=0`, e.g. for a project
+`--fail-on`: the configuration was not checked. With `--config-check=0`, the configuration is still loaded
+to find the directories of the application, but not checked; give `--paths` too, and the code of the
+application is not run at all. In CI, give the secrets of production to the job
+([CI](ci.md#the-configuration-in-ci)). Turn the check off with `--config-check=0`, e.g. for a project
 that is not a CakePHP application.
 
 ### Options
@@ -246,8 +252,9 @@ environment of CI with `--config-env`, or turn the check off with `--config-chec
 **`Nothing to scan in .`**: none of `src`, `templates`, `plugins` and `app` exists in the project. Give the
 paths with `--paths`.
 
-**The report says that the engine reported errors**: a file could not be parsed, e.g. a PHP syntax error. The
-other files are scanned.
+**The report says that the engine reported errors**: a file could not be parsed, e.g. a PHP syntax error, and
+was not scanned; the message names it. The other files are scanned. Fix the file, or leave it out with
+`--exclude`.
 
 **`Chrome is needed to print the report`**: install Chrome or Chromium, or set `REPORT_CHROME_BINARY` (see
 [pieceofcake2/report](https://pieceofcake2.github.io/report/)).

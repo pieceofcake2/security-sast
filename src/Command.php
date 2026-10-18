@@ -71,7 +71,8 @@ final class Command
             // The configuration of the application, for its check and for its layout
             $values = null;
             $loadError = null;
-            if (ConfigCheck::applies($config->project)) {
+            // Without the check and with the paths given, the code of the application is not run at all
+            if (ConfigCheck::applies($config->project) && ($config->configCheck || $config->paths === [])) {
                 try {
                     $values = ($this->configCheck ?? new ConfigCheck($config->configEnv))->load($config->project);
                 } catch (RuntimeException $e) {

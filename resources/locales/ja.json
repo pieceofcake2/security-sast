@@ -49,7 +49,7 @@
     "rule.cakephp2-config-cookie-cipher": "'cipher' で暗号化した Cookie",
     "message.cakephp2-config-cookie-cipher": "CookieComponent が 'cipher' で暗号化しています (Cookie.type が未設定か 'cipher')。'cipher' は安全ではありません。Cookie.type を 'aes'、Cookie.key を 32 バイト以上のランダムな値、Security.useOpenSsl を true にしてください。",
     "rule.cakephp2-config-cookie-key": "サンプルまたは短い Cookie.key",
-    "message.cakephp2-config-cookie-key": "'aes' の Cookie の鍵 Cookie.key が、ドキュメントのサンプルの値か、32 バイト未満です。COOKIE_KEY に 32 バイト以上のランダムな値を設定してください。",
+    "message.cakephp2-config-cookie-key": "'aes' と 'rijndael' の Cookie の鍵 Cookie.key が、ドキュメントのサンプルの値か、32 バイト未満です。COOKIE_KEY に 32 バイト以上のランダムな値を設定してください。",
     "rule.cakephp2-config-openssl": "有効でない Security.useOpenSsl",
     "message.cakephp2-config-openssl": "Security.useOpenSsl が true ではありません。Security::encrypt() と 'aes' の Cookie が、メンテナンスされておらず PHP 7.2 以降に同梱されない mcrypt を使います。Security.useOpenSsl を true にしてください。",
     "rule.cakephp2-config-session-cookie": "HttpOnly や Secure のないセッションの Cookie",

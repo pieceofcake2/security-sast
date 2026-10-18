@@ -120,7 +120,7 @@ final class RuleCatalog
             'cwe' => ['CWE-321: Use of Hard-coded Cryptographic Key', 'CWE-326: Inadequate Encryption Strength'],
             'owasp' => ['A02:2021 - Cryptographic Failures'],
             'confidence' => 'HIGH',
-            'message' => 'Cookie.key, the key of the \'aes\' cookies, is a sample of the documentation or shorter than 32 bytes. Set COOKIE_KEY to a random value of 32 bytes or more.',
+            'message' => 'Cookie.key, the key of the \'aes\' and \'rijndael\' cookies, is a sample of the documentation or shorter than 32 bytes. Set COOKIE_KEY to a random value of 32 bytes or more.',
         ],
         'cakephp2-config-openssl' => [
             'identifier' => '',

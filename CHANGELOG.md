@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## Unreleased
+
+- `cakephp2-view-unescaped-output` reports the values of the request and of the session printed in a view, as
+  they are or through a variable set to them: `$this->request` (`query()`, `data`, ...), `$this->data`,
+  `$this->params`, `$this->passedArgs` and `$this->Session->read()`, which were taken for the output of a helper
+  or left out as `$this`
+- A file that PHPStan cannot parse is an error of the report, as with Semgrep, instead of a file left out
+  without notice
+- With `--config-check=0` and `--paths`, the code of the application is not run at all
+- The message of `cakephp2-config-cookie-key` names the `rijndael` cookies too
+- Documentation: the secrets of production in CI for the check of the configuration, the example workflow
+  gives them; pieceofcake2/cakephp for the check of the configuration; what differs between the engines
+
 ## 1.0.3
 
 - The comments of the code that suppress findings of the engine (`nosemgrep`, and the ignore comments of
