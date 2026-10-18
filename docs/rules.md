@@ -3,7 +3,8 @@
 The rules of this package for CakePHP 2 applications, what each one finds, and how to fix it. Each rule is
 written for Semgrep ([resources/semgrep/cakephp2.yml](../resources/semgrep/cakephp2.yml)) and PHPStan
 ([src/PHPStan/](../src/PHPStan/)), and both are tested on the same code to find the same places. Semgrep matches
-the text of the code, so a few constructs differ: e.g. a heredoc with a variable is found by PHPStan only. Semgrep also runs the PHP rules
+the text of the code, so a few constructs differ: e.g. a heredoc whose closing marker is indented (the syntax of
+PHP 7.3+) can make Semgrep misread the rest of its file, and report a concatenation of string literals there. Semgrep also runs the PHP rules
 of the Semgrep Registry (`p/php` by default), which are described on [semgrep.dev](https://semgrep.dev/p/php).
 
 | Rule | Risk | PHPStan identifier | CWE | OWASP Top 10 (2021) |

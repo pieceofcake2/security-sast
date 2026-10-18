@@ -3,7 +3,8 @@
 このパッケージの、CakePHP 2 アプリケーション向けのルールと、それぞれが見つけるもの、修正方法です。どのルールも Semgrep
 ([resources/semgrep/cakephp2.yml](../../resources/semgrep/cakephp2.yml)) と PHPStan ([src/PHPStan/](../../src/PHPStan/))
 の両方で書いてあり、同じコードで同じ箇所を見つけることをテストしています。Semgrep はコードのテキストで照合するので、
-いくつかの書き方では違います。たとえば、変数を埋め込んだヒアドキュメントは PHPStan だけが見つけます。Semgrep では、Semgrep Registry の PHP のルール (デフォルトは
+いくつかの書き方では違います。たとえば、閉じを字下げしたヒアドキュメント (PHP 7.3 以降の書き方) があると、Semgrep が
+そのファイルの残りを読み違え、文字列リテラルだけの連結を指摘することがあります。Semgrep では、Semgrep Registry の PHP のルール (デフォルトは
 `p/php`) も実行します。その内容は [semgrep.dev](https://semgrep.dev/p/php) をご覧ください。
 
 | ルール | リスク | PHPStan の識別子 | CWE | OWASP Top 10 (2021) |

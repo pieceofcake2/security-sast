@@ -54,6 +54,10 @@ final class Nodes
         if ($expr instanceof InterpolatedString) {
             return true;
         }
+        // Either value of a ternary, as Semgrep finds the concatenation in it
+        if ($expr instanceof Expr\Ternary) {
+            return ($expr->if !== null && self::isStringWithVariable($expr->if)) || self::isStringWithVariable($expr->else);
+        }
 
         return $expr instanceof Concat && !self::isLiteral($expr);
     }
