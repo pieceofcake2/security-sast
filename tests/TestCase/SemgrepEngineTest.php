@@ -194,6 +194,8 @@ class SemgrepEngineTest extends TestCase
         }
 
         $result = (new SemgrepEngine())->scan(self::APP, ['src', 'templates']);
+        // Temporary: the version of Semgrep and the code of line 56
+        fwrite(STDERR, 'SEMGREP-DEBUG ' . $result->engine . ' ' . json_encode(array_values(array_map(static fn($f): string => $f->rule . ' ' . $f->line . ' ' . $f->code, array_filter($result->findings, static fn($f): bool => in_array($f->line, [56, 93], true) && str_ends_with($f->file, 'PostsController.php'))))) . "\n");
 
         $this->assertSame(self::EXPECTED, self::places(array_filter($result->findings, static fn($finding): bool => str_starts_with($finding->rule, 'cakephp2-'))));
 
