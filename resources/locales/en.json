@@ -56,5 +56,14 @@
     "message.cakephp2-config-session-cookie": "The session cookie is configured without HttpOnly or Secure (session.cookie_httponly or session.cookie_secure is false in Session.ini). CakePHP sets both by default (Secure on HTTPS); remove the settings that turn them off.",
     "field.config": "Configuration",
     "config.env": "Checked with APP_ENV={env}",
-    "config.none": "Not checked"
+    "config.none": "Not checked",
+    "group.suppressed": "Suppressed findings",
+    "badge.suppressed": "Suppressed",
+    "field.suppressed": "Suppressed findings",
+    "field.reason": "Reason",
+    "suppressed.count": "{count} (comments in the code; they do not fail the scan)",
+    "suppressed.title": "Comments that suppress findings",
+    "suppressed.description": "These comments of the code turn findings off at their place. Check that each reason still holds: the code may have changed since.",
+    "suppressed.allRules": "every rule",
+    "suppressed.noReason": "No reason is given"
 }

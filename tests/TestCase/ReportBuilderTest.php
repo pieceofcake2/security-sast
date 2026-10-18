@@ -70,6 +70,18 @@ class ReportBuilderTest extends TestCase
         $this->assertStringNotContainsString('p/php', $html);
     }
 
+    public function testSuppressed(): void
+    {
+        $result = new ScanResult([], 3, 'PHPStan 2.3.1', suppressed: [['file' => 'src/Model/Post.php', 'line' => 12, 'rules' => ['cakephp2-query-concatenation'], 'reason' => 'The table name is a constant', 'code' => "\$this->query('TRUNCATE ' . self::TABLE);"]]);
+        $html = self::html(new Config(project: SemgrepEngineTest::APP), $result);
+
+        $this->assertStringContainsString('<div class="verdict passed">', $html);
+        $this->assertMatchesRegularExpression('#<td>\s*1 \(comments in the code; they do not fail the scan\)\s*</td>#', $html);
+        $this->assertMatchesRegularExpression('#<h3>1\. Suppressed findings</h3>#', $html);
+        $this->assertStringContainsString('<span class="badge suppressed">Suppressed</span>', $html);
+        $this->assertStringContainsString('<div class="loc">src/Model/Post.php:12　cakephp2-query-concatenation</div><div class="reason">Reason: The table name is a constant</div>', $html);
+    }
+
     public function testNoFinding(): void
     {
         $html = self::html(new Config(failOn: 'none', project: SemgrepEngineTest::APP), new ScanResult([], 10, 'PHPStan 2.1.0', ['Syntax error in a.php']));

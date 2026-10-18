@@ -178,6 +178,8 @@ file with `--settings`.
    number, and a link to its page
 3. **A page for each rule**: its title, ID, risk, CWE, OWASP Top 10 category and confidence, what it found and
    how to fix it, then each place (file and line) with its code, up to 100 places
+4. **Suppressed findings**, when comments of the code suppress some: each comment with its place, its rules,
+   its reason and the code ([Suppressing a Finding](#suppressing-a-finding))
 
 The risks of Semgrep are `ERROR` (high), `WARNING` (medium) and `INFO` (low). The rules of this package set
 their own risks (see [Rules](rules.md)).
@@ -201,6 +203,14 @@ PHPStan, with the identifier of the rule ([Rules](rules.md)):
 // The table name is a constant of the model
 $this->query('TRUNCATE ' . self::TABLE); // @phpstan-ignore securitySast.queryConcatenation
 ```
+
+The suppressions are still in the report, so that they are checked again: their number on the cover and in
+the summary of the command, and a group "Suppressed findings" with each comment, its place, its rules and its
+reason. They do not fail the run. The reason is the text after `--` (`// nosemgrep: rule-id -- reason`) or in
+parentheses (`// @phpstan-ignore securitySast.queryConcatenation (reason)`), else the comment lines just before.
+Only the comments of the engine of the run are listed: `nosemgrep` for Semgrep; for PHPStan, the ignore
+comments with an identifier of this package, and those of a line or of the next line without an identifier,
+which suppress every rule.
 
 To leave out whole paths, use `--exclude`. A finding of the configuration is fixed in the configuration, or the
 check is turned off with `--config-check=0`.

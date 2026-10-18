@@ -1,7 +1,7 @@
 /* The risks of the findings and the places in the code, added to the CSS of pieceofcake2/report */
 :root { --critical: #7a0f12; --high: #b3261e; --medium: #c25e00; --low: #8a6d00; --unknown: #6b6b6b; }
 .badge.critical { background: var(--critical); } .badge.high { background: var(--high); } .badge.medium { background: var(--medium); }
-.badge.low { background: var(--low); } .badge.unknown { background: var(--unknown); }
+.badge.low { background: var(--low); } .badge.unknown, .badge.suppressed { background: var(--unknown); }
 .t-critical { color: var(--critical); } .t-high { color: var(--high); } .t-medium { color: var(--medium); } .t-low { color: var(--low); }
 /* The number of places in the last column of the list, and the longer labels of the tables of the pages */
 .list col.time { width: 20mm; }
@@ -13,3 +13,5 @@
 .place .loc { font-family: "SF Mono", Menlo, "DejaVu Sans Mono", monospace; font-size: 8pt; font-weight: 700; }
 .place pre { margin: 1mm 0 0; padding: 2mm 3mm; background: var(--soft); border: 0.75pt solid var(--line); white-space: pre-wrap; overflow-wrap: anywhere; font-size: 7.5pt; }
 .place-more { color: var(--sub); font-size: 8pt; }
+/* The reason of a suppression, between its place and its code */
+.place .reason { font-size: 8pt; color: var(--sub); }

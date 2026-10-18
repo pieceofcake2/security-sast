@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## Unreleased
+
+- The comments of the code that suppress findings of the engine (`nosemgrep`, and the ignore comments of
+  PHPStan for the rules of this package) are in the report, with their places, rules and reasons: their number
+  on the cover and in the summary of the command, and a group "Suppressed findings". They do not fail the run
+
 ## 1.0.2
 
 - `cakephp2-view-unescaped-output` no longer reports a variable set in the view to a string literal or to a

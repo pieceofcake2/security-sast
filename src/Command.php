@@ -93,6 +93,13 @@ final class Command
                 $result->errors[] = $loadError;
             }
             $result->paths = $paths;
+            $result->suppressed = Suppressions::find(
+                (string)realpath($config->project),
+                $paths,
+                $config->exclude($layout),
+                array_values(array_unique(array_merge(['php'], $config->viewExtensions($layout)))),
+                str_starts_with($result->engine, 'PHPStan') ? 'phpstan' : 'semgrep',
+            );
             $finishedAt = new DateTimeImmutable('now', $timezone);
 
             $translator = ReportBuilder::translator($config->language, $config->localeDir);
@@ -115,12 +122,13 @@ final class Command
             }
         }
         fwrite($this->stdout, sprintf(
-            "%d findings%s of %d rules in %d files (%s). Report: %s\n",
+            "%d findings%s of %d rules in %d files (%s)%s. Report: %s\n",
             count($result->findings),
             $summary === [] ? '' : ' (' . implode(', ', $summary) . ')',
             count($result->byRule()),
             $result->files,
             $result->engine,
+            $result->suppressed === [] ? '' : sprintf(', %d suppressed', count($result->suppressed)),
             $config->pdf,
         ));
 
