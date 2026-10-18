@@ -84,8 +84,9 @@ class PostsController extends AppController
     {
         $id = $this->request->query('id');
         $this->Post->query(<<<SQL
-            SELECT * FROM posts WHERE id = $id
-            SQL);
+SELECT * FROM posts WHERE id = $id
+SQL
+        );
         $data = unserialize($this->request['data']['payload']);
         $this->Post->updateAll(['Post.published' => 1], sprintf('Post.id = %d', 'a' . $id));
         $this->Post->query($id ? 'SELECT * FROM posts WHERE id = ' . $id : 'SELECT 1');
