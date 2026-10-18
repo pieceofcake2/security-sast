@@ -94,4 +94,24 @@ SQL
         $this->Post->query('SELECT * FROM posts WHERE price > ' . "$1");
         $this->set(compact('data'));
     }
+
+    public function sinks()
+    {
+        $q = $this->request->query('q');
+        $this->Post->find('all', ['conditions' => ['OR' => ["Post.title LIKE '%" . $q . "%'", 'Post.body' => $q]]]);
+        $this->Post->find('all', ['order' => $this->request->query('sort')]);
+        $this->paginate = ['fields' => $this->request->data('fields')];
+        $this->Post->getDataSource()->fetchAll('SELECT * FROM posts WHERE id = ' . $q);
+        $this->Post->field('title', 'Post.id = ' . $q);
+        $this->Post->hasAny("Post.slug = '$q'");
+        $this->Post->updateAll(['Post.title' => "'" . $q . "'"], ['Post.id' => 1]);
+        $this->Post->find('all', ['order' => ['Post.created' => 'DESC']]);
+
+        return $this->redirect(['action' => 'view', $this->request->params['pass'][0]]);
+    }
+
+    public function ajax()
+    {
+        $this->render($this->request->is('ajax') ? 'ajax' : 'index');
+    }
 }
