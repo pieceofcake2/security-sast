@@ -992,6 +992,102 @@
     "validation_state": "NO_VALIDATOR",
     "engine_kind": "OSS"
    }
+  },
+  {
+   "check_id": "rules.cakephp2-conditions-string",
+   "path": "src/Controller/PostsController.php",
+   "start": {
+    "line": 77,
+    "col": 34,
+    "offset": 0
+   },
+   "end": {
+    "line": 77,
+    "col": 87,
+    "offset": 0
+   },
+   "extra": {
+    "message": "A conditions string with a variable is passed to find(), deleteAll() or updateAll(). Use a conditions array (['Post.title' => $title]) so that the value is escaped.",
+    "metadata": {
+     "cwe": [
+      "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "MEDIUM"
+    },
+    "severity": "ERROR",
+    "fingerprint": "requires login",
+    "lines": "        $this->Post->find('all', ['recursive' => -1, 'conditions' => \"Post.id = $id\"]);",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-conditions-string",
+   "path": "src/Controller/PostsController.php",
+   "start": {
+    "line": 78,
+    "col": 34,
+    "offset": 0
+   },
+   "end": {
+    "line": 78,
+    "col": 83,
+    "offset": 0
+   },
+   "extra": {
+    "message": "A conditions string with a variable is passed to find(), deleteAll() or updateAll(). Use a conditions array (['Post.title' => $title]) so that the value is escaped.",
+    "metadata": {
+     "cwe": [
+      "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "MEDIUM"
+    },
+    "severity": "ERROR",
+    "fingerprint": "requires login",
+    "lines": "        $this->paginate = ['limit' => 20, 'conditions' => 'Post.user_id = ' . $id];",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-conditions-string",
+   "path": "src/Controller/PostsController.php",
+   "start": {
+    "line": 79,
+    "col": 34,
+    "offset": 0
+   },
+   "end": {
+    "line": 79,
+    "col": 112,
+    "offset": 0
+   },
+   "extra": {
+    "message": "A conditions string with a variable is passed to find(), deleteAll() or updateAll(). Use a conditions array (['Post.title' => $title]) so that the value is escaped.",
+    "metadata": {
+     "cwe": [
+      "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "MEDIUM"
+    },
+    "severity": "ERROR",
+    "fingerprint": "requires login",
+    "lines": "        $this->Post->find('all', ['recursive' => -1, 'conditions' => ['Post.published' => 1, \"Post.id = $id\"]]);",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
   }
  ],
  "errors": [],

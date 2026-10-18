@@ -45,8 +45,9 @@ rules:
     pattern-either:
       - patterns:
           - pattern-either:
-              - pattern: "['conditions' => $V, ...]"
-              - pattern: "['conditions' => [..., $V, ...], ...]"
+              # In any place of the options, e.g. after 'recursive'
+              - pattern: "[..., 'conditions' => $V, ...]"
+              - pattern: "[..., 'conditions' => [..., $V, ...], ...]"
               - pattern: $M->deleteAll($V, ...)
               - pattern: $M->updateAll($F, $V, ...)
           # A concatenation with a value that is not a string literal, as the value itself (not in a call)
@@ -64,8 +65,9 @@ rules:
               regex: '\A(?!\s*(?:''(?:[^''\\]|\\.)*''|"(?:[^"\\]|\\.)*")\s*=>)(?!\s*(?:''(?:[^''\\]|\\.)*''|"(?:[^"\\$]|\\.)*"|\d+(?:\.\d+)?)(?:\s*\.\s*(?:''(?:[^''\\]|\\.)*''|"(?:[^"\\$]|\\.)*"|\d+(?:\.\d+)?))*\s*\z)'
       - patterns:
           - pattern-either:
-              - pattern: "['conditions' => $V, ...]"
-              - pattern: "['conditions' => [..., $V, ...], ...]"
+              # In any place of the options, e.g. after 'recursive'
+              - pattern: "[..., 'conditions' => $V, ...]"
+              - pattern: "[..., 'conditions' => [..., $V, ...], ...]"
               - pattern: $M->deleteAll($V, ...)
               - pattern: $M->updateAll($F, $V, ...)
           # A double-quoted string with a variable in it, not an item with a key
