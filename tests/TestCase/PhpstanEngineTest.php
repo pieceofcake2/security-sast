@@ -15,7 +15,7 @@ class PhpstanEngineTest extends TestCase
 
         // The same places as the Semgrep rules, and no other error of PHPStan
         $this->assertSame(SemgrepEngineTest::EXPECTED, SemgrepEngineTest::places($result->findings));
-        $this->assertSame(10, $result->files);
+        $this->assertSame(11, $result->files);
         $this->assertStringStartsWith('PHPStan 2.', $result->engine);
         $view = array_values(array_filter($result->findings, static fn($finding): bool => $finding->file === 'templates/Posts/view.ctp'))[0];
         $this->assertSame('<div><?= $post[\'Post\'][\'body\'] ?></div>', $view->code);
@@ -36,6 +36,8 @@ class PhpstanEngineTest extends TestCase
             'cakephp2-view-unescaped-output templates/Posts/links.ctp:11',
             'cakephp2-view-unescaped-output templates/Posts/links.ctp:12',
             'cakephp2-view-unescaped-output templates/Posts/links.ctp:13',
+            'cakephp2-view-unescaped-output templates/Posts/parity.ctp:7',
+            'cakephp2-view-unescaped-output templates/Posts/parity.ctp:8',
             'cakephp2-view-unescaped-output templates/Posts/request.ctp:10',
             'cakephp2-view-unescaped-output templates/Posts/request.ctp:6',
             'cakephp2-view-unescaped-output templates/Posts/request.ctp:7',
@@ -43,7 +45,7 @@ class PhpstanEngineTest extends TestCase
             'cakephp2-view-unescaped-output templates/Posts/view.ctp:2',
             'cakephp2-view-unescaped-output templates/Posts/view.ctp:3',
         ], $views);
-        $this->assertSame(11, $result->files);
+        $this->assertSame(12, $result->files);
     }
 
     public function testScanWithSafeViewVariables(): void
@@ -102,9 +104,9 @@ class PhpstanEngineTest extends TestCase
 
     public function testCountFiles(): void
     {
-        $this->assertSame(10, PhpstanEngine::countFiles(SemgrepEngineTest::APP, ['src', 'templates']));
-        $this->assertSame(9, PhpstanEngine::countFiles(SemgrepEngineTest::APP, ['src', 'templates'], ['src/Model']));
-        $this->assertSame(11, PhpstanEngine::countFiles(SemgrepEngineTest::APP, ['src', 'templates'], [], ['ctp', 'php', 'html']));
+        $this->assertSame(11, PhpstanEngine::countFiles(SemgrepEngineTest::APP, ['src', 'templates']));
+        $this->assertSame(10, PhpstanEngine::countFiles(SemgrepEngineTest::APP, ['src', 'templates'], ['src/Model']));
+        $this->assertSame(12, PhpstanEngine::countFiles(SemgrepEngineTest::APP, ['src', 'templates'], [], ['ctp', 'php', 'html']));
         $this->assertSame(1, PhpstanEngine::countFiles(SemgrepEngineTest::APP, ['templates/Posts/view.ctp']));
     }
 

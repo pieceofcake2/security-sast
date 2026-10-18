@@ -39,7 +39,8 @@ final class ConditionsStringRule implements Rule
             }
             if ($item->value instanceof Array_) {
                 foreach ($item->value->items as $condition) {
-                    if ($condition->key === null && Nodes::isStringWithVariable($condition->value)) {
+                    // A string without a key, or a key with a variable: CakePHP escapes the values only
+                    if (($condition->key === null && Nodes::isStringWithVariable($condition->value)) || ($condition->key !== null && Nodes::isStringWithVariable($condition->key))) {
                         return [Nodes::error('cakephp2-conditions-string')];
                     }
                 }

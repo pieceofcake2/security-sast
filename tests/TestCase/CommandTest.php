@@ -141,7 +141,7 @@ class CommandTest extends TestCase
         $output = '';
         try {
             $this->assertSame(Command::FAILURE, self::runCommand(['--pdf=' . $pdf], $output));
-            $this->assertStringContainsString('34 findings (15 high, 19 medium) of 8 rules in 10 files (PHPStan 2.', $output);
+            $this->assertStringContainsString('40 findings (19 high, 21 medium) of 8 rules in 11 files (PHPStan 2.', $output);
             $this->assertStringStartsWith('%PDF', (string)file_get_contents($pdf));
 
             $this->assertSame(Command::SUCCESS, self::runCommand(['--pdf=' . $pdf, '--fail-on=critical']));

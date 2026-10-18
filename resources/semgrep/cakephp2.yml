@@ -22,14 +22,14 @@ rules:
           # Not an item with a key, and not of string literals only
           - metavariable-regex:
               metavariable: $V
-              regex: '\A(?!\s*(?:''(?:[^''\\]|\\.)*''|"(?:[^"\\]|\\.)*")\s*=>)(?!\s*(?:''(?:[^''\\]|\\.)*''|"(?:[^"\\$]|\\.)*"|\d+(?:\.\d+)?)(?:\s*\.\s*(?:''(?:[^''\\]|\\.)*''|"(?:[^"\\$]|\\.)*"|\d+(?:\.\d+)?))*\s*\z)'
+              regex: '\A(?!\s*(?:''(?:[^''\\]|\\.)*''|"(?:[^"\\]|\\.)*")\s*=>)(?!\s*(?:''(?:[^''\\]|\\.)*''|"(?:[^"\\$]|\\.|\$(?![A-Za-z_{]))*"|\d+(?:\.\d+)?)(?:\s*\.\s*(?:''(?:[^''\\]|\\.)*''|"(?:[^"\\$]|\\.|\$(?![A-Za-z_{]))*"|\d+(?:\.\d+)?))*\s*\z)'
       - patterns:
           - pattern: $M->query($V, ...)
           - pattern-not: $this->request->query(...)
-          # A double-quoted string with a variable in it, not an item with a key
+          # A double-quoted string or a heredoc with a variable in it, not an item with a key
           - metavariable-regex:
               metavariable: $V
-              regex: '\A(?!\s*(?:''(?:[^''\\]|\\.)*''|"(?:[^"\\]|\\.)*")\s*=>)"(?:[^"\\]|\\.)*\$[A-Za-z_{]'
+              regex: '\A(?!\s*(?:''(?:[^''\\]|\\.)*''|"(?:[^"\\]|\\.)*")\s*=>)(?:"(?:[^"\\]|\\.)*\$[A-Za-z_{]|<<<[ \t]*"?[A-Za-z_]\w*"?\R[\s\S]*?\$[A-Za-z_{])'
     metadata:
       cwe: ["CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"]
       owasp: ["A03:2021 - Injection"]
@@ -49,7 +49,7 @@ rules:
               - pattern: "[..., 'conditions' => $V, ...]"
               - pattern: "[..., 'conditions' => [..., $V, ...], ...]"
               - pattern: $M->deleteAll($V, ...)
-              - pattern: $M->updateAll($F, $V, ...)
+              - pattern: $M->updateAll($FIELDS, $V, ...)
           # A concatenation with a value that is not a string literal, as the value itself (not in a call)
           - metavariable-pattern:
               metavariable: $V
@@ -62,18 +62,18 @@ rules:
           # Not an item with a key, and not of string literals only
           - metavariable-regex:
               metavariable: $V
-              regex: '\A(?!\s*(?:''(?:[^''\\]|\\.)*''|"(?:[^"\\]|\\.)*")\s*=>)(?!\s*(?:''(?:[^''\\]|\\.)*''|"(?:[^"\\$]|\\.)*"|\d+(?:\.\d+)?)(?:\s*\.\s*(?:''(?:[^''\\]|\\.)*''|"(?:[^"\\$]|\\.)*"|\d+(?:\.\d+)?))*\s*\z)'
+              regex: '\A(?!\s*(?:''(?:[^''\\]|\\.)*''|"(?:[^"\\]|\\.)*")\s*=>)(?!\s*(?:''(?:[^''\\]|\\.)*''|"(?:[^"\\$]|\\.|\$(?![A-Za-z_{]))*"|\d+(?:\.\d+)?)(?:\s*\.\s*(?:''(?:[^''\\]|\\.)*''|"(?:[^"\\$]|\\.|\$(?![A-Za-z_{]))*"|\d+(?:\.\d+)?))*\s*\z)'
       - patterns:
           - pattern-either:
               # In any place of the options, e.g. after 'recursive'
               - pattern: "[..., 'conditions' => $V, ...]"
               - pattern: "[..., 'conditions' => [..., $V, ...], ...]"
               - pattern: $M->deleteAll($V, ...)
-              - pattern: $M->updateAll($F, $V, ...)
-          # A double-quoted string with a variable in it, not an item with a key
+              - pattern: $M->updateAll($FIELDS, $V, ...)
+          # A double-quoted string or a heredoc with a variable in it, not an item with a key
           - metavariable-regex:
               metavariable: $V
-              regex: '\A(?!\s*(?:''(?:[^''\\]|\\.)*''|"(?:[^"\\]|\\.)*")\s*=>)"(?:[^"\\]|\\.)*\$[A-Za-z_{]'
+              regex: '\A(?!\s*(?:''(?:[^''\\]|\\.)*''|"(?:[^"\\]|\\.)*")\s*=>)(?:"(?:[^"\\]|\\.)*\$[A-Za-z_{]|<<<[ \t]*"?[A-Za-z_]\w*"?\R[\s\S]*?\$[A-Za-z_{])'
     metadata:
       cwe: ["CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"]
       owasp: ["A03:2021 - Injection"]
@@ -88,7 +88,7 @@ rules:
       Router::url() of a route array, or check the URL against a list.
     # The values of the request, as PHPStan finds them: $this->request and the superglobals of the request
     pattern-either:
-      - pattern: $this->redirect(<... $this->request->$P ...>, ...)
+      - pattern: $this->redirect(<... $this->request ...>, ...)
       - pattern: $this->redirect(<... $_GET ...>, ...)
       - pattern: $this->redirect(<... $_POST ...>, ...)
       - pattern: $this->redirect(<... $_REQUEST ...>, ...)
@@ -108,13 +108,13 @@ rules:
       value to a list of allowed views.
     # The values of the request, as PHPStan finds them: $this->request and the superglobals of the request
     pattern-either:
-      - pattern: $this->render(<... $this->request->$P ...>, ...)
+      - pattern: $this->render(<... $this->request ...>, ...)
       - pattern: $this->render(<... $_GET ...>, ...)
       - pattern: $this->render(<... $_POST ...>, ...)
       - pattern: $this->render(<... $_REQUEST ...>, ...)
       - pattern: $this->render(<... $_COOKIE ...>, ...)
       - pattern: $this->render(<... $_FILES ...>, ...)
-      - pattern: $this->element(<... $this->request->$P ...>, ...)
+      - pattern: $this->element(<... $this->request ...>, ...)
       - pattern: $this->element(<... $_GET ...>, ...)
       - pattern: $this->element(<... $_POST ...>, ...)
       - pattern: $this->element(<... $_REQUEST ...>, ...)
@@ -149,7 +149,7 @@ rules:
       A value of the request is passed to unserialize(): it can create objects of any class. Use json_decode().
     # The values of the request, as PHPStan finds them: $this->request and the superglobals of the request
     pattern-either:
-      - pattern: unserialize(<... $this->request->$P ...>, ...)
+      - pattern: unserialize(<... $this->request ...>, ...)
       - pattern: unserialize(<... $_GET ...>, ...)
       - pattern: unserialize(<... $_POST ...>, ...)
       - pattern: unserialize(<... $_REQUEST ...>, ...)
@@ -188,7 +188,7 @@ rules:
           # the layouts. SecuritySast\SemgrepEngine adds the safe variables of the settings to the names.
           - metavariable-regex:
               metavariable: $X
-              regex: '\A\$(?!this\b)(?!(?:content_for_layout|scripts_for_layout)\b)[A-Za-z_]\w*(?:\[[^\]]*\]|->\w+)*\z'
+              regex: '\A\$(?!this\b)(?!(?:content_for_layout|scripts_for_layout)\b)[A-Za-z_]\w*(?:\[(?:[^\[\]]|\[[^\]]*\])*\]|->\w+)*\z'
           # A variable that holds the output of a helper, an escaped value or a number
           - pattern-not-inside: |
               $X = $this->$HELPER->$METHOD(...);
@@ -236,7 +236,7 @@ rules:
           - pattern: echo $X;
           - metavariable-regex:
               metavariable: $X
-              regex: '\A\$(?!this\b)(?!(?:content_for_layout|scripts_for_layout)\b)[A-Za-z_]\w*(?:\[[^\]]*\]|->\w+)*\z'
+              regex: '\A\$(?!this\b)(?!(?:content_for_layout|scripts_for_layout)\b)[A-Za-z_]\w*(?:\[(?:[^\[\]]|\[[^\]]*\])*\]|->\w+)*\z'
           - pattern-inside: |
               $X = $Y;
               ...
@@ -246,6 +246,27 @@ rules:
           - pattern-not-inside: |
               $X = h(...);
               ...
+      # A variable set to a string literal, then to another value, as PHPStan takes the last assignment
+      - patterns:
+          - pattern: echo $X;
+          - metavariable-regex:
+              metavariable: $X
+              regex: '\A\$(?!this\b)(?!(?:content_for_layout|scripts_for_layout)\b)[A-Za-z_]\w*(?:\[(?:[^\[\]]|\[[^\]]*\])*\]|->\w+)*\z'
+          - pattern-inside: |
+              $X = '...';
+              ...
+              $X = $Y;
+              ...
+          - metavariable-pattern:
+              metavariable: $Y
+              patterns:
+                - pattern: $Z
+                - pattern-not: "'...'"
+                - pattern-not: h(...)
+                - pattern-not: count(...)
+                - pattern-not: (int)$W
+                - pattern-not: (float)$W
+                - pattern-not: $this->$HELPER->$METHOD(...)
     paths:
       include:
         - "**/templates/**/*.ctp"

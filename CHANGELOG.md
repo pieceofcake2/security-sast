@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Both engines find the same places in more cases, checked on the same code with Semgrep in Docker:
+  - Semgrep finds SQL in a heredoc with a variable, values of the request read as an array
+    (`$this->request['data']`), a variable of a view set to `''` and then to another value, and nested indexes
+    (`$labels[$post['Post']['status']]`)
+  - Semgrep no longer reports a call in the conditions of `updateAll()`, nor a literal `"$1"`
+  - PHPStan finds a concatenation in a ternary, and a key of the conditions with a variable
+    (`['Post.' . $field => $value]`), which CakePHP does not escape
 - The suppressed findings of the report are the lines that the engine does not report, as it reads its comments,
   checked against both engines: Semgrep reads the text of the lines (` nosem` too, also in a string or an HTML
   comment, and not the word in a sentence), and neither engine applies a comment across another comment or an

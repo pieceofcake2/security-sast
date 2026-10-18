@@ -86,7 +86,7 @@ class SemgrepEngineTest extends TestCase
         $this->assertStringStartsWith('docker run --rm -v ' . realpath(self::APP) . ':/src:ro -v ', $command);
         $this->assertStringContainsString(':/rules:ro -w /src semgrep/semgrep:1.180.0 semgrep scan --json --metrics=off', $command);
         $this->assertStringContainsString(' --scan-unknown-extensions ', $command);
-        $this->assertStringContainsString('--config /rules/cakephp2.yml --config p/php --config /src/rules/app.yml --include /src --include /templates --exclude /vendor . templates/Emails/html/default.ctp templates/Posts/edit.ctp templates/Posts/index.php templates/Posts/links.ctp templates/Posts/request.ctp templates/Posts/view.ctp', $command);
+        $this->assertStringContainsString('--config /rules/cakephp2.yml --config p/php --config /src/rules/app.yml --include /src --include /templates --exclude /vendor . templates/Emails/html/default.ctp templates/Posts/edit.ctp templates/Posts/index.php templates/Posts/links.ctp templates/Posts/parity.ctp templates/Posts/request.ctp templates/Posts/view.ctp', $command);
     }
 
     public function testResult(): void
@@ -95,7 +95,7 @@ class SemgrepEngineTest extends TestCase
         $result = SemgrepEngine::result($data, (string)realpath(self::APP));
 
         $this->assertSame(self::EXPECTED, self::places($result->findings));
-        $this->assertSame(9, $result->files);
+        $this->assertSame(10, $result->files);
         $this->assertStringStartsWith('Semgrep 1.', $result->engine);
         $this->assertSame([], $result->errors);
 
@@ -194,8 +194,6 @@ class SemgrepEngineTest extends TestCase
         }
 
         $result = (new SemgrepEngine())->scan(self::APP, ['src', 'templates']);
-        // Temporary: the version of Semgrep and the code of line 56
-        fwrite(STDERR, 'SEMGREP-DEBUG ' . $result->engine . ' ' . json_encode(array_values(array_map(static fn($f): string => $f->rule . ' ' . $f->line . ' ' . $f->code, array_filter($result->findings, static fn($f): bool => in_array($f->line, [56, 93], true) && str_ends_with($f->file, 'PostsController.php'))))) . "\n");
 
         $this->assertSame(self::EXPECTED, self::places(array_filter($result->findings, static fn($finding): bool => str_starts_with($finding->rule, 'cakephp2-'))));
 
