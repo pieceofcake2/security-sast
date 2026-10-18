@@ -56,5 +56,14 @@
     "message.cakephp2-config-session-cookie": "セッションの Cookie の HttpOnly か Secure を無効にしています (Session.ini の session.cookie_httponly か session.cookie_secure が false)。CakePHP はどちらも既定で付けます (Secure は HTTPS のとき)。無効にしている設定を削除してください。",
     "field.config": "設定",
     "config.env": "APP_ENV={env} で検査",
-    "config.none": "検査していません"
+    "config.none": "検査していません",
+    "group.suppressed": "抑制した指摘",
+    "badge.suppressed": "抑制",
+    "field.suppressed": "抑制した指摘",
+    "field.reason": "理由",
+    "suppressed.count": "{count} 件（コードのコメント。不合格にはなりません）",
+    "suppressed.title": "指摘を抑制するコメント",
+    "suppressed.description": "コードのこれらのコメントが、その場所の指摘を止めています。それぞれの理由がまだ成り立つか確かめてください。コードがその後に変わっているかもしれません。",
+    "suppressed.allRules": "すべてのルール",
+    "suppressed.noReason": "理由は書かれていません"
 }

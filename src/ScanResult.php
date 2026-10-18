@@ -17,6 +17,9 @@ final class ScanResult
      * @param array<string> $errors Errors of the engine that did not stop the scan, e.g. files it could not parse
      * @param string|null $configEnv `APP_ENV` of the checked configuration, or null when it was not checked
      * @param array<string> $paths Scanned paths, relative to the project
+     * @param array<array{file: string, line: int, rules: array<string>, reason: string|null, code: string}> $suppressed
+     *  The comments of the code that suppress findings of the engine (`Suppressions`): reported, but they do not
+     *  fail the scan
      */
     public function __construct(
         public array $findings = [],
@@ -25,6 +28,7 @@ final class ScanResult
         public array $errors = [],
         public ?string $configEnv = null,
         public array $paths = [],
+        public array $suppressed = [],
     ) {
     }
 

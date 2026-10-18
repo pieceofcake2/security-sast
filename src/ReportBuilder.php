@@ -86,6 +86,9 @@ final class ReportBuilder
             array_push($rules, ...$config->semgrepConfigs);
         }
         $target[] = new Row($this->t('field.rules'), implode('　', $rules));
+        if ($result->suppressed !== []) {
+            $target[] = new Row($this->t('field.suppressed'), $this->t('suppressed.count', ['count' => count($result->suppressed)]));
+        }
         $target[] = new Row($this->t('field.config'), $result->configEnv !== null ? $this->t('config.env', ['env' => $result->configEnv]) : $this->t('config.none'));
         $target[] = new Row($this->t('field.threshold'), $config->failOn === 'none'
             ? $this->t('threshold.none')
@@ -163,7 +166,46 @@ final class ReportBuilder
             }
         }
 
+        if ($result->suppressed !== []) {
+            $group = new Group(count($groups) + 1, $this->t('group.suppressed'));
+            $group->items[] = new Item(
+                $group->no . '-1',
+                $this->t('suppressed.title'),
+                'suppressed',
+                $this->t('badge.suppressed'),
+                (string)count($result->suppressed),
+                [new Row($this->t('field.suppressed'), (string)count($result->suppressed))],
+                $this->t('suppressed.description'),
+                body: $this->suppressed($result->suppressed),
+            );
+            $groups[] = $group;
+        }
+
         return $groups;
+    }
+
+    /**
+     * The suppressions of the code: the place and the rules, the reason, then the code
+     *
+     * @param array<array{file: string, line: int, rules: array<string>, reason: string|null, code: string}> $suppressed
+     *  Suppressions
+     * @return string HTML
+     */
+    private function suppressed(array $suppressed): string
+    {
+        $h = static fn(string $text): string => htmlspecialchars($text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $html = '<div class="places">';
+        foreach ($suppressed as $suppression) {
+            $rules = $suppression['rules'] !== [] ? implode(', ', $suppression['rules']) : $this->t('suppressed.allRules');
+            $html .= '<div class="place"><div class="loc">' . $h($suppression['file'] . ':' . $suppression['line']) . '　' . $h($rules) . '</div>'
+                . '<div class="reason">' . $h($this->t('field.reason')) . ': ' . $h($suppression['reason'] ?? $this->t('suppressed.noReason')) . '</div>';
+            if ($suppression['code'] !== '') {
+                $html .= '<pre>' . $h($suppression['code']) . '</pre>';
+            }
+            $html .= '</div>';
+        }
+
+        return $html . '</div>';
     }
 
     /**
