@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Unreleased
+## 1.0.1
 
 - `cakephp2-conditions-string` also finds the conditions strings of `deleteAll()` and `updateAll()`, as the
   documentation said
