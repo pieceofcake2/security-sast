@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Unreleased
+## 1.0.3
 
 - The comments of the code that suppress findings of the engine (`nosemgrep`, and the ignore comments of
   PHPStan for the rules of this package) are in the report, with their places, rules and reasons: their number
