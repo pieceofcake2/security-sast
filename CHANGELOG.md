@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Unreleased
+## 1.0.4
 
 - `cakephp2-view-unescaped-output` reports the values of the request and of the session printed in a view, as
   they are or through a variable set to them: `$this->request` (`query()`, `data`, ...), `$this->data`,
