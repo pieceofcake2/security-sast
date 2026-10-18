@@ -42,8 +42,8 @@ class ReportBuilderTest extends TestCase
         $this->assertStringContainsString('<h1>Static Application Security Testing Report</h1>', $html);
         $this->assertStringContainsString('<div class="project">acme/app</div>', $html);
         $this->assertStringContainsString('<div class="verdict failed">', $html);
-        $this->assertStringContainsString('<b class="t-high">19</b><span>High</span>', $html);
-        $this->assertStringContainsString('<b class="t-medium">21</b><span>Medium</span>', $html);
+        $this->assertStringContainsString('<b class="t-high">26</b><span>High</span>', $html);
+        $this->assertStringContainsString('<b class="t-medium">22</b><span>Medium</span>', $html);
         $this->assertStringContainsString('src　templates', $html);
         $this->assertStringContainsString('pieceofcake2/security-sast (CakePHP 2)　p/php', $html);
         $this->assertStringContainsString('Semgrep 1.', $html);
@@ -65,9 +65,22 @@ class ReportBuilderTest extends TestCase
         $this->assertStringContainsString("<h1>静的アプリケーションセキュリティテスト\u{200b}報告書</h1>", $html);
         $this->assertStringContainsString('<div class="verdict passed">', $html);
         $this->assertStringContainsString('Model::query() に変数を含む SQL', $html);
-        $this->assertStringContainsString('変数を含む文字列で組み立てた SQL を Model::query() に渡しています。', $html);
+        $this->assertStringContainsString('変数を含む文字列で組み立てた SQL を Model::query() (または fetchAll()、execute()) に渡しています。', $html);
         $this->assertStringContainsString('<td class="num">2箇所</td>', $html);
         $this->assertStringNotContainsString('p/php', $html);
+    }
+
+    public function testSemgrepignore(): void
+    {
+        $project = TMP . 'semgrepignore';
+        is_dir($project) || mkdir($project);
+        file_put_contents($project . DS . '.semgrepignore', "legacy/\n");
+
+        $html = self::html(new Config(project: $project), new ScanResult([], 1, 'Semgrep 1.180.0'));
+        $this->assertStringContainsString('Semgrep also leaves out the paths of the .semgrepignore of the project', $html);
+
+        $html = self::html(new Config(project: $project, engine: 'phpstan'), new ScanResult([], 1, 'PHPStan 2.3.1'));
+        $this->assertStringNotContainsString('.semgrepignore', $html);
     }
 
     public function testSuppressed(): void

@@ -4,11 +4,16 @@ rules:
     languages: [php]
     severity: ERROR
     message: >-
-      SQL built from a string with a variable is passed to Model::query(). Use the values array of query()
+      SQL built from a string with a variable is passed to Model::query() (or fetchAll(), execute()). Use the
+      values array of query()
       ($this->Model->query('... WHERE id = ?', [$id])) or find() with conditions arrays.
     pattern-either:
       - patterns:
-          - pattern: $M->query($V, ...)
+          - pattern-either:
+              - pattern: $M->query($V, ...)
+              # The methods of the datasource, e.g. $this->Post->getDataSource()->fetchAll($sql)
+              - pattern: $M->fetchAll($V, ...)
+              - pattern: $M->execute($V, ...)
           - pattern-not: $this->request->query(...)
           # A concatenation with a value that is not a string literal, as the value itself (not in a call)
           - metavariable-pattern:
@@ -24,7 +29,11 @@ rules:
               metavariable: $V
               regex: '\A(?!\s*(?:''(?:[^''\\]|\\.)*''|"(?:[^"\\]|\\.)*")\s*=>)(?!\s*(?:''(?:[^''\\]|\\.)*''|"(?:[^"\\$]|\\.|\$(?![A-Za-z_{]))*"|\d+(?:\.\d+)?)(?:\s*\.\s*(?:''(?:[^''\\]|\\.)*''|"(?:[^"\\$]|\\.|\$(?![A-Za-z_{]))*"|\d+(?:\.\d+)?))*\s*\z)'
       - patterns:
-          - pattern: $M->query($V, ...)
+          - pattern-either:
+              - pattern: $M->query($V, ...)
+              # The methods of the datasource, e.g. $this->Post->getDataSource()->fetchAll($sql)
+              - pattern: $M->fetchAll($V, ...)
+              - pattern: $M->execute($V, ...)
           - pattern-not: $this->request->query(...)
           # A double-quoted string or a heredoc with a variable in it, not an item with a key
           - metavariable-regex:
@@ -40,8 +49,9 @@ rules:
     languages: [php]
     severity: ERROR
     message: >-
-      A conditions string with a variable is passed to find(), deleteAll() or updateAll(). Use a conditions array
-      (['Post.title' => $title]) so that the value is escaped.
+      A conditions string with a variable is passed to find(), deleteAll(), updateAll(), field() or hasAny(), or as a
+      value of the fields of updateAll(). Use a conditions array (['Post.title' => $title]) so that the value is
+      escaped.
     pattern-either:
       - patterns:
           - pattern-either:
@@ -50,6 +60,10 @@ rules:
               - pattern: "[..., 'conditions' => [..., $V, ...], ...]"
               - pattern: $M->deleteAll($V, ...)
               - pattern: $M->updateAll($FIELDS, $V, ...)
+              - pattern: $M->field($NAME, $V, ...)
+              - pattern: $M->hasAny($V, ...)
+              # The fields of updateAll() are SQL too
+              - pattern: $M->updateAll([..., $FIELD => $V, ...], ...)
           # A concatenation with a value that is not a string literal, as the value itself (not in a call)
           - metavariable-pattern:
               metavariable: $V
@@ -70,10 +84,72 @@ rules:
               - pattern: "[..., 'conditions' => [..., $V, ...], ...]"
               - pattern: $M->deleteAll($V, ...)
               - pattern: $M->updateAll($FIELDS, $V, ...)
+              - pattern: $M->field($NAME, $V, ...)
+              - pattern: $M->hasAny($V, ...)
+              # The fields of updateAll() are SQL too
+              - pattern: $M->updateAll([..., $FIELD => $V, ...], ...)
           # A double-quoted string or a heredoc with a variable in it, not an item with a key
           - metavariable-regex:
               metavariable: $V
               regex: '\A(?!\s*(?:''(?:[^''\\]|\\.)*''|"(?:[^"\\]|\\.)*")\s*=>)(?:"(?:[^"\\]|\\.)*\$[A-Za-z_{]|<<<[ \t]*"?[A-Za-z_]\w*"?\R[\s\S]*?\$[A-Za-z_{])'
+      # The conditions of OR, AND, NOT and XOR in the conditions
+      - patterns:
+          - pattern: "[..., 'conditions' => [..., $LOGIC => [..., $V, ...], ...], ...]"
+          - metavariable-regex:
+              metavariable: $LOGIC
+              regex: '\A[''"](?i:or|and|not|xor)[''"]\z'
+          # A concatenation with a value that is not a string literal, as the value itself (not in a call)
+          - metavariable-pattern:
+              metavariable: $V
+              patterns:
+                - pattern: $A . $B
+                - pattern-not-inside: $F(...)
+                - pattern-not-inside: $O->$F(...)
+                - pattern-not-inside: $C::$F(...)
+                - pattern-not-inside: '[...]'
+          # Not an item with a key, and not of string literals only
+          - metavariable-regex:
+              metavariable: $V
+              regex: '\A(?!\s*(?:''(?:[^''\\]|\\.)*''|"(?:[^"\\]|\\.)*")\s*=>)(?!\s*(?:''(?:[^''\\]|\\.)*''|"(?:[^"\\$]|\\.|\$(?![A-Za-z_{]))*"|\d+(?:\.\d+)?)(?:\s*\.\s*(?:''(?:[^''\\]|\\.)*''|"(?:[^"\\$]|\\.|\$(?![A-Za-z_{]))*"|\d+(?:\.\d+)?))*\s*\z)'
+      - patterns:
+          - pattern: "[..., 'conditions' => [..., $LOGIC => [..., $V, ...], ...], ...]"
+          - metavariable-regex:
+              metavariable: $LOGIC
+              regex: '\A[''"](?i:or|and|not|xor)[''"]\z'
+          # A double-quoted string or a heredoc with a variable in it, not an item with a key
+          - metavariable-regex:
+              metavariable: $V
+              regex: '\A(?!\s*(?:''(?:[^''\\]|\\.)*''|"(?:[^"\\]|\\.)*")\s*=>)(?:"(?:[^"\\]|\\.)*\$[A-Za-z_{]|<<<[ \t]*"?[A-Za-z_]\w*"?\R[\s\S]*?\$[A-Za-z_{])'
+    metadata:
+      cwe: ["CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"]
+      owasp: ["A03:2021 - Injection"]
+      category: security
+      confidence: MEDIUM
+
+  - id: cakephp2-order-request
+    languages: [php]
+    severity: ERROR
+    message: >-
+      A value of the request is the order, fields or group of find() or paginate: it goes into the SQL as a name.
+      Map the value to a list of allowed fields.
+    patterns:
+      - pattern: "[..., $OPTION => $V, ...]"
+      - metavariable-regex:
+          metavariable: $OPTION
+          regex: '\A[''"](?:order|fields|group)[''"]\z'
+      - metavariable-pattern:
+          metavariable: $V
+          patterns:
+            - pattern-either:
+                - pattern: <... $this->request ...>
+                - pattern: <... $_GET ...>
+                - pattern: <... $_POST ...>
+                - pattern: <... $_REQUEST ...>
+                - pattern: <... $_COOKIE ...>
+                - pattern: <... $_FILES ...>
+            # A lookup in a list of allowed values
+            - pattern-not: $LIST[...] ?? $DEFAULT
+            - pattern-not: $LIST[...]
     metadata:
       cwe: ["CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"]
       owasp: ["A03:2021 - Injection"]
@@ -87,13 +163,16 @@ rules:
       A value of the request is passed to redirect(). Redirect only to paths of the application, e.g. with
       Router::url() of a route array, or check the URL against a list.
     # The values of the request, as PHPStan finds them: $this->request and the superglobals of the request
-    pattern-either:
-      - pattern: $this->redirect(<... $this->request ...>, ...)
-      - pattern: $this->redirect(<... $_GET ...>, ...)
-      - pattern: $this->redirect(<... $_POST ...>, ...)
-      - pattern: $this->redirect(<... $_REQUEST ...>, ...)
-      - pattern: $this->redirect(<... $_COOKIE ...>, ...)
-      - pattern: $this->redirect(<... $_FILES ...>, ...)
+    patterns:
+      - pattern-either:
+          - pattern: $this->redirect(<... $this->request ...>, ...)
+          - pattern: $this->redirect(<... $_GET ...>, ...)
+          - pattern: $this->redirect(<... $_POST ...>, ...)
+          - pattern: $this->redirect(<... $_REQUEST ...>, ...)
+          - pattern: $this->redirect(<... $_COOKIE ...>, ...)
+          - pattern: $this->redirect(<... $_FILES ...>, ...)
+      # A route array is a URL of the application, whatever the values of the request in it
+      - pattern-not: $this->redirect([...], ...)
     metadata:
       cwe: ["CWE-601: URL Redirection to Untrusted Site ('Open Redirect')"]
       owasp: ["A01:2021 - Broken Access Control"]
@@ -108,18 +187,49 @@ rules:
       value to a list of allowed views.
     # The values of the request, as PHPStan finds them: $this->request and the superglobals of the request
     pattern-either:
-      - pattern: $this->render(<... $this->request ...>, ...)
-      - pattern: $this->render(<... $_GET ...>, ...)
-      - pattern: $this->render(<... $_POST ...>, ...)
-      - pattern: $this->render(<... $_REQUEST ...>, ...)
-      - pattern: $this->render(<... $_COOKIE ...>, ...)
-      - pattern: $this->render(<... $_FILES ...>, ...)
-      - pattern: $this->element(<... $this->request ...>, ...)
-      - pattern: $this->element(<... $_GET ...>, ...)
-      - pattern: $this->element(<... $_POST ...>, ...)
-      - pattern: $this->element(<... $_REQUEST ...>, ...)
-      - pattern: $this->element(<... $_COOKIE ...>, ...)
-      - pattern: $this->element(<... $_FILES ...>, ...)
+      - patterns:
+          - pattern-either:
+              - pattern: $this->render(<... $this->request ...>, ...)
+              - pattern: $this->render(<... $_GET ...>, ...)
+              - pattern: $this->render(<... $_POST ...>, ...)
+              - pattern: $this->render(<... $_REQUEST ...>, ...)
+              - pattern: $this->render(<... $_COOKIE ...>, ...)
+              - pattern: $this->render(<... $_FILES ...>, ...)
+              - pattern: $this->element(<... $this->request ...>, ...)
+              - pattern: $this->element(<... $_GET ...>, ...)
+              - pattern: $this->element(<... $_POST ...>, ...)
+              - pattern: $this->element(<... $_REQUEST ...>, ...)
+              - pattern: $this->element(<... $_COOKIE ...>, ...)
+              - pattern: $this->element(<... $_FILES ...>, ...)
+          # A ternary that only checks the request, e.g. is('ajax'), chooses between views of the code
+          - pattern-not: "$this->render($C ? $A : $B, ...)"
+          - pattern-not: "$this->element($C ? $A : $B, ...)"
+      - patterns:
+          - pattern-either:
+              - pattern: "$this->render($C ? $A : $B, ...)"
+              - pattern: "$this->element($C ? $A : $B, ...)"
+          - metavariable-pattern:
+              metavariable: $A
+              pattern-either:
+                  - pattern: <... $this->request ...>
+                  - pattern: <... $_GET ...>
+                  - pattern: <... $_POST ...>
+                  - pattern: <... $_REQUEST ...>
+                  - pattern: <... $_COOKIE ...>
+                  - pattern: <... $_FILES ...>
+      - patterns:
+          - pattern-either:
+              - pattern: "$this->render($C ? $A : $B, ...)"
+              - pattern: "$this->element($C ? $A : $B, ...)"
+          - metavariable-pattern:
+              metavariable: $B
+              pattern-either:
+                  - pattern: <... $this->request ...>
+                  - pattern: <... $_GET ...>
+                  - pattern: <... $_POST ...>
+                  - pattern: <... $_REQUEST ...>
+                  - pattern: <... $_COOKIE ...>
+                  - pattern: <... $_FILES ...>
     metadata:
       cwe: ["CWE-22: Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal')"]
       owasp: ["A01:2021 - Broken Access Control"]
@@ -170,6 +280,9 @@ rules:
     pattern-either:
       - pattern: $this->Security->csrfCheck = false;
       - pattern: $this->Security->validatePost = false;
+      # In the settings of the component
+      - pattern: "[..., 'Security' => [..., 'csrfCheck' => false, ...], ...]"
+      - pattern: "[..., 'Security' => [..., 'validatePost' => false, ...], ...]"
     metadata:
       cwe: ["CWE-352: Cross-Site Request Forgery (CSRF)"]
       owasp: ["A01:2021 - Broken Access Control"]
@@ -274,6 +387,9 @@ rules:
       # The text mails are not HTML
       exclude:
         - "**/Emails/text/**"
+        # The classes of the directories of views: the helpers, and the views, e.g. View/AppView.php
+        - "**/View/Helper/**"
+        - "**/View/*View.php"
     metadata:
       cwe: ["CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"]
       owasp: ["A03:2021 - Injection"]

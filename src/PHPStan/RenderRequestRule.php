@@ -33,7 +33,12 @@ final class RenderRequestRule implements Rule
             return [];
         }
         $args = $node->getArgs();
-        if ($args === [] || !Nodes::hasRequestValue($args[0]->value)) {
+        // A ternary that only checks the request, e.g. is('ajax'), chooses between views of the code
+        $value = $args[0]->value ?? null;
+        if ($value instanceof Node\Expr\Ternary) {
+            $value = new Node\Expr\Array_([new Node\ArrayItem($value->if ?? $value->cond), new Node\ArrayItem($value->else)]);
+        }
+        if ($value === null || !Nodes::hasRequestValue($value)) {
             return [];
         }
 

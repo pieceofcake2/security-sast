@@ -84,7 +84,7 @@ vendor/bin/security-sast --paths=src,templates --exclude=vendor,tmp
 ```
 
 PHP のファイル (`.php`) とビューを検査します。ビューとは、`templates/` か `View/` のディレクトリにある、ビューの
-拡張子のファイルです。デフォルトの `ctp,php` では、`templates/Posts/index.php` は
+拡張子のファイルです (`View/Helper/` のヘルパーや、`View/AppView.php` のようなビューのクラスは除きます)。デフォルトの `ctp,php` では、`templates/Posts/index.php` は
 ビューで、`src/Controller/PostsController.php` はビューではありません。ビューの拡張子は `--view-extensions` で足せます。
 
 ```bash

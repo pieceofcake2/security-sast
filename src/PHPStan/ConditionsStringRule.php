@@ -38,7 +38,14 @@ final class ConditionsStringRule implements Rule
                 return [Nodes::error('cakephp2-conditions-string')];
             }
             if ($item->value instanceof Array_) {
+                // The conditions, and those of OR, AND, NOT and XOR in them
+                $conditions = $item->value->items;
                 foreach ($item->value->items as $condition) {
+                    if ($condition->key instanceof String_ && in_array(strtoupper($condition->key->value), ['OR', 'AND', 'NOT', 'XOR'], true) && $condition->value instanceof Array_) {
+                        $conditions = array_merge($conditions, $condition->value->items);
+                    }
+                }
+                foreach ($conditions as $condition) {
                     // A string without a key, or a key with a variable: CakePHP escapes the values only
                     if (($condition->key === null && Nodes::isStringWithVariable($condition->value)) || ($condition->key !== null && Nodes::isStringWithVariable($condition->key))) {
                         return [Nodes::error('cakephp2-conditions-string')];

@@ -11,6 +11,7 @@
 | --- | --- | --- | --- | --- |
 | [`cakephp2-query-concatenation`](#cakephp2-query-concatenation) | 高 | `securitySast.queryConcatenation` | CWE-89 | A03 インジェクション |
 | [`cakephp2-conditions-string`](#cakephp2-conditions-string) | 高 | `securitySast.conditionsString` | CWE-89 | A03 インジェクション |
+| [`cakephp2-order-request`](#cakephp2-order-request) | 高 | `securitySast.orderRequest` | CWE-89 | A03 インジェクション |
 | [`cakephp2-render-request`](#cakephp2-render-request) | 高 | `securitySast.renderRequest` | CWE-22 | A01 アクセス制御の不備 |
 | [`cakephp2-unserialize-request`](#cakephp2-unserialize-request) | 高 | `securitySast.unserializeRequest` | CWE-502 | A08 ソフトウェアとデータの整合性の不具合 |
 | [`cakephp2-redirect-request`](#cakephp2-redirect-request) | 中 | `securitySast.redirectRequest` | CWE-601 | A01 アクセス制御の不備 |
@@ -29,7 +30,8 @@
 
 ## cakephp2-query-concatenation
 
-連結やダブルクォートの文字列で変数を埋め込んで組み立てた SQL を、`Model::query()` に渡しています。
+連結、ダブルクォートの文字列、ヒアドキュメントで変数を埋め込んで組み立てた SQL を、`Model::query()` や、データソースの
+`fetchAll()`、`execute()` に渡しています。
 
 **なぜ危ないか。** 値がそのまま SQL に入ります。値がリクエストや、ユーザーが以前に保存したデータから来ると、値の
 クォートで SQL の文字列が終わり、残りが攻撃者の SQL になります。ほかのテーブル (パスワード) を読む、レコードを変えたり
@@ -70,8 +72,10 @@ $posts = $this->Post->find('all', ['order' => [$sort => $direction]]);
 
 ## cakephp2-conditions-string
 
-変数を含む条件の文字列を、`'conditions' => "..."` や、条件の配列のキーのない要素として渡しています。`find()` や
-`paginate` のオプション、`deleteAll()` (1 つ目の引数) と `updateAll()` (2 つ目の引数) の条件などです。
+変数を含む条件の文字列を、`'conditions' => "..."`、条件の配列のキーのない要素 (その `OR`、`AND`、`NOT`、`XOR` の中も)、
+変数を含むキー (`['Post.' . $field => $value]`) として渡しています。`find()` や `paginate` のオプション、`deleteAll()` と
+`hasAny()` (1 つ目の引数)、`updateAll()` と `field()` (2 つ目の引数) の条件、SQL になる `updateAll()` の項目の値
+(`['Post.title' => "'" . $title . "'"]`) などです。
 
 **なぜ危ないか。** CakePHP は条件の配列 `['Post.title' => $title]` の値をエスケープしますが、文字列は SQL として
 そのまま使います。`query()` と同じ SQL インジェクションになります。
@@ -94,9 +98,32 @@ $this->Post->deleteAll(['Post.user_id' => $userId]);
 **安全な場合。** 文字列にリクエストの変数がない場合です。定数の SQL の断片などです。変数は文字列に入れず、配列の値に
 してください。
 
+## cakephp2-order-request
+
+リクエストの値を、`find()` や `paginate` のオプションの `order`、`fields`、`group` にしています。
+
+**なぜ危ないか。** CakePHP はこれらのオプションを、値ではなく項目の名前として SQL に入れます。値のようにはエスケープ
+されないので、細工した値でクエリに SQL を足せます (`ORDER BY` の SQL インジェクション)。
+
+```php
+// 見つかる書き方
+$this->Post->find('all', ['order' => $this->request->query('sort')]);
+$this->paginate = ['fields' => $this->request->data('fields')];
+
+// 修正方法: 値を許可する項目に対応づける
+$columns = ['title' => 'Post.title', 'date' => 'Post.created'];
+$sort = $columns[(string)$this->request->query('sort')] ?? 'Post.created';
+$this->Post->find('all', ['order' => [$sort => 'DESC']]);
+```
+
+許可する値の一覧での引き当て (`$columns[...] ?? 'Post.id'`) は指摘しません。`PaginatorComponent` の並べ替えでは、
+`paginate()` の 3 つ目の引数で許可する項目を指定してください:
+`$this->Paginator->paginate('Post', [], ['Post.title', 'Post.created'])`。
+
 ## cakephp2-render-request
 
-リクエストの値を `$this->render()` や `$this->element()` に渡しています。
+リクエストの値を `$this->render()` や `$this->element()` に渡しています。リクエストを条件にだけ使う三項演算子
+(`$this->render($this->request->is('ajax') ? 'ajax' : 'index')`) は指摘しません。
 
 **なぜ危ないか。** 値がビューの名前になります。`../` を入れると、アプリケーションのどのテンプレートでも、アクションの
 変数とともに表示できます。管理画面のエレメントなど、そのページが見せるべきでない情報や、想定していない値でコードを
@@ -144,7 +171,8 @@ JSON で書きます。ユーザーのデータはそこか、セッションに
 
 ## cakephp2-redirect-request
 
-リクエストの値を `$this->redirect()` に渡しています。
+リクエストの値を `$this->redirect()` に渡しています。ルートの配列 (`['action' => 'view', $id]`) はアプリケーションの
+URL なので指摘しません。
 
 **なぜ危ないか。** 攻撃者は、`https://example.com/users/login?redirect=https://evil.example` のような、あなたのサイトの
 リンクを送ります。ユーザーはあなたのドメインを見てログインし、攻撃者のページに着きます。もう一度パスワードを聞く、
@@ -192,7 +220,8 @@ $xml = Xml::build((string)$this->request->data('xml'), ['readFile' => false]);
 
 ## cakephp2-security-csrf-disabled
 
-`$this->Security->csrfCheck = false` か `$this->Security->validatePost = false` です。
+`$this->Security->csrfCheck = false` か `$this->Security->validatePost = false`、またはコンポーネントの設定での同じ指定
+(`$components = ['Security' => ['csrfCheck' => false]]`) です。
 
 **なぜ危ないか。** `SecurityComponent` の CSRF トークンは、フォームがサイトのページから送られたことを確かめます。
 これがないと、ほかのサイトが、ログイン中のユーザーのブラウザにフォームを送らせられます。アカウントのメールアドレスや

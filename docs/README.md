@@ -90,7 +90,8 @@ vendor/bin/security-sast --paths=src,templates --exclude=vendor,tmp
 ```
 
 The PHP files (`.php`) and the views are scanned. A view is a file of an extension of the views in a
-`templates/` or `View/` directory: with the default `ctp,php`,
+`templates/` or `View/` directory, but not a helper of `View/Helper/` nor a class of a view such as
+`View/AppView.php`: with the default `ctp,php`,
 `templates/Posts/index.php` is a view and `src/Controller/PostsController.php` is not. Add the extensions of
 your views with `--view-extensions`:
 

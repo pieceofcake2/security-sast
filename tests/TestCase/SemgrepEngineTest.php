@@ -103,7 +103,7 @@ class SemgrepEngineTest extends TestCase
         $result = SemgrepEngine::result($data, (string)realpath(self::APP));
 
         $this->assertSame(self::EXPECTED, self::places($result->findings));
-        $this->assertSame(10, $result->files);
+        $this->assertSame(13, $result->files);
         $this->assertStringStartsWith('Semgrep 1.', $result->engine);
         $this->assertSame([], $result->errors);
 
@@ -179,6 +179,13 @@ class SemgrepEngineTest extends TestCase
         $this->expectExceptionMessage('Semgrep failed (exit code 2): Killed');
 
         $engine->scan(self::APP, ['src']);
+    }
+
+    public function testErrorOfAListType(): void
+    {
+        $errors = SemgrepEngine::errors(['errors' => [['level' => 'warn', 'type' => ['PartialParsing', [['path' => 'src/A.php']]], 'message' => 'Syntax error at line 3']]]);
+
+        $this->assertSame(['PartialParsing: Syntax error at line 3'], $errors);
     }
 
     public function testWarningsDoNotFail(): void

@@ -211,7 +211,9 @@ final class SemgrepEngine implements Engine
         $errors = [];
         foreach (is_array($data['errors'] ?? null) ? $data['errors'] : [] as $error) {
             if (is_array($error) && ($level === null || ($error['level'] ?? null) === $level)) {
-                $errors[] = trim((string)($error['type'] ?? 'Error') . ': ' . trim((string)($error['message'] ?? $error['long_msg'] ?? '')));
+                // Some types are lists, e.g. ["PartialParsing", [...]]
+                $type = is_array($error['type'] ?? null) ? ($error['type'][0] ?? 'Error') : ($error['type'] ?? 'Error');
+                $errors[] = trim((is_scalar($type) ? (string)$type : 'Error') . ': ' . trim((string)($error['message'] ?? $error['long_msg'] ?? '')));
             }
         }
 

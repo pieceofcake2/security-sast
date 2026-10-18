@@ -82,6 +82,11 @@ final class Command
             $layout = is_array($values['layout'] ?? null) ? $values['layout'] : null;
 
             $paths = $config->paths($layout);
+            // A path given that does not exist: Semgrep would scan nothing and pass
+            $missing = array_values(array_filter($config->paths, static fn(string $path): bool => !file_exists($config->project . DIRECTORY_SEPARATOR . $path)));
+            if ($missing !== []) {
+                throw new InvalidArgumentException(sprintf('--paths: not found in %s: %s', $config->project, implode(', ', $missing)));
+            }
             if ($paths === []) {
                 throw new InvalidArgumentException(sprintf('Nothing to scan in %s: give the paths with --paths.', $config->project));
             }

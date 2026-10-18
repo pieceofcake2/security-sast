@@ -28,7 +28,7 @@ final class QueryConcatenationRule implements Rule
      */
     public function processNode(Node $node, Scope $scope): array
     {
-        if (!Nodes::isMethod($node, ['query']) || Nodes::isThisProperty($node->var, 'request')) {
+        if (!Nodes::isMethod($node, ['query', 'fetchall', 'execute']) || Nodes::isThisProperty($node->var, 'request')) {
             return [];
         }
         $args = $node->getArgs();
