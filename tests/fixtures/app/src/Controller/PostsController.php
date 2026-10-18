@@ -79,4 +79,18 @@ class PostsController extends AppController
         $this->Post->find('all', ['recursive' => -1, 'conditions' => ['Post.published' => 1, "Post.id = $id"]]);
         $this->Post->find('all', ['limit' => 1, 'conditions' => ['Post.id' => $id]]);
     }
+
+    public function parity()
+    {
+        $id = $this->request->query('id');
+        $this->Post->query(<<<SQL
+            SELECT * FROM posts WHERE id = $id
+            SQL);
+        $data = unserialize($this->request['data']['payload']);
+        $this->Post->updateAll(['Post.published' => 1], sprintf('Post.id = %d', 'a' . $id));
+        $this->Post->query($id ? 'SELECT * FROM posts WHERE id = ' . $id : 'SELECT 1');
+        $this->Post->find('all', ['conditions' => ['Post.' . $id => 1]]);
+        $this->Post->query('SELECT * FROM posts WHERE price > ' . "$1");
+        $this->set(compact('data'));
+    }
 }
