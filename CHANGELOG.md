@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- The example workflows of the docs are in the Composer package, which `docs/ci.md` links to
 - New rule `cakephp2-order-request` (High): a value of the request as the `order`, `fields` or `group` of `find()`
   or `paginate`, which goes into the SQL as a name
 - `cakephp2-conditions-string` also finds the conditions of `OR`, `AND`, `NOT` and `XOR`, those of `field()` and
