@@ -24,6 +24,8 @@ class SuppressionsTest extends TestCase
             ['line' => 8, 'rules' => ['cakephp2-query-concatenation'], 'reason' => 'The table name is a constant of the model', 'code' => "\$this->query('TRUNCATE ' . self::TABLE);"],
             // At the end of a line, for every rule, with the reason after --
             ['line' => 12, 'rules' => [], 'reason' => 'a test value', 'code' => '$z = 1; // nosemgrep -- a test value'],
+            // Semgrep reads the text of the line, also of a string
+            ['line' => 16, 'rules' => [], 'reason' => null, 'code' => "\$s = '// nosemgrep in a string';"],
         ], $suppressions);
     }
 
@@ -44,7 +46,7 @@ class SuppressionsTest extends TestCase
     {
         $suppressions = Suppressions::find(dirname(self::CODE), ['suppressions.php'], [], ['php'], 'semgrep');
 
-        $this->assertSame(['suppressions.php', 'suppressions.php'], array_column($suppressions, 'file'));
+        $this->assertSame(['suppressions.php', 'suppressions.php', 'suppressions.php'], array_column($suppressions, 'file'));
         $this->assertSame([], Suppressions::find(dirname(self::CODE), ['suppressions.php'], ['suppressions.php'], ['php'], 'semgrep'));
     }
 
@@ -62,7 +64,7 @@ class SuppressionsTest extends TestCase
         $vulnerable = [];
         foreach (['src/Controller/SuppressedController.php', 'templates/Posts/suppressed.ctp'] as $file) {
             foreach (explode("\n", (string)file_get_contents($project . DS . $file)) as $i => $line) {
-                if (str_contains($line, 'unserialize(') || preg_match('/<\?= \$\w+ \?>/', $line)) {
+                if (str_contains($line, 'unserialize($_GET') || preg_match('/<\?= \$\w+ \?>/', $line)) {
                     $vulnerable[] = $file . ':' . ($i + 1);
                 }
             }

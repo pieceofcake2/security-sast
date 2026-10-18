@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- The suppressed findings of the report are the lines that the engine does not report, as it reads its comments,
+  checked against both engines: Semgrep reads the text of the lines (` nosem` too, also in a string or an HTML
+  comment, and not the word in a sentence), and neither engine applies a comment across another comment or an
+  empty line, which the report listed as suppressed
+
+## Unreleased
+
 - Semgrep finds the conditions strings of `cakephp2-conditions-string` in any place of the options, e.g. after
   `'recursive' => -1` or `'limit' => 20`, as PHPStan does: it matched the first key only
 

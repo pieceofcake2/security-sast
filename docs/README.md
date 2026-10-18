@@ -214,9 +214,17 @@ The suppressions are still in the report, so that they are checked again: their 
 the summary of the command, and a group "Suppressed findings" with each comment, its place, its rules and its
 reason. They do not fail the run. The reason is the text after `--` (`// nosemgrep: rule-id -- reason`) or in
 parentheses (`// @phpstan-ignore securitySast.queryConcatenation (reason)`), else the comment lines just before.
-Only the comments of the engine of the run are listed: `nosemgrep` for Semgrep; for PHPStan, the ignore
-comments with an identifier of this package, and those of a line or of the next line without an identifier,
-which suppress every rule.
+The list is of the lines whose findings the engine of the run does not report, as it reads its comments:
+
+- **Semgrep** reads the text of the lines. ` nosemgrep` (or ` nosem`) anywhere in a line, also in a string,
+  suppresses the findings of that line; a line that starts with it, after signs only (`//`, `#`, `<!--`),
+  suppresses those of the next line, not of a line after a comment. `nosemgrep: rule-a, rule-b` limits it to
+  these rules; the ID of a rule of this package works without its prefix, e.g. `cakephp2-query-concatenation`.
+  The word in a sentence, e.g. `// We never use nosemgrep here`, suppresses nothing.
+- **PHPStan** reads its ignore comments with an identifier of this package, and those of a line or of the next
+  line without an identifier, which suppress every rule. A comment first on its line applies to the next line,
+  one after code to its own line; in a view, `<?php // ... ?>` alone on a line applies to that line. On a line
+  without code, e.g. a comment or an empty line, it suppresses nothing.
 
 To leave out whole paths, use `--exclude`. A finding of the configuration is fixed in the configuration, or the
 check is turned off with `--config-check=0`.

@@ -8,8 +8,9 @@ namespace PieceOfCake2\SecuritySast;
  * PHPStan its ignore comment with an identifier of this package, or its ignore comments of a line and of the next
  * line, which suppress every rule (written here without their at sign, which PHPStan would read).
  *
- * They are read from the code, as PHP tokens, so that both engines report them the same way, with the reason of the
- * comment: the text after `--` or in parentheses, else the comment lines just before.
+ * They are read from the code, as each engine reads them, so that the report lists the lines whose findings the
+ * engine does not report, with the reason of the comment: the text after `--` or in parentheses, else the comment
+ * lines just before.
  */
 final class Suppressions
 {
@@ -37,7 +38,7 @@ final class Suppressions
     }
 
     /**
-     * The suppressions of the code of a file
+     * The suppressions of the code of a file: the lines whose findings the engine does not report
      *
      * @param string $code PHP code, or a view
      * @param string $engine `semgrep` or `phpstan`
@@ -46,28 +47,14 @@ final class Suppressions
     public static function inCode(string $code, string $engine): array
     {
         $lines = explode("\n", $code);
-        $comments = [];
-        foreach (token_get_all($code) as $token) {
-            if (is_array($token) && in_array($token[0], [T_COMMENT, T_DOC_COMMENT], true)) {
-                $comments[] = [$token[2], $token[1]];
-            }
-        }
+        [$codeLines, $comments] = self::tokens($code);
+        $found = $engine === 'phpstan' ? self::phpstanLines($comments, $codeLines) : self::semgrepLines($lines, $codeLines);
 
-        $found = [];
-        foreach ($comments as [$line, $text]) {
-            $suppression = $engine === 'phpstan' ? self::phpstan($text) : self::semgrep($text);
-            if ($suppression === null) {
-                continue;
-            }
-            [$rules, $reason, $nextLine] = $suppression;
+        $suppressions = [];
+        foreach ($found as $target => [$rules, $reason, $line]) {
             // The IDs of the rules of this package for the identifiers of PHPStan
-            $rules = array_map(static fn(string $rule): string => RuleCatalog::idOf($rule) ?? $rule, $rules);
-            // A comment on a line of its own suppresses the next line, one at the end of a line suppresses that line
-            $source = $lines[$line - 1] ?? '';
-            $start = strpos($source, (string)strtok($text, "\n"));
-            $own = $start !== false && preg_match('/\A\s*(?:<\?php)?\s*\z/', substr($source, 0, $start)) === 1;
-            $target = $nextLine || $own ? self::nextCodeLine($lines, $line) : $line;
-            $found[] = [
+            $rules = array_values(array_unique(array_map(static fn(string $rule): string => RuleCatalog::idOf($rule) ?? $rule, $rules)));
+            $suppressions[] = [
                 'line' => $target,
                 'rules' => $rules,
                 'reason' => $reason ?? self::commentBefore($lines, $line),
@@ -75,48 +62,126 @@ final class Suppressions
             ];
         }
 
+        return $suppressions;
+    }
+
+    /**
+     * The lines of code and the comments of a file, as PHP tokens
+     *
+     * @param string $code PHP code, or a view
+     * @return array{0: array<int, true>, 1: array<array{0: int, 1: string, 2: bool}>} The lines with code, and the
+     *  comments: their line, text, and whether they are first on their line
+     */
+    private static function tokens(string $code): array
+    {
+        $codeLines = [];
+        $comments = [];
+        $first = [];
+        foreach (token_get_all($code) as $token) {
+            if (!is_array($token)) {
+                // A character, e.g. ; or (, is code of the line of the token before it
+                continue;
+            }
+            [$id, $text, $line] = $token;
+            if (in_array($id, [T_COMMENT, T_DOC_COMMENT], true)) {
+                $comments[] = [$line, $text, !isset($first[$line])];
+            }
+            // Whitespace and inline HTML start no line of code; the open tag is a token before a comment
+            if (!in_array($id, [T_WHITESPACE, T_INLINE_HTML], true)) {
+                $first[$line] = true;
+            }
+            if (!in_array($id, [T_WHITESPACE, T_COMMENT, T_DOC_COMMENT, T_OPEN_TAG, T_CLOSE_TAG, T_INLINE_HTML], true)) {
+                $codeLines[$line] = true;
+            }
+        }
+
+        return [$codeLines, $comments];
+    }
+
+    /**
+     * The lines that Semgrep does not report: it reads the text of the lines, not the comments. ` nosem` (or
+     * ` nosemgrep`) anywhere in a line suppresses the findings of that line, and a line that starts with it, after
+     * signs only (e.g. `//`, `#`, `<!--`), those of the next line. `: rule-a, rule-b` limits it to these rules.
+     *
+     * @param array<string> $lines Lines of the file
+     * @param array<int, true> $codeLines The lines with code
+     * @return array<int, array{0: array<string>, 1: string|null, 2: int}> Rules, reason and line of the comment, by
+     *  the line of code it suppresses
+     */
+    private static function semgrepLines(array $lines, array $codeLines): array
+    {
+        $found = [];
+        foreach ($lines as $i => $text) {
+            $line = $i + 1;
+            if (!preg_match('/ nosem(?:grep)?\b(?:[:=]\s?((?:[^,\s](?:[,\s]+)?)+))?(.*)/', $text, $matches)) {
+                continue;
+            }
+            // The rules after a colon, then a reason after --; without rules, the reason after --
+            [$rules, $reason] = $matches[1] !== ''
+                ? self::semgrepRules($matches[1])
+                : [[], preg_match('/\A\s*--\s/', $matches[2]) ? self::reason((string)preg_replace('#\s*(?:\*/|-->|\?>).*\z#s', '', $matches[2])) : null];
+            if (isset($codeLines[$line])) {
+                $found[$line] ??= [$rules, $reason, $line];
+            }
+            if (preg_match('/\A[^a-zA-Z0-9]* nosem/', $text) && isset($codeLines[$line + 1])) {
+                $found[$line + 1] ??= [$rules, $reason, $line];
+            }
+        }
+        ksort($found);
+
         return $found;
     }
 
     /**
-     * The rules and the reason of a comment of Semgrep: `nosemgrep`, `nosemgrep: rule-a, rule-b`, with a reason after
-     * `--`
+     * The rules and the reason of the text after `nosemgrep:`, with a reason after `--`
      *
-     * @param string $text Comment
-     * @return array{0: array<string>, 1: string|null, 2: bool}|null Rules (empty for all), reason, whether it is
-     *  about the next line
+     * @param string $text Text
+     * @return array{0: array<string>, 1: string|null}
      */
-    private static function semgrep(string $text): ?array
+    private static function semgrepRules(string $text): array
     {
-        if (!preg_match('/\bnosemgrep\b(?::\s*([\w.\-]+(?:\s*,\s*[\w.\-]+)*))?(.*)/s', $text, $matches)) {
-            return null;
-        }
-        $rules = $matches[1] !== '' ? array_map('trim', explode(',', $matches[1])) : [];
+        $text = trim((string)preg_replace('#\s*(?:\*/|-->|\?>).*\z#s', '', $text));
+        [$ids, $reason] = array_pad(preg_split('/(?:\A|\s)--(?:\s|\z)/', $text, 2) ?: [''], 2, null);
+        $rules = array_values(array_filter(preg_split('/[,\s]+/', trim((string)$ids)) ?: [], static fn(string $rule): bool => $rule !== ''));
 
-        return [$rules, self::reason($matches[2]), false];
+        return [$rules, $reason !== null ? self::reason('-- ' . $reason) : null];
     }
 
     /**
-     * The rules and the reason of a comment of PHPStan that concerns the rules of this package
+     * The lines that PHPStan does not report for the rules of this package: its ignore comment first on its line
+     * applies to the next line, one after code to its own line, and those of a line or of the next line to these
      *
-     * @param string $text Comment
-     * @return array{0: array<string>, 1: string|null, 2: bool}|null Rules (empty for all), reason, whether it is
-     *  about the next line
+     * @param array<array{0: int, 1: string, 2: bool}> $comments Comments: line, text, first on the line
+     * @param array<int, true> $codeLines The lines with code
+     * @return array<int, array{0: array<string>, 1: string|null, 2: int}> Rules, reason and line of the comment, by
+     *  the line of code it suppresses
      */
-    private static function phpstan(string $text): ?array
+    private static function phpstanLines(array $comments, array $codeLines): array
     {
-        if (preg_match('/@phpstan-ignore-(next-line|line)\b(.*)/s', $text, $matches)) {
-            return [[], self::reason($matches[2]), $matches[1] === 'next-line'];
+        $found = [];
+        foreach ($comments as [$line, $text, $first]) {
+            if (preg_match('/@phpstan-ignore-(next-line|line)\b(.*)/s', $text, $matches)) {
+                $target = $matches[1] === 'next-line' ? $line + 1 : $line;
+                $rules = [];
+                $reason = self::reason($matches[2]);
+            } elseif (preg_match('/@phpstan-ignore\s+([\w.\-]+(?:\s*,\s*[\w.\-]+)*)(.*)/s', $text, $matches)) {
+                $rules = array_values(array_filter(array_map('trim', explode(',', $matches[1])), static fn(string $id): bool => str_starts_with($id, 'securitySast.')));
+                if ($rules === []) {
+                    continue;
+                }
+                $target = $first ? $line + 1 : $line;
+                $reason = self::reason($matches[2]);
+            } else {
+                continue;
+            }
+            // On a line without code, e.g. a comment or an empty line, it suppresses nothing
+            if (isset($codeLines[$target])) {
+                $found[$target] ??= [$rules, $reason, $line];
+            }
         }
-        if (!preg_match('/@phpstan-ignore\s+([\w.\-]+(?:\s*,\s*[\w.\-]+)*)(.*)/s', $text, $matches)) {
-            return null;
-        }
-        $rules = array_values(array_filter(array_map('trim', explode(',', $matches[1])), static fn(string $id): bool => str_starts_with($id, 'securitySast.')));
-        if ($rules === []) {
-            return null;
-        }
+        ksort($found);
 
-        return [$rules, self::reason($matches[2]), false];
+        return $found;
     }
 
     /**
@@ -158,24 +223,5 @@ final class Suppressions
         $text = trim(implode(' ', array_filter($texts, static fn(string $text): bool => $text !== '' && $text !== '*')));
 
         return $text !== '' ? $text : null;
-    }
-
-    /**
-     * The next line of code after a line, without the comment lines
-     *
-     * @param array<string> $lines Lines of the file
-     * @param int $line Line, from 1
-     * @return int
-     */
-    private static function nextCodeLine(array $lines, int $line): int
-    {
-        $count = count($lines);
-        for ($i = $line; $i < $count; $i++) {
-            if (!preg_match('#\A\s*(?://|\#|\*|/\*|\z)#', $lines[$i])) {
-                return $i + 1;
-            }
-        }
-
-        return $line;
     }
 }
