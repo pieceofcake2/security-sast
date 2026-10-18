@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## Unreleased
+
+- Semgrep finds the conditions strings of `cakephp2-conditions-string` in any place of the options, e.g. after
+  `'recursive' => -1` or `'limit' => 20`, as PHPStan does: it matched the first key only
+
 ## 1.0.4
 
 - `cakephp2-view-unescaped-output` reports the values of the request and of the session printed in a view, as

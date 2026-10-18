@@ -70,4 +70,13 @@ class PostsController extends AppController
 
         return $this->redirect($_REQUEST['back']);
     }
+
+    public function index()
+    {
+        $id = $this->request->query('id');
+        $this->Post->find('all', ['recursive' => -1, 'conditions' => "Post.id = $id"]);
+        $this->paginate = ['limit' => 20, 'conditions' => 'Post.user_id = ' . $id];
+        $this->Post->find('all', ['recursive' => -1, 'conditions' => ['Post.published' => 1, "Post.id = $id"]]);
+        $this->Post->find('all', ['limit' => 1, 'conditions' => ['Post.id' => $id]]);
+    }
 }
