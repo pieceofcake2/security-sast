@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Unreleased
+## 1.0.2
 
 - `cakephp2-view-unescaped-output` no longer reports a variable set in the view to a string literal or to a
   translation of string literals only (`__('...')`, `__d('...', '...')`, `__x()`, `__dx()`), and leaves out the
