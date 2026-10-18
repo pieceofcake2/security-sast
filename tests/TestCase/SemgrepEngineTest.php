@@ -39,6 +39,10 @@ class SemgrepEngineTest extends TestCase
         'cakephp2-view-unescaped-output templates/Posts/links.ctp:11',
         'cakephp2-view-unescaped-output templates/Posts/links.ctp:12',
         'cakephp2-view-unescaped-output templates/Posts/links.ctp:13',
+        'cakephp2-view-unescaped-output templates/Posts/request.ctp:10',
+        'cakephp2-view-unescaped-output templates/Posts/request.ctp:6',
+        'cakephp2-view-unescaped-output templates/Posts/request.ctp:7',
+        'cakephp2-view-unescaped-output templates/Posts/request.ctp:9',
         'cakephp2-view-unescaped-output templates/Posts/view.ctp:2',
         'cakephp2-view-unescaped-output templates/Posts/view.ctp:3',
         'cakephp2-xml-build-variable src/Controller/PostsController.php:44',
@@ -73,7 +77,7 @@ class SemgrepEngineTest extends TestCase
         $this->assertStringStartsWith('docker run --rm -v ' . realpath(self::APP) . ':/src:ro -v ', $command);
         $this->assertStringContainsString(':/rules:ro -w /src semgrep/semgrep:1.180.0 semgrep scan --json --metrics=off', $command);
         $this->assertStringContainsString(' --scan-unknown-extensions ', $command);
-        $this->assertStringContainsString('--config /rules/cakephp2.yml --config p/php --config /src/rules/app.yml --include /src --include /templates --exclude /vendor . templates/Emails/html/default.ctp templates/Posts/edit.ctp templates/Posts/index.php templates/Posts/links.ctp templates/Posts/view.ctp', $command);
+        $this->assertStringContainsString('--config /rules/cakephp2.yml --config p/php --config /src/rules/app.yml --include /src --include /templates --exclude /vendor . templates/Emails/html/default.ctp templates/Posts/edit.ctp templates/Posts/index.php templates/Posts/links.ctp templates/Posts/request.ctp templates/Posts/view.ctp', $command);
     }
 
     public function testResult(): void
@@ -82,7 +86,7 @@ class SemgrepEngineTest extends TestCase
         $result = SemgrepEngine::result($data, (string)realpath(self::APP));
 
         $this->assertSame(self::EXPECTED, self::places($result->findings));
-        $this->assertSame(8, $result->files);
+        $this->assertSame(9, $result->files);
         $this->assertStringStartsWith('Semgrep 1.', $result->engine);
         $this->assertSame([], $result->errors);
 

@@ -2,7 +2,9 @@
 
 このパッケージの、CakePHP 2 アプリケーション向けのルールと、それぞれが見つけるもの、修正方法です。どのルールも Semgrep
 ([resources/semgrep/cakephp2.yml](../../resources/semgrep/cakephp2.yml)) と PHPStan ([src/PHPStan/](../../src/PHPStan/))
-の両方で書いてあり、どちらのエンジンでも同じ箇所を見つけます。Semgrep では、Semgrep Registry の PHP のルール (デフォルトは
+の両方で書いてあり、同じコードで同じ箇所を見つけることをテストしています。Semgrep はコードのテキストで照合するので、
+いくつかの書き方では違います。変数を埋め込んだヒアドキュメントや、別のキーの後ろの `conditions` は、PHPStan だけが
+見つけます。Semgrep では、Semgrep Registry の PHP のルール (デフォルトは
 `p/php`) も実行します。その内容は [semgrep.dev](https://semgrep.dev/p/php) をご覧ください。
 
 | ルール | リスク | PHPStan の識別子 | CWE | OWASP Top 10 (2021) |
@@ -23,8 +25,7 @@
 
 「変数を含む」文字列とは、文字列リテラルでない値 (変数、定数、呼び出し) との連結か、変数を埋め込んだダブルクォートの
 文字列です。`sprintf()` などの呼び出しの引数の中の連結は含みません。下の修正例の `(string)` のキャストは、`?sort[]=x`
-のようなリクエストの配列でアクションが失敗しないようにするものです。このパッケージのルールでは、Semgrep と PHPStan は
-同じ箇所を見つけます。
+のようなリクエストの配列でアクションが失敗しないようにするものです。
 
 ## cakephp2-query-concatenation
 
@@ -250,10 +251,14 @@ public function beforeFilter()
 - ユーザーが書く HTML (Markdown など) は、出力する前に、スクリプトやイベントの属性を取り除くライブラリで
   サニタイズしてください。
 
+リクエストとセッションの値は、`$this` のものでも指摘します。そのまま出力したときも、ビューの中でそれを入れた変数を
+出力したときもです。`$this->request` (その `query()`、`data` など)、`$this->data`、`$this->params`、`$this->passedArgs`、
+`$this->Session->read()` です。
+
 指摘が多くなりすぎないよう、次は指摘しません。
 
 - ヘルパーや関数の呼び出しの出力
-- 出力する前にビューの中で、ヘルパーの出力、`h()`、`count()`、`(int)` や `(float)` の数値、文字列リテラル、文字列
+- 出力する前にビューの中で、ヘルパーの出力 (下のリクエストとセッションの値は除く)、`h()`、`count()`、`(int)` や `(float)` の数値、文字列リテラル、文字列
   リテラルだけの翻訳 (`__('...')`、`__d('...', '...')`、`__x('...', '...')`、`__dx('...', '...', '...')`) を入れた
   変数。`__('Hello %s', $name)` のように値を含む翻訳は指摘します
 - レイアウトの HTML である `$content_for_layout` と `$scripts_for_layout`
@@ -268,6 +273,9 @@ public function beforeFilter()
 <?= $docsUrl ?>         <!-- 指摘しない: 文字列リテラル -->
 <?= $content_for_layout ?>  <!-- 指摘しない: レイアウト -->
 <?= $post['Post']['body'] ?>  <!-- 指摘する -->
+<?php $q = $this->request->query('q'); ?>
+<?= $q ?>               <!-- 指摘する: リクエストの値 -->
+<?= $this->request->data['Post']['title'] ?>  <!-- 指摘する -->
 ```
 
 わざとサニタイズした HTML を入れた変数は、`--safe-view-variables` か設定ファイルで、`$` を除いた名前を指定すると、

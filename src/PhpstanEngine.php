@@ -117,10 +117,17 @@ final class PhpstanEngine implements Engine
     public static function result(array $data, string $project, ?string $version = null): ScanResult
     {
         $findings = [];
+        $errors = array_values(array_map('strval', is_array($data['errors'] ?? null) ? $data['errors'] : []));
         $files = is_array($data['files'] ?? null) ? $data['files'] : [];
         foreach ($files as $path => $file) {
             foreach (is_array($file['messages'] ?? null) ? $file['messages'] : [] as $message) {
-                $rule = is_array($message) ? RuleCatalog::idOf((string)($message['identifier'] ?? '')) : null;
+                $identifier = is_array($message) ? (string)($message['identifier'] ?? '') : '';
+                // A file that PHPStan could not parse is not scanned: an error of the report, as with Semgrep
+                if (str_starts_with($identifier, 'phpstan.parse')) {
+                    $errors[] = sprintf('%s: %s', self::relative((string)$path, $project), (string)($message['message'] ?? ''));
+                    continue;
+                }
+                $rule = RuleCatalog::idOf($identifier);
                 if ($rule === null) {
                     continue;
                 }
@@ -145,7 +152,7 @@ final class PhpstanEngine implements Engine
             $findings,
             is_array($data['files'] ?? null) ? count($data['files']) : 0,
             'PHPStan' . ($version !== null ? ' ' . $version : ''),
-            array_values(array_map('strval', is_array($data['errors'] ?? null) ? $data['errors'] : [])),
+            $errors,
         );
     }
 

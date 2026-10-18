@@ -2,7 +2,9 @@
 
 The rules of this package for CakePHP 2 applications, what each one finds, and how to fix it. Each rule is
 written for Semgrep ([resources/semgrep/cakephp2.yml](../resources/semgrep/cakephp2.yml)) and PHPStan
-([src/PHPStan/](../src/PHPStan/)), and finds the same places with both engines. Semgrep also runs the PHP rules
+([src/PHPStan/](../src/PHPStan/)), and both are tested on the same code to find the same places. Semgrep matches
+the text of the code, so a few constructs differ: e.g. a heredoc with a variable, or a `conditions` key after
+another key, is found by PHPStan only. Semgrep also runs the PHP rules
 of the Semgrep Registry (`p/php` by default), which are described on [semgrep.dev](https://semgrep.dev/p/php).
 
 | Rule | Risk | PHPStan identifier | CWE | OWASP Top 10 (2021) |
@@ -24,7 +26,7 @@ through a report, and [The Configuration](#the-configuration) for the rules of t
 A string "with a variable" is a concatenation with a value that is not a string literal (a variable, a constant,
 a call), or a double-quoted string with a variable in it; a concatenation in the arguments of a call, e.g. of
 `sprintf()`, is not one. The `(string)` casts of the fixes below keep an array of the request, e.g.
-`?sort[]=x`, from failing the action. Semgrep and PHPStan find the same places with the rules of this package.
+`?sort[]=x`, from failing the action.
 
 ## cakephp2-query-concatenation
 
@@ -255,10 +257,15 @@ too.
 - HTML that users write (e.g. Markdown) must be sanitized with a library that removes scripts and event
   attributes before it is printed.
 
+The values of the request and of the session are reported, printed as they are or through a variable set to
+them in the view, although they are of `$this`: `$this->request` (its `query()`, `data`, ...), `$this->data`,
+`$this->params`, `$this->passedArgs` and `$this->Session->read()`.
+
 To keep the number of findings small, these are not reported:
 
 - the output of a helper or of a function call
-- a variable set in the view, before it is printed, to the output of a helper, to `h()`, to `count()`, to
+- a variable set in the view, before it is printed, to the output of a helper (not a value of the request or of
+  the session, below), to `h()`, to `count()`, to
   a number with `(int)` or `(float)`, to a string literal, or to a translation of string literals only
   (`__('...')`, `__d('...', '...')`, `__x('...', '...')`, `__dx('...', '...', '...')`); a translation with
   values, e.g. `__('Hello %s', $name)`, is reported
@@ -274,6 +281,9 @@ To keep the number of findings small, these are not reported:
 <?= $docsUrl ?>         <!-- not reported: a string literal -->
 <?= $content_for_layout ?>  <!-- not reported: the layout -->
 <?= $post['Post']['body'] ?>  <!-- reported -->
+<?php $q = $this->request->query('q'); ?>
+<?= $q ?>               <!-- reported: a value of the request -->
+<?= $this->request->data['Post']['title'] ?>  <!-- reported -->
 ```
 
 A variable that holds sanitized HTML on purpose is set safe for all the views with `--safe-view-variables` or

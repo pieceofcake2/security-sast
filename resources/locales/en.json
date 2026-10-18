@@ -49,7 +49,7 @@
     "rule.cakephp2-config-cookie-cipher": "Cookies encrypted with 'cipher'",
     "message.cakephp2-config-cookie-cipher": "CookieComponent encrypts with the 'cipher' type (Cookie.type is not set, or is 'cipher'), which is not secure. Set Cookie.type to 'aes', Cookie.key to a random value of 32 bytes or more, and Security.useOpenSsl to true.",
     "rule.cakephp2-config-cookie-key": "Sample or short Cookie.key",
-    "message.cakephp2-config-cookie-key": "Cookie.key, the key of the 'aes' cookies, is a sample of the documentation or shorter than 32 bytes. Set COOKIE_KEY to a random value of 32 bytes or more.",
+    "message.cakephp2-config-cookie-key": "Cookie.key, the key of the 'aes' and 'rijndael' cookies, is a sample of the documentation or shorter than 32 bytes. Set COOKIE_KEY to a random value of 32 bytes or more.",
     "rule.cakephp2-config-openssl": "Security.useOpenSsl not enabled",
     "message.cakephp2-config-openssl": "Security.useOpenSsl is not true: Security::encrypt() and the 'aes' cookies use mcrypt, which is not maintained and not bundled with PHP 7.2+. Set Security.useOpenSsl to true.",
     "rule.cakephp2-config-session-cookie": "Session cookie without HttpOnly or Secure",

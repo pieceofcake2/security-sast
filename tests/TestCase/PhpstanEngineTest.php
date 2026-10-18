@@ -15,7 +15,7 @@ class PhpstanEngineTest extends TestCase
 
         // The same places as the Semgrep rules, and no other error of PHPStan
         $this->assertSame(SemgrepEngineTest::EXPECTED, SemgrepEngineTest::places($result->findings));
-        $this->assertSame(9, $result->files);
+        $this->assertSame(10, $result->files);
         $this->assertStringStartsWith('PHPStan 2.', $result->engine);
         $view = array_values(array_filter($result->findings, static fn($finding): bool => $finding->file === 'templates/Posts/view.ctp'))[0];
         $this->assertSame('<div><?= $post[\'Post\'][\'body\'] ?></div>', $view->code);
@@ -36,10 +36,14 @@ class PhpstanEngineTest extends TestCase
             'cakephp2-view-unescaped-output templates/Posts/links.ctp:11',
             'cakephp2-view-unescaped-output templates/Posts/links.ctp:12',
             'cakephp2-view-unescaped-output templates/Posts/links.ctp:13',
+            'cakephp2-view-unescaped-output templates/Posts/request.ctp:10',
+            'cakephp2-view-unescaped-output templates/Posts/request.ctp:6',
+            'cakephp2-view-unescaped-output templates/Posts/request.ctp:7',
+            'cakephp2-view-unescaped-output templates/Posts/request.ctp:9',
             'cakephp2-view-unescaped-output templates/Posts/view.ctp:2',
             'cakephp2-view-unescaped-output templates/Posts/view.ctp:3',
         ], $views);
-        $this->assertSame(10, $result->files);
+        $this->assertSame(11, $result->files);
     }
 
     public function testScanWithSafeViewVariables(): void
@@ -85,11 +89,22 @@ class PhpstanEngineTest extends TestCase
         $this->assertSame($temp, glob(sys_get_temp_dir() . DS . 'security-sast-*'));
     }
 
+    public function testParseError(): void
+    {
+        $app = (string)realpath(SemgrepEngineTest::APP);
+        $data = ['files' => [$app . DS . 'src' . DS . 'Broken.php' => ['messages' => [['message' => 'Syntax error, unexpected EOF on line 3', 'line' => 3, 'identifier' => 'phpstan.parse']]]], 'errors' => []];
+
+        // Not scanned, and said so
+        $result = PhpstanEngine::result($data, $app);
+        $this->assertSame([], $result->findings);
+        $this->assertSame(['src/Broken.php: Syntax error, unexpected EOF on line 3'], $result->errors);
+    }
+
     public function testCountFiles(): void
     {
-        $this->assertSame(9, PhpstanEngine::countFiles(SemgrepEngineTest::APP, ['src', 'templates']));
-        $this->assertSame(8, PhpstanEngine::countFiles(SemgrepEngineTest::APP, ['src', 'templates'], ['src/Model']));
-        $this->assertSame(10, PhpstanEngine::countFiles(SemgrepEngineTest::APP, ['src', 'templates'], [], ['ctp', 'php', 'html']));
+        $this->assertSame(10, PhpstanEngine::countFiles(SemgrepEngineTest::APP, ['src', 'templates']));
+        $this->assertSame(9, PhpstanEngine::countFiles(SemgrepEngineTest::APP, ['src', 'templates'], ['src/Model']));
+        $this->assertSame(11, PhpstanEngine::countFiles(SemgrepEngineTest::APP, ['src', 'templates'], [], ['ctp', 'php', 'html']));
         $this->assertSame(1, PhpstanEngine::countFiles(SemgrepEngineTest::APP, ['templates/Posts/view.ctp']));
     }
 

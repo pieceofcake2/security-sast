@@ -34,6 +34,12 @@ jobs:
 
       # Semgrep runs in Docker, which the Ubuntu runners have
       - name: Scan the code
+        env:
+          # The secrets of production, for the check of the configuration: without them, it checks the defaults
+          # of the application. They are compared as their SHA-256 and length, and not written to the report
+          SECURITY_SALT: ${{ secrets.SECURITY_SALT }}
+          SECURITY_CIPHER_SEED: ${{ secrets.SECURITY_CIPHER_SEED }}
+          COOKIE_KEY: ${{ secrets.COOKIE_KEY }}
         run: vendor/bin/security-sast --pdf=tmp/security-sast.pdf --fail-on=high --language=ja
 
       - name: Upload the report
