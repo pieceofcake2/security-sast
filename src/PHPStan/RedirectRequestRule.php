@@ -33,7 +33,8 @@ final class RedirectRequestRule implements Rule
             return [];
         }
         $args = $node->getArgs();
-        if ($args === [] || !Nodes::hasRequestValue($args[0]->value)) {
+        // A route array is a URL of the application, whatever the values of the request in it
+        if ($args === [] || $args[0]->value instanceof Node\Expr\Array_ || !Nodes::hasRequestValue($args[0]->value)) {
             return [];
         }
 

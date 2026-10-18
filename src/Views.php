@@ -30,6 +30,11 @@ final class Views
     public const TEXT_DIRECTORIES = ['Emails/text'];
 
     /**
+     * The classes in the directories of views, which are not views: the helpers, and the views of `src/View/`
+     */
+    public const CLASS_DIRECTORIES = ['View/Helper'];
+
+    /**
      * Whether a file is a view
      *
      * @param string $path Path of the file
@@ -43,10 +48,14 @@ final class Views
         if (!in_array($extension, array_map('strtolower', $extensions), true)) {
             return false;
         }
-        foreach (self::TEXT_DIRECTORIES as $directory) {
+        foreach (array_merge(self::TEXT_DIRECTORIES, self::CLASS_DIRECTORIES) as $directory) {
             if (str_contains($path, '/' . $directory . '/')) {
                 return false;
             }
+        }
+        // A class of a view, e.g. View/AppView.php
+        if (preg_match('#/View/\w+View\.php\z#', $path)) {
+            return false;
         }
         foreach (self::DIRECTORIES as $directory) {
             if (str_contains($path, '/' . $directory . '/')) {

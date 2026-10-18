@@ -11,6 +11,7 @@ of the Semgrep Registry (`p/php` by default), which are described on [semgrep.de
 | --- | --- | --- | --- | --- |
 | [`cakephp2-query-concatenation`](#cakephp2-query-concatenation) | High | `securitySast.queryConcatenation` | CWE-89 | A03 Injection |
 | [`cakephp2-conditions-string`](#cakephp2-conditions-string) | High | `securitySast.conditionsString` | CWE-89 | A03 Injection |
+| [`cakephp2-order-request`](#cakephp2-order-request) | High | `securitySast.orderRequest` | CWE-89 | A03 Injection |
 | [`cakephp2-render-request`](#cakephp2-render-request) | High | `securitySast.renderRequest` | CWE-22 | A01 Broken Access Control |
 | [`cakephp2-unserialize-request`](#cakephp2-unserialize-request) | High | `securitySast.unserializeRequest` | CWE-502 | A08 Software and Data Integrity Failures |
 | [`cakephp2-redirect-request`](#cakephp2-redirect-request) | Medium | `securitySast.redirectRequest` | CWE-601 | A01 Broken Access Control |
@@ -30,8 +31,8 @@ a call), or a double-quoted string with a variable in it; a concatenation in the
 
 ## cakephp2-query-concatenation
 
-SQL built from a string with a variable, by concatenation or in a double-quoted string, passed to
-`Model::query()`.
+SQL built from a string with a variable, by concatenation, in a double-quoted string or in a heredoc, passed to
+`Model::query()`, or to `fetchAll()` and `execute()` of a datasource.
 
 **Why it matters.** The value goes into the SQL as it is. When it comes from the request, or from data that a
 user saved earlier, a quote in it ends the string of the SQL, and the rest is SQL of the attacker: reading other
@@ -73,9 +74,11 @@ sends SQL to the parameters of the pages.
 
 ## cakephp2-conditions-string
 
-A conditions string with a variable, as `'conditions' => "..."` or as an item of a conditions array without a
-key, e.g. in the options of `find()` or of `paginate`, or as the conditions of `deleteAll()` (its first argument)
-and `updateAll()` (its second argument).
+A conditions string with a variable, as `'conditions' => "..."`, as an item of a conditions array without a key
+(also in its `OR`, `AND`, `NOT` and `XOR`), or as a key with a variable (`['Post.' . $field => $value]`), e.g. in
+the options of `find()` or of `paginate`; or as the conditions of `deleteAll()` and `hasAny()` (their first
+argument), `updateAll()` and `field()` (their second argument), or as a value of the fields of `updateAll()`,
+which are SQL too (`['Post.title' => "'" . $title . "'"]`).
 
 **Why it matters.** CakePHP escapes the values of a conditions array, `['Post.title' => $title]`, but takes a
 string as SQL: the same SQL injection as with `query()`.
@@ -99,9 +102,32 @@ The operators go in the key, the value in the value: `['Post.created >=' => $fro
 **When it is safe.** The string has no variable of the request, e.g. a constant SQL fragment. Keep the
 variables out of the string: put them in the values of the array.
 
+## cakephp2-order-request
+
+A value of the request as the `order`, `fields` or `group` of the options of `find()` or of `paginate`.
+
+**Why it matters.** CakePHP puts these options into the SQL as names of fields, not as values: they are not
+escaped as values are, and a crafted value adds SQL to the query (SQL injection in `ORDER BY`).
+
+```php
+// Found
+$this->Post->find('all', ['order' => $this->request->query('sort')]);
+$this->paginate = ['fields' => $this->request->data('fields')];
+
+// Fixed: map the value to the allowed fields
+$columns = ['title' => 'Post.title', 'date' => 'Post.created'];
+$sort = $columns[(string)$this->request->query('sort')] ?? 'Post.created';
+$this->Post->find('all', ['order' => [$sort => 'DESC']]);
+```
+
+A lookup in a list of allowed values, `$columns[...] ?? 'Post.id'`, is not reported. For the sorting of
+`PaginatorComponent`, give the allowed fields as the third argument of `paginate()`:
+`$this->Paginator->paginate('Post', [], ['Post.title', 'Post.created'])`.
+
 ## cakephp2-render-request
 
-A value of the request passed to `$this->render()` or `$this->element()`.
+A value of the request passed to `$this->render()` or `$this->element()`. A ternary that only checks the
+request, `$this->render($this->request->is('ajax') ? 'ajax' : 'index')`, is not reported.
 
 **Why it matters.** The value names the view. With `../` in it, any template of the application is rendered,
 e.g. an element of the administration, with the variables of the action: information that the page should not
@@ -150,7 +176,8 @@ can change.
 
 ## cakephp2-redirect-request
 
-A value of the request passed to `$this->redirect()`.
+A value of the request passed to `$this->redirect()`. A route array, `['action' => 'view', $id]`, is a URL of the
+application and is not reported.
 
 **Why it matters.** An attacker sends a link of your site, `https://example.com/users/login?redirect=https://evil.example`:
 the user sees your domain, logs in, and lands on the page of the attacker, e.g. a copy of the login that asks for
@@ -198,7 +225,8 @@ of such a call, with the reason.
 
 ## cakephp2-security-csrf-disabled
 
-`$this->Security->csrfCheck = false` or `$this->Security->validatePost = false`.
+`$this->Security->csrfCheck = false` or `$this->Security->validatePost = false`, or the same in the settings of
+the component: `$components = ['Security' => ['csrfCheck' => false]]`.
 
 **Why it matters.** The CSRF tokens of `SecurityComponent` make sure that a form was sent from a page of the
 site. Without them, another site can make the browser of a logged-in user send the form: change the email or the

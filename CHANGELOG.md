@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+- New rule `cakephp2-order-request` (High): a value of the request as the `order`, `fields` or `group` of `find()`
+  or `paginate`, which goes into the SQL as a name
+- `cakephp2-conditions-string` also finds the conditions of `OR`, `AND`, `NOT` and `XOR`, those of `field()` and
+  `hasAny()`, and the values of the fields of `updateAll()`; `cakephp2-query-concatenation` those of `fetchAll()`
+  and `execute()`; `cakephp2-security-csrf-disabled` the settings of the component
+  (`['Security' => ['csrfCheck' => false]]`)
+- No longer reported: a redirect to a route array, a render with a ternary that only checks the request, and the
+  helpers and the view classes of `View/` (e.g. `View/AppView.php`)
+- A path of `--paths` that does not exist is an error, instead of a Semgrep scan of nothing that passes
+- The report says when the project has a `.semgrepignore`, whose paths Semgrep leaves out; the Semgrep errors of
+  a list type are no longer printed as `Array`
 - Both engines find the same places in more cases, checked on the same code with Semgrep in Docker:
   - Semgrep finds SQL in a heredoc with a variable, values of the request read as an array
     (`$this->request['data']`), a variable of a view set to `''` and then to another value, and nested indexes

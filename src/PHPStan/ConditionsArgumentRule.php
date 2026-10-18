@@ -9,8 +9,9 @@ use PHPStan\Analyser\Scope;
 use PHPStan\Rules\Rule;
 
 /**
- * `cakephp2-conditions-string`: a conditions string with a variable passed to `Model::deleteAll()` (its first
- * argument) or `Model::updateAll()` (its second argument). The `conditions` of the options are checked by
+ * `cakephp2-conditions-string`: a conditions string with a variable passed to `Model::deleteAll()` and
+ * `Model::hasAny()` (their first argument), `Model::updateAll()` and `Model::field()` (their second argument), or
+ * as a value of the fields of `updateAll()`. The `conditions` of the options are checked by
  * `ConditionsStringRule`.
  *
  * @implements \PHPStan\Rules\Rule<\PhpParser\Node\Expr\MethodCall>
@@ -20,7 +21,7 @@ final class ConditionsArgumentRule implements Rule
     /**
      * The argument of the conditions, by method
      */
-    private const ARGUMENTS = ['deleteall' => 0, 'updateall' => 1];
+    private const ARGUMENTS = ['deleteall' => 0, 'updateall' => 1, 'field' => 1, 'hasany' => 0];
 
     /**
      * @inheritDoc
@@ -40,6 +41,14 @@ final class ConditionsArgumentRule implements Rule
         }
         $args = $node->getArgs();
         $index = self::ARGUMENTS[$node->name instanceof Node\Identifier ? $node->name->toLowerString() : ''] ?? null;
+        // The fields of updateAll() are SQL too: ['Post.title' => "'" . $title . "'"]
+        if ($index === 1 && $node->name instanceof Node\Identifier && $node->name->toLowerString() === 'updateall' && isset($args[0]) && $args[0]->value instanceof Node\Expr\Array_) {
+            foreach ($args[0]->value->items as $item) {
+                if (Nodes::isStringWithVariable($item->value)) {
+                    return [Nodes::error('cakephp2-conditions-string')];
+                }
+            }
+        }
         if ($index === null || !isset($args[$index]) || !Nodes::isStringWithVariable($args[$index]->value)) {
             return [];
         }

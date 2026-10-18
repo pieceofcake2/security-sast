@@ -15,6 +15,10 @@ class SemgrepEngineTest extends TestCase
      * The rules of this package and the places they find in the fixture application
      */
     public const EXPECTED = [
+        'cakephp2-conditions-string src/Controller/PostsController.php:101',
+        'cakephp2-conditions-string src/Controller/PostsController.php:105',
+        'cakephp2-conditions-string src/Controller/PostsController.php:106',
+        'cakephp2-conditions-string src/Controller/PostsController.php:107',
         'cakephp2-conditions-string src/Controller/PostsController.php:22',
         'cakephp2-conditions-string src/Controller/PostsController.php:53',
         'cakephp2-conditions-string src/Controller/PostsController.php:54',
@@ -23,6 +27,9 @@ class SemgrepEngineTest extends TestCase
         'cakephp2-conditions-string src/Controller/PostsController.php:78',
         'cakephp2-conditions-string src/Controller/PostsController.php:79',
         'cakephp2-conditions-string src/Controller/PostsController.php:93',
+        'cakephp2-order-request src/Controller/PostsController.php:102',
+        'cakephp2-order-request src/Controller/PostsController.php:103',
+        'cakephp2-query-concatenation src/Controller/PostsController.php:104',
         'cakephp2-query-concatenation src/Controller/PostsController.php:19',
         'cakephp2-query-concatenation src/Controller/PostsController.php:20',
         'cakephp2-query-concatenation src/Controller/PostsController.php:57',
@@ -34,6 +41,7 @@ class SemgrepEngineTest extends TestCase
         'cakephp2-redirect-request src/Controller/PostsController.php:71',
         'cakephp2-render-request src/Controller/PostsController.php:39',
         'cakephp2-render-request src/Controller/PostsController.php:67',
+        'cakephp2-security-csrf-disabled src/Controller/ApiController.php:4',
         'cakephp2-security-csrf-disabled src/Controller/PostsController.php:12',
         'cakephp2-security-csrf-disabled src/Controller/PostsController.php:13',
         'cakephp2-unserialize-request src/Controller/PostsController.php:46',
@@ -95,7 +103,7 @@ class SemgrepEngineTest extends TestCase
         $result = SemgrepEngine::result($data, (string)realpath(self::APP));
 
         $this->assertSame(self::EXPECTED, self::places($result->findings));
-        $this->assertSame(10, $result->files);
+        $this->assertSame(13, $result->files);
         $this->assertStringStartsWith('Semgrep 1.', $result->engine);
         $this->assertSame([], $result->errors);
 
@@ -171,6 +179,13 @@ class SemgrepEngineTest extends TestCase
         $this->expectExceptionMessage('Semgrep failed (exit code 2): Killed');
 
         $engine->scan(self::APP, ['src']);
+    }
+
+    public function testErrorOfAListType(): void
+    {
+        $errors = SemgrepEngine::errors(['errors' => [['level' => 'warn', 'type' => ['PartialParsing', [['path' => 'src/A.php']]], 'message' => 'Syntax error at line 3']]]);
+
+        $this->assertSame(['PartialParsing: Syntax error at line 3'], $errors);
     }
 
     public function testWarningsDoNotFail(): void

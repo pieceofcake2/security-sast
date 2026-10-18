@@ -86,7 +86,7 @@ class CommandTest extends TestCase
         $layout = ['app' => 'src', 'views' => ['src/View', 'templates'], 'plugins' => ['plugins'], 'viewExtension' => 'html', 'installed' => ['plugins/DebugKit']];
 
         // Only the paths that exist
-        $this->assertSame(['src', 'templates'], $config->paths($layout));
+        $this->assertSame(['src', 'src/View', 'templates'], $config->paths($layout));
         $this->assertSame(['ctp', 'php', 'html'], $config->viewExtensions($layout));
         $this->assertContains('plugins/DebugKit', $config->exclude($layout));
         $this->assertSame(['ctp', 'php'], $config->viewExtensions());
@@ -141,7 +141,7 @@ class CommandTest extends TestCase
         $output = '';
         try {
             $this->assertSame(Command::FAILURE, self::runCommand(['--pdf=' . $pdf], $output));
-            $this->assertStringContainsString('40 findings (19 high, 21 medium) of 8 rules in 11 files (PHPStan 2.', $output);
+            $this->assertStringContainsString('48 findings (26 high, 22 medium) of 9 rules in 14 files (PHPStan 2.', $output);
             $this->assertStringStartsWith('%PDF', (string)file_get_contents($pdf));
 
             $this->assertSame(Command::SUCCESS, self::runCommand(['--pdf=' . $pdf, '--fail-on=critical']));
@@ -185,6 +185,14 @@ class CommandTest extends TestCase
         $this->assertSame(Command::ERROR, self::runCommand(['--fail-on=severe'], $output));
         $this->assertStringContainsString('--fail-on must be one of', $output);
         $this->assertStringContainsString('Usage: vendor/bin/security-sast', $output);
+    }
+
+    public function testRunWithAMissingPath(): void
+    {
+        $output = '';
+        $this->assertSame(Command::ERROR, self::runCommand(['--paths=src,srcc'], $output));
+        $this->assertStringContainsString('--paths: not found in', $output);
+        $this->assertStringContainsString(': srcc', $output);
     }
 
     public function testRunWithNothingToScan(): void

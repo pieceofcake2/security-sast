@@ -24,7 +24,7 @@ final class RuleCatalog
             'cwe' => [self::SQL],
             'owasp' => ['A03:2021 - Injection'],
             'confidence' => 'MEDIUM',
-            'message' => "SQL built from a string with a variable is passed to Model::query(). Use the values array of query() (\$this->Model->query('... WHERE id = ?', [\$id])) or find() with conditions arrays.",
+            'message' => "SQL built from a string with a variable is passed to Model::query() (or fetchAll(), execute()). Use the values array of query() (\$this->Model->query('... WHERE id = ?', [\$id])) or find() with conditions arrays.",
         ],
         'cakephp2-conditions-string' => [
             'identifier' => 'securitySast.conditionsString',
@@ -32,7 +32,15 @@ final class RuleCatalog
             'cwe' => [self::SQL],
             'owasp' => ['A03:2021 - Injection'],
             'confidence' => 'MEDIUM',
-            'message' => "A conditions string with a variable is passed to find(), deleteAll() or updateAll(). Use a conditions array (['Post.title' => \$title]) so that the value is escaped.",
+            'message' => "A conditions string with a variable is passed to find(), deleteAll(), updateAll(), field() or hasAny(), or as a value of the fields of updateAll(). Use a conditions array (['Post.title' => \$title]) so that the value is escaped.",
+        ],
+        'cakephp2-order-request' => [
+            'identifier' => 'securitySast.orderRequest',
+            'severity' => Severity::HIGH,
+            'cwe' => [self::SQL],
+            'owasp' => ['A03:2021 - Injection'],
+            'confidence' => 'MEDIUM',
+            'message' => 'A value of the request is the order, fields or group of find() or paginate: it goes into the SQL as a name. Map the value to a list of allowed fields.',
         ],
         'cakephp2-redirect-request' => [
             'identifier' => 'securitySast.redirectRequest',
