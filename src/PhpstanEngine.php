@@ -49,7 +49,8 @@ final class PhpstanEngine implements Engine
         $phpstan = $this->phpstan ?? (string)InstalledVersions::getInstallPath('phpstan/phpstan') . DIRECTORY_SEPARATOR . 'phpstan';
         // A name of its own: PHPStan reads the configuration by its extension, .neon
         $config = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'security-sast-' . bin2hex(random_bytes(6)) . '.neon';
-        file_put_contents($config, self::config($project, $paths, $exclude, $this->viewExtensions, $this->safeViewVariables));
+        $hereIsPath = Framework::detect($project)?->hereIsPath() ?? false;
+        file_put_contents($config, self::config($project, $paths, $exclude, $this->viewExtensions, $this->safeViewVariables, $hereIsPath));
         try {
             [$code, $output, $error] = ($this->run)([PHP_BINARY, $phpstan, 'analyse', '--configuration=' . $config, '--error-format=json', '--no-progress', '--no-interaction', '--memory-limit=1G'], $project);
         } finally {
@@ -79,13 +80,15 @@ final class PhpstanEngine implements Engine
      * @param array<string> $exclude Paths to leave out, relative to the project
      * @param array<string> $viewExtensions Extensions of the views, without the dot
      * @param array<string> $safeViewVariables Variables that the views may print without h()
+     * @param bool $hereIsPath Whether `here()` of the request is a path of the application (`Framework::hereIsPath()`)
      * @return string NEON
      */
-    public static function config(string $project, array $paths, array $exclude = [], array $viewExtensions = Views::EXTENSIONS, array $safeViewVariables = []): string
+    public static function config(string $project, array $paths, array $exclude = [], array $viewExtensions = Views::EXTENSIONS, array $safeViewVariables = [], bool $hereIsPath = false): string
     {
         $neon = "includes:\n    - " . self::neon((string)realpath(self::RULES)) . "\n";
         $neon .= "services:\n    -\n        class: PieceOfCake2\\SecuritySast\\PHPStan\\ViewUnescapedOutputRule\n";
         $neon .= '        arguments: [[' . implode(', ', array_map([self::class, 'neon'], $viewExtensions)) . '], [' . implode(', ', array_map([self::class, 'neon'], $safeViewVariables)) . '], ' . self::neon($project) . "]\n        tags: [phpstan.rules.rule]\n";
+        $neon .= "    -\n        class: PieceOfCake2\\SecuritySast\\PHPStan\\RedirectRequestRule\n        arguments: [" . ($hereIsPath ? 'true' : 'false') . "]\n        tags: [phpstan.rules.rule]\n";
         $neon .= "parameters:\n    level: 0\n    reportUnmatchedIgnoredErrors: false\n    fileExtensions:\n";
         foreach (array_unique(array_merge(['php'], $viewExtensions)) as $extension) {
             $neon .= '        - ' . self::neon($extension) . "\n";

@@ -6,7 +6,8 @@ namespace PieceOfCake2\SecuritySast;
 /**
  * The rules of this package for CakePHP 2 applications: the same checks of the code for Semgrep
  * (`resources/semgrep/cakephp2.yml`) and PHPStan (`resources/phpstan/rules.neon`), and the checks of the
- * configuration (`ConfigCheck`, `cakephp2-config-*`), which have no PHPStan identifier.
+ * configuration (`ConfigCheck`, `cakephp2-config-*`) and of the installed framework (`Framework`,
+ * `cakephp2-framework-*`), which have no PHPStan identifier.
  */
 final class RuleCatalog
 {
@@ -48,7 +49,7 @@ final class RuleCatalog
             'cwe' => ["CWE-601: URL Redirection to Untrusted Site ('Open Redirect')"],
             'owasp' => ['A01:2021 - Broken Access Control'],
             'confidence' => 'HIGH',
-            'message' => 'A value of the request is passed to redirect(). Redirect only to paths of the application, e.g. with Router::url() of a route array, or check the URL against a list.',
+            'message' => 'A value of the request is passed to redirect(). Redirect only to paths of the application, e.g. with Router::url() of a route array, or check the URL against a list. Before pieceofcake2/cakephp 2.12.11, $this->request->here() can begin with // (a URL of another site): update CakePHP, or put Router::fullBaseUrl() before it.',
         ],
         'cakephp2-render-request' => [
             'identifier' => 'securitySast.renderRequest',
@@ -161,6 +162,14 @@ final class RuleCatalog
             'owasp' => ['A05:2021 - Security Misconfiguration'],
             'confidence' => 'HIGH',
             'message' => 'The pages with a session get no Cache-Control: no-store, as Session.cacheLimiter is not \'nocache\'. CakePHP 2 sets it to \'must-revalidate\' by default, for Internet Explorer 8 and before, which PHP does not know: PHP then sends no cache header. Set Session.cacheLimiter to \'nocache\', as CakePHP 5 leaves it.',
+        ],
+        'cakephp2-framework-protocol-relative-here' => [
+            'identifier' => '',
+            'severity' => Severity::MEDIUM,
+            'cwe' => ["CWE-601: URL Redirection to Untrusted Site ('Open Redirect')"],
+            'owasp' => ['A06:2021 - Vulnerable and Outdated Components'],
+            'confidence' => 'HIGH',
+            'message' => 'The installed CakePHP keeps the leading // of the path of the request in $this->request->here() (pieceofcake2/cakephp before 2.12.11, cakephp/cakephp before 3.4.0, GHSA-wh43-gc93-wh4c): for a request to //evil.example/..., FormHelper::create() without a url renders <form action="//evil.example/...">, which sends the data of the form to another host, and a redirect to here() goes there. Update to pieceofcake2/cakephp 2.12.11 or later.',
         ],
     ];
 

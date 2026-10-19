@@ -161,7 +161,9 @@ rules:
     severity: WARNING
     message: >-
       A value of the request is passed to redirect(). Redirect only to paths of the application, e.g. with
-      Router::url() of a route array, or check the URL against a list.
+      Router::url() of a route array, or check the URL against a list. Before pieceofcake2/cakephp 2.12.11,
+      $this->request->here() can begin with // (a URL of another site): update CakePHP, or put
+      Router::fullBaseUrl() before it.
     # The values of the request, as PHPStan finds them: $this->request and the superglobals of the request
     patterns:
       - pattern-either:
@@ -173,6 +175,25 @@ rules:
           - pattern: $this->redirect(<... $_FILES ...>, ...)
       # A route array is a URL of the application, whatever the values of the request in it
       - pattern-not: $this->redirect([...], ...)
+      # here() of the request is a path of the application with pieceofcake2/cakephp 2.12.11+ (or cakephp/cakephp
+      # 3.4+) in the composer.lock of the project: SemgrepEngine::rules() then adds after this comment the
+      # patterns that leave it out (SemgrepEngine::HERE_IS_PATH)
+      # A URL of the own origin of the application: Router::url('/', true), or the origin followed by a path that
+      # begins with / (here() of the request, or a string literal). Whatever follows, even //evil.example, is in
+      # the path of the same host. Semgrep matches $REST with the rest of a longer concatenation
+      - pattern-not: $this->redirect(Router::url('/', true) . $REST, ...)
+      - pattern-not: $this->redirect(Router::fullBaseUrl() . $this->request->here(...), ...)
+      - pattern-not: $this->redirect(Router::fullBaseUrl() . $this->request->here(...) . $REST, ...)
+      - pattern-not: $this->redirect(Router::fullBaseUrl() . $this->request->here, ...)
+      - pattern-not: $this->redirect(Router::fullBaseUrl() . $this->request->here . $REST, ...)
+      - pattern-not: $this->redirect(Router::fullBaseUrl() . "=~/^\//", ...)
+      - pattern-not: $this->redirect(Router::fullBaseUrl() . "=~/^\//" . $REST, ...)
+      - pattern-not: $this->redirect(Configure::read('App.fullBaseUrl') . $this->request->here(...), ...)
+      - pattern-not: $this->redirect(Configure::read('App.fullBaseUrl') . $this->request->here(...) . $REST, ...)
+      - pattern-not: $this->redirect(Configure::read('App.fullBaseUrl') . $this->request->here, ...)
+      - pattern-not: $this->redirect(Configure::read('App.fullBaseUrl') . $this->request->here . $REST, ...)
+      - pattern-not: $this->redirect(Configure::read('App.fullBaseUrl') . "=~/^\//", ...)
+      - pattern-not: $this->redirect(Configure::read('App.fullBaseUrl') . "=~/^\//" . $REST, ...)
     metadata:
       cwe: ["CWE-601: URL Redirection to Untrusted Site ('Open Redirect')"]
       owasp: ["A01:2021 - Broken Access Control"]

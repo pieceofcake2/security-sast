@@ -24,6 +24,27 @@ final class SemgrepEngine implements Engine
     public const CONFIGS = ['p/php'];
 
     /**
+     * The patterns of `cakephp2-redirect-request` that leave out `here()` of the request, a path of the application
+     * with a fixed CakePHP (`Framework::hereIsPath()`): a redirect with a value of the request besides it is still
+     * reported. They are added after the comment that ends with `(SemgrepEngine::HERE_IS_PATH)`
+     */
+    public const HERE_IS_PATH = <<<'YAML'
+      - pattern: $this->redirect($URL, ...)
+      - metavariable-pattern:
+          metavariable: $URL
+          patterns:
+            - pattern-either:
+                - pattern: $this->request
+                - pattern: $_GET
+                - pattern: $_POST
+                - pattern: $_REQUEST
+                - pattern: $_COOKIE
+                - pattern: $_FILES
+            - pattern-not-inside: $this->request->here
+
+YAML;
+
+    /**
      * The CakePHP 2 rules of this package
      */
     public const RULES = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'semgrep';
@@ -63,7 +84,8 @@ final class SemgrepEngine implements Engine
         $project = (string)realpath($project);
         $rules = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'security-sast-rules-' . bin2hex(random_bytes(6));
         mkdir($rules, 0755, true);
-        file_put_contents($rules . DIRECTORY_SEPARATOR . 'cakephp2.yml', self::rules($this->viewExtensions, $this->safeViewVariables));
+        $hereIsPath = Framework::detect($project)?->hereIsPath() ?? false;
+        file_put_contents($rules . DIRECTORY_SEPARATOR . 'cakephp2.yml', self::rules($this->viewExtensions, $this->safeViewVariables, $hereIsPath));
         $command = [
             $this->docker, 'run', '--rm',
             '-v', $project . ':/src:ro',
@@ -126,11 +148,15 @@ final class SemgrepEngine implements Engine
      *
      * @param array<string> $viewExtensions Extensions of the views, without the dot
      * @param array<string> $safeViewVariables Variables that the views may print without h()
+     * @param bool $hereIsPath Whether `here()` of the request is a path of the application (`Framework::hereIsPath()`)
      * @return string YAML
      */
-    public static function rules(array $viewExtensions = Views::EXTENSIONS, array $safeViewVariables = []): string
+    public static function rules(array $viewExtensions = Views::EXTENSIONS, array $safeViewVariables = [], bool $hereIsPath = false): string
     {
         $yaml = (string)file_get_contents(self::RULES . DIRECTORY_SEPARATOR . 'cakephp2.yml');
+        if ($hereIsPath) {
+            $yaml = str_replace("(SemgrepEngine::HERE_IS_PATH)\n", "(SemgrepEngine::HERE_IS_PATH)\n" . self::HERE_IS_PATH, $yaml);
+        }
         $names = array_merge(Views::SAFE_VARIABLES, array_map(static fn(string $name): string => preg_quote(ltrim($name, '$'), '/'), $safeViewVariables));
         $yaml = str_replace('(?:' . implode('|', Views::SAFE_VARIABLES) . ')', '(?:' . implode('|', $names) . ')', $yaml);
         $include = '';

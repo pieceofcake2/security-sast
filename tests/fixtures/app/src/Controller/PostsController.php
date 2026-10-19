@@ -114,4 +114,22 @@ SQL
     {
         $this->render($this->request->is('ajax') ? 'ajax' : 'index');
     }
+
+    public function redirects()
+    {
+        // The own origin followed by a path: not reported
+        $this->redirect(Router::fullBaseUrl() . $this->request->here());
+        $this->redirect(Router::fullBaseUrl() . $this->request->here(false) . '?page=' . $this->request->query('page'));
+        $this->redirect(Configure::read('App.fullBaseUrl') . $this->request->here, 301);
+        $this->redirect(Router::fullBaseUrl() . '/posts/view/' . $this->request->query('id'));
+        $this->redirect(Router::url('/', true) . $this->request->query('path'));
+        // Reported
+        $this->redirect($this->request->here() . Router::fullBaseUrl());
+        $this->redirect($this->request->query('url') . Router::fullBaseUrl() . $this->request->here());
+        $this->redirect(Router::fullBaseUrl() . $this->request->query('path'));
+        $this->redirect('https://' . $this->request->host() . $this->request->here());
+        $this->redirect(\Router::fullBaseUrl() . $this->request->here());
+        $this->redirect(Router::url($this->request->query('path'), true));
+        $this->redirect(sprintf('%s%s', Router::fullBaseUrl(), $this->request->here()));
+    }
 }
