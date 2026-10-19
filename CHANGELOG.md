@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Unreleased
+## 1.0.6
 
 - `cakephp2-view-unescaped-output` no longer reports, with either engine, a variable set in the view to a number
   literal (`$width = 3;`, `-1`, `1.5`), which the docs list as safe; and Semgrep no longer reports a value cast to
