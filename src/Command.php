@@ -100,6 +100,7 @@ final class Command
             } elseif ($config->configCheck && $loadError !== null) {
                 $result->errors[] = $loadError;
             }
+            $result->notRun = self::notRun($config, $values !== null, $loadError !== null);
             $result->paths = $paths;
             $result->suppressed = Suppressions::find(
                 (string)realpath($config->project),
@@ -148,6 +149,40 @@ final class Command
         }
 
         return $result->fails($config->failOn) ? self::FAILURE : self::SUCCESS;
+    }
+
+    /**
+     * The rules of this package that do not run, with the key of the message of the reason: the checks of the
+     * configuration when it is turned off, not found or not loaded, and the check of the CakePHP of the
+     * `composer.lock` without one, or for a branch
+     *
+     * @param \PieceOfCake2\SecuritySast\Config $config Settings
+     * @param bool $loaded Whether the configuration of the application was loaded
+     * @param bool $failed Whether loading the configuration failed
+     * @return array<string, string>
+     */
+    public static function notRun(Config $config, bool $loaded, bool $failed): array
+    {
+        $notRun = [];
+        $framework = Framework::detect((string)realpath($config->project));
+        if ($framework === null || $framework->release() === null) {
+            $notRun['cakephp2-framework-protocol-relative-here'] = $framework === null ? 'notRun.noFramework' : 'notRun.frameworkBranch';
+        }
+        $reason = match (true) {
+            !$config->configCheck => 'notRun.configOff',
+            $loaded => null,
+            $failed => 'notRun.configError',
+            default => 'notRun.configNotApplicable',
+        };
+        if ($reason !== null) {
+            foreach (array_keys(RuleCatalog::RULES) as $rule) {
+                if (str_starts_with($rule, 'cakephp2-config-')) {
+                    $notRun[$rule] = $reason;
+                }
+            }
+        }
+
+        return $notRun;
     }
 
     /**

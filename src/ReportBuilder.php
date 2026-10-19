@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace PieceOfCake2\SecuritySast;
 
 use DateTimeImmutable;
+use PieceOfCake2\Report\Check;
+use PieceOfCake2\Report\CheckList;
 use PieceOfCake2\Report\Count;
 use PieceOfCake2\Report\Cover;
 use PieceOfCake2\Report\Document;
@@ -15,7 +17,8 @@ use PieceOfCake2\Report\Translator;
 use PieceOfCake2\Report\Verdict;
 
 /**
- * Builds the report of a scan: the rules that found places by risk, and a page for each rule with its places.
+ * Builds the report of a scan: the rules that found places by risk, the rules that found nothing and those that
+ * did not run, and a page for each rule with its places.
  */
 final class ReportBuilder
 {
@@ -130,7 +133,82 @@ final class ReportBuilder
             headerRight: $cover->headerRight($startedAt, $environment),
             css: (string)file_get_contents(self::RESOURCE_DIR . DIRECTORY_SEPARATOR . 'sast.css'),
             language: $this->translator->language(),
+            checkLists: $this->checkLists($result, $config),
+            checksTitle: $this->t('section.checks'),
         );
+    }
+
+    /**
+     * The risks of the groups of the findings, as on the cover: unknown and info only when a rule found places
+     *
+     * @param \PieceOfCake2\SecuritySast\ScanResult $result Scan
+     * @return array<string>
+     */
+    private static function severities(ScanResult $result): array
+    {
+        $counts = $result->counts();
+
+        return array_values(array_filter(Severity::ALL, static fn(string $severity): bool => !in_array($severity, [Severity::UNKNOWN, Severity::INFO], true) || $counts[$severity] > 0));
+    }
+
+    /**
+     * The tables of the checks: the rules of this package that ran and found nothing, the other rules of Semgrep,
+     * and the rules that did not run
+     *
+     * @param \PieceOfCake2\SecuritySast\ScanResult $result Scan
+     * @param \PieceOfCake2\SecuritySast\Config $config Settings
+     * @return array<\PieceOfCake2\Report\CheckList>
+     */
+    private function checkLists(ScanResult $result, Config $config): array
+    {
+        $found = array_keys($result->byRule());
+        $passed = [];
+        $notRun = [];
+        foreach (RuleCatalog::RULES as $rule => $definition) {
+            if (!$result->ran($rule)) {
+                $notRun[] = new Check($rule, $this->title($rule), [$this->t($result->notRun[$rule] ?? 'notRun.engine')]);
+            } elseif (!in_array($rule, $found, true)) {
+                $passed[] = new Check($rule, $this->title($rule), [implode(', ', RuleCatalog::cweIds($rule))], $definition['severity'], $this->t('severity.' . $definition['severity']));
+            }
+        }
+        foreach ($result->skippedRules as $skipped) {
+            $notRun[] = new Check($skipped['id'], $this->title($skipped['id']), [$this->t('notRun.skipped', ['details' => $skipped['reason'] !== '' ? $skipped['reason'] : '-'])]);
+        }
+        // Sorted by risk, as the findings
+        usort($passed, static fn(Check $a, Check $b): int => [Severity::rank((string)$a->badge), $a->id] <=> [Severity::rank((string)$b->badge), $b->id]);
+
+        $lists = [new CheckList(
+            $this->t('checks.passed'),
+            [$this->t('field.rule'), $this->t('field.name'), $this->t('field.risk'), $this->t('field.cwe')],
+            $passed,
+            $this->t('checks.passed.note'),
+        )];
+
+        $configs = $config->engine === 'semgrep' ? $config->semgrepConfigs : [];
+        if ($configs !== []) {
+            // The rules of the Registry are too many to list: their numbers
+            $foundOther = array_values(array_filter($found, static fn(string $rule): bool => !isset(RuleCatalog::RULES[$rule])));
+            $values = ['-', (string)count($foundOther), '-'];
+            if ($result->engineRules !== null) {
+                $ran = array_values(array_unique(array_merge(array_filter($result->engineRules, static fn(string $rule): bool => !isset(RuleCatalog::RULES[$rule])), $foundOther)));
+                $values = [(string)count($ran), (string)count($foundOther), (string)(count($ran) - count($foundOther))];
+            }
+            $lists[] = new CheckList(
+                $this->t('checks.other'),
+                [$this->t('field.ruleset'), $this->t('field.name'), $this->t('field.rulesRun'), $this->t('field.rulesFound'), $this->t('field.rulesPassed')],
+                [new Check(implode(', ', $configs), $this->t('checks.other.title'), $values)],
+                $this->t($result->engineRules !== null ? 'checks.other.note' : 'checks.other.unknown'),
+            );
+        }
+
+        $lists[] = new CheckList(
+            $this->t('checks.notRun'),
+            [$this->t('field.rule'), $this->t('field.name'), $this->t('field.reason')],
+            $notRun,
+            $this->t('checks.notRun.note'),
+        );
+
+        return $lists;
     }
 
     /**
@@ -149,7 +227,7 @@ final class ReportBuilder
     }
 
     /**
-     * The rules that found places, by risk
+     * The rules that found places, by risk: every risk of the cover, also without findings
      *
      * @param \PieceOfCake2\SecuritySast\ScanResult $result Scan
      * @return array<\PieceOfCake2\Report\Group>
@@ -158,16 +236,15 @@ final class ReportBuilder
     {
         $groups = [];
         $rules = $result->byRule();
-        foreach (Severity::ALL as $severity) {
+        // Every risk, also without findings, so that a reader tells none from left out
+        foreach (self::severities($result) as $severity) {
             $group = new Group(count($groups) + 1, $this->t('severity.' . $severity));
             foreach ($rules as $rule => $findings) {
                 if ($findings[0]->severity === $severity) {
                     $group->items[] = $this->rule($group->no . '-' . (count($group->items) + 1), $rule, $findings);
                 }
             }
-            if ($group->items !== []) {
-                $groups[] = $group;
-            }
+            $groups[] = $group;
         }
 
         if ($result->suppressed !== []) {

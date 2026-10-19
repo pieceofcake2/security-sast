@@ -20,6 +20,12 @@ final class ScanResult
      * @param array<array{file: string, line: int, rules: array<string>, reason: string|null, code: string}> $suppressed
      *  The comments of the code that suppress findings of the engine (`Suppressions`): reported, but they do not
      *  fail the scan
+     * @param array<string>|null $engineRules The IDs of the rules that the engine ran, e.g. from the timing of
+     *  Semgrep (`--time`), or null when the engine does not tell them: then it ran every rule of the code of this
+     *  package
+     * @param array<array{id: string, reason: string}> $skippedRules The rules that the engine skipped, and why
+     * @param array<string, string> $notRun The rules of this package that did not run, by ID, with the key of the
+     *  message of the reason (`notRun.*`), e.g. the checks of the configuration when it is turned off
      */
     public function __construct(
         public array $findings = [],
@@ -29,6 +35,9 @@ final class ScanResult
         public ?string $configEnv = null,
         public array $paths = [],
         public array $suppressed = [],
+        public ?array $engineRules = null,
+        public array $skippedRules = [],
+        public array $notRun = [],
     ) {
     }
 
@@ -49,6 +58,25 @@ final class ScanResult
         }
 
         return $rules;
+    }
+
+    /**
+     * Whether a rule of this package ran: not one that did not run (`$notRun`), and, for a rule of the code, one
+     * that the engine ran when it tells which
+     *
+     * @param string $rule ID of the rule
+     * @return bool
+     */
+    public function ran(string $rule): bool
+    {
+        if (isset($this->notRun[$rule])) {
+            return false;
+        }
+        if ($this->engineRules === null || !RuleCatalog::isCode($rule)) {
+            return true;
+        }
+
+        return in_array($rule, $this->engineRules, true);
     }
 
     /**

@@ -1,0 +1,162 @@
+{
+    "_comment": "The scan of the sample reports (docs/examples/report-sample.php): a fictional application, scanned with Semgrep",
+    "project": "acme/app",
+    "engine": "Semgrep 1.180.0",
+    "files": 6,
+    "paths": [
+        "src",
+        "templates"
+    ],
+    "configEnv": "prod",
+    "software": "PHP 8.5.11　Semgrep 1.180.0　pieceofcake2/security-sast 1.x-dev",
+    "startedAt": "2026-10-17 10:05:39",
+    "finishedAt": "2026-10-17 10:05:44",
+    "findings": [
+        {
+            "rule": "cakephp2-conditions-string",
+            "file": "src/Controller/PostsController.php",
+            "line": 22,
+            "code": "$found = $this->Post->find('all', ['conditions' => \"Post.title = '$q'\"]);"
+        },
+        {
+            "rule": "cakephp2-config-salt",
+            "file": "config/core.php",
+            "line": 3,
+            "code": "Configure::write('Security.salt', 'DYhG93b0qyJfIxfs2guVoUubWwvniR2G0FgaC9mi');"
+        },
+        {
+            "rule": "cakephp2-query-concatenation",
+            "file": "src/Controller/PostsController.php",
+            "line": 19,
+            "code": "$posts = $this->Post->query(\"SELECT * FROM posts WHERE title LIKE '%\" . $q . \"%'\");"
+        },
+        {
+            "rule": "cakephp2-query-concatenation",
+            "file": "src/Controller/PostsController.php",
+            "line": 20,
+            "code": "$more = $this->Post->query(\"SELECT * FROM posts WHERE id = $q\");"
+        },
+        {
+            "rule": "cakephp2-render-request",
+            "file": "src/Controller/PostsController.php",
+            "line": 39,
+            "code": "$this->render($this->request->query('page'));"
+        },
+        {
+            "rule": "cakephp2-unserialize-request",
+            "file": "src/Controller/PostsController.php",
+            "line": 46,
+            "code": "$data = unserialize($this->request->data('payload'));"
+        },
+        {
+            "rule": "cakephp2-config-cipher-seed",
+            "file": "config/core.php",
+            "line": 4,
+            "code": "Configure::write('Security.cipherSeed', '76859309657453542496749683645');"
+        },
+        {
+            "rule": "cakephp2-config-cookie-cipher",
+            "file": "config/core.php",
+            "line": 5,
+            "code": "Configure::write('Cookie.type', 'cipher');"
+        },
+        {
+            "rule": "cakephp2-redirect-request",
+            "file": "src/Controller/PostsController.php",
+            "line": 29,
+            "code": "return $this->redirect($this->request->query('url'));"
+        },
+        {
+            "rule": "cakephp2-redirect-request",
+            "file": "src/Controller/PostsController.php",
+            "line": 34,
+            "code": "return $this->redirect($this->request->data['Post']['url']);"
+        },
+        {
+            "rule": "cakephp2-security-csrf-disabled",
+            "file": "src/Controller/PostsController.php",
+            "line": 12,
+            "code": "$this->Security->csrfCheck = false;"
+        },
+        {
+            "rule": "cakephp2-security-csrf-disabled",
+            "file": "src/Controller/PostsController.php",
+            "line": 13,
+            "code": "$this->Security->validatePost = false;"
+        },
+        {
+            "rule": "cakephp2-view-unescaped-output",
+            "file": "templates/Posts/edit.ctp",
+            "line": 10,
+            "code": "<div><?= $body_html ?></div>"
+        },
+        {
+            "rule": "cakephp2-view-unescaped-output",
+            "file": "templates/Posts/edit.ctp",
+            "line": 12,
+            "code": "<p><?= $summary ?></p>"
+        },
+        {
+            "rule": "cakephp2-view-unescaped-output",
+            "file": "templates/Posts/index.php",
+            "line": 2,
+            "code": "<p><?= $title ?></p>"
+        },
+        {
+            "rule": "cakephp2-view-unescaped-output",
+            "file": "templates/Posts/view.ctp",
+            "line": 2,
+            "code": "<div><?= $post['Post']['body'] ?></div>"
+        },
+        {
+            "rule": "cakephp2-view-unescaped-output",
+            "file": "templates/Posts/view.ctp",
+            "line": 3,
+            "code": "<p><?php echo $post['Post']['summary']; ?></p>"
+        },
+        {
+            "rule": "cakephp2-xml-build-variable",
+            "file": "src/Controller/PostsController.php",
+            "line": 44,
+            "code": "$xml = Xml::build($this->request->data('xml'));"
+        }
+    ],
+    "notRun": [],
+    "engineRules": [
+        "cakephp2-query-concatenation",
+        "cakephp2-conditions-string",
+        "cakephp2-order-request",
+        "cakephp2-redirect-request",
+        "cakephp2-render-request",
+        "cakephp2-xml-build-variable",
+        "cakephp2-unserialize-request",
+        "cakephp2-security-csrf-disabled",
+        "cakephp2-view-raw-output",
+        "cakephp2-view-unescaped-output",
+        "php.doctrine.security.audit.doctrine-orm-dangerous-query.doctrine-orm-dangerous-query",
+        "php.lang.security.assert-use.assert-use",
+        "php.lang.security.curl-ssl-verifypeer-off.curl-ssl-verifypeer-off",
+        "php.lang.security.deserialization.extract-user-data",
+        "php.lang.security.injection.echoed-request.echoed-request",
+        "php.lang.security.injection.tainted-filename.tainted-filename",
+        "php.lang.security.injection.tainted-object-instantiation.tainted-object-instantiation",
+        "php.lang.security.injection.tainted-sql-string.tainted-sql-string",
+        "php.lang.security.injection.tainted-url-host.tainted-url-host",
+        "php.lang.security.md5-used-as-password.md5-used-as-password",
+        "php.lang.security.openssl-cbc-static-iv.openssl-cbc-static-iv",
+        "php.lang.security.phpinfo-use.phpinfo-use",
+        "php.lang.security.redirect-to-request-uri.redirect-to-request-uri",
+        "php.laravel.security.laravel-api-route-sql-injection.laravel-api-route-sql-injection",
+        "php.laravel.security.laravel-sql-injection.laravel-sql-injection",
+        "php.laravel.security.laravel-unsafe-validator.laravel-unsafe-validator",
+        "php.lang.security.injection.tainted-callable.tainted-callable",
+        "php.lang.security.tainted-exec.tainted-exec",
+        "php.lang.security.injection.tainted-session.tainted-session",
+        "php.lang.security.base-convert-loses-precision.base-convert-loses-precision",
+        "php.lang.security.injection.tainted-exec.tainted-exec",
+        "php.lang.security.injection.printed-request.printed-request",
+        "php.lang.security.audit.sha224-hash.sha224-hash",
+        "php.wordpress-plugins.security.audit.wp-ssrf-audit.wp-ssrf-audit"
+    ],
+    "semgrepImage": "semgrep/semgrep:1.180.0"
+}

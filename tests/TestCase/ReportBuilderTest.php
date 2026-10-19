@@ -10,6 +10,7 @@ use PieceOfCake2\Report\HtmlRenderer;
 use PieceOfCake2\SecuritySast\Config;
 use PieceOfCake2\SecuritySast\Finding;
 use PieceOfCake2\SecuritySast\ReportBuilder;
+use PieceOfCake2\SecuritySast\RuleCatalog;
 use PieceOfCake2\SecuritySast\ScanResult;
 use PieceOfCake2\SecuritySast\SemgrepEngine;
 
@@ -49,7 +50,10 @@ class ReportBuilderTest extends TestCase
         $this->assertStringContainsString('Semgrep 1.', $html);
 
         // The rules by risk, with their places
-        $this->assertMatchesRegularExpression('#<h3>1\. High</h3>.*<h3>2\. Medium</h3>#s', $html);
+        // Every risk of the cover, also without findings
+        $this->assertMatchesRegularExpression('#<h3>1\. Critical</h3>\s*<p class="empty">None</p>#', $html);
+        $this->assertMatchesRegularExpression('#<h3>2\. High</h3>.*<h3>3\. Medium</h3>.*<h3>4\. Low</h3>\s*<p class="empty">None</p>.*<h3>5\. Info</h3>#s', $html);
+        $this->assertStringNotContainsString('. Unknown</h3>', $html);
         $this->assertStringContainsString('SQL built with a variable in Model::query()', $html);
         $this->assertStringContainsString('<td class="num">2</td>', $html);
         $this->assertStringContainsString('<div class="loc">src/Controller/PostsController.php:19</div>', $html);
@@ -90,7 +94,8 @@ class ReportBuilderTest extends TestCase
 
         $this->assertStringContainsString('<div class="verdict passed">', $html);
         $this->assertMatchesRegularExpression('#<td>\s*1 \(comments in the code; they do not fail the scan\)\s*</td>#', $html);
-        $this->assertMatchesRegularExpression('#<h3>1\. Suppressed findings</h3>#', $html);
+        $this->assertMatchesRegularExpression('#<h3>4\. Low</h3>\s*<p class="empty">None</p>#', $html);
+        $this->assertMatchesRegularExpression('#<h3>5\. Suppressed findings</h3>#', $html);
         $this->assertStringContainsString('<span class="badge suppressed">Suppressed</span>', $html);
         $this->assertStringContainsString('<div class="loc">src/Model/Post.php:12　cakephp2-query-concatenation</div><div class="reason">Reason: The table name is a constant</div>', $html);
     }
@@ -102,6 +107,110 @@ class ReportBuilderTest extends TestCase
         $this->assertStringContainsString('<div class="verdict passed">', $html);
         $this->assertStringContainsString('No finding in the scanned files.', $html);
         $this->assertStringContainsString('The engine reported 1 errors, e.g. files it could not parse: Syntax error in a.php', $html);
+    }
+
+    /**
+     * The rules of this package that ran and found nothing, by risk, with their CWE
+     *
+     * @return void
+     */
+    public function testPassedChecks(): void
+    {
+        $result = self::result();
+        $html = self::html(new Config(project: SemgrepEngineTest::APP), $result);
+
+        $this->assertStringContainsString('<h2>Checks</h2>', $html);
+        $this->assertStringContainsString('<h3>Passed checks</h3>', $html);
+        $passed = self::section($html, 'Passed checks');
+        $found = array_keys($result->byRule());
+        foreach (array_keys(RuleCatalog::RULES) as $rule) {
+            if (in_array($rule, $found, true)) {
+                $this->assertStringNotContainsString('>' . $rule . '<', $passed);
+            } else {
+                $this->assertStringContainsString('<td class="mono">' . $rule . '</td>', $passed);
+            }
+        }
+        $this->assertMatchesRegularExpression('#<td class="mono">cakephp2-config-debug</td>\s*<td>Debug level above 0 in production</td>\s*<td class="res"><span class="badge high">High</span></td>\s*<td>CWE-489</td>#', $passed);
+        $this->assertStringContainsString('<td>CWE-1188, CWE-330</td>', $passed);
+        // High before medium
+        $this->assertLessThan(strpos($passed, 'cakephp2-config-cipher-seed'), strpos($passed, 'cakephp2-config-salt'));
+        $this->assertStringContainsString('<h3>Not run</h3>', $html);
+        $this->assertMatchesRegularExpression('#<h3>Not run</h3>\s*<p class="check-note">[^<]*</p>\s*<p class="empty">None</p>#', $html);
+    }
+
+    /**
+     * The rules that did not run, with the reason, are not passed checks
+     *
+     * @return void
+     */
+    public function testNotRun(): void
+    {
+        $result = new ScanResult([], 3, 'Semgrep 1.180.0', engineRules: ['cakephp2-query-concatenation', 'php.lang.security.exec-use.exec-use'], skippedRules: [['id' => 'php.lang.security.new-rule', 'reason' => 'Requires Semgrep 2']]);
+        $result->notRun = ['cakephp2-config-debug' => 'notRun.configOff', 'cakephp2-framework-protocol-relative-here' => 'notRun.noFramework'];
+        $html = self::html(new Config(project: SemgrepEngineTest::APP), $result);
+
+        $notRun = self::section($html, 'Not run');
+        $this->assertMatchesRegularExpression('#<td class="mono">cakephp2-config-debug</td>\s*<td>Debug level above 0 in production</td>\s*<td>The check of the configuration is turned off \(--config-check=0\)</td>#', $notRun);
+        $this->assertStringContainsString('<td>No CakePHP in the composer.lock of the project</td>', $notRun);
+        // A rule of the code that Semgrep did not run
+        $this->assertMatchesRegularExpression('#<td class="mono">cakephp2-render-request</td>\s*<td>[^<]*</td>\s*<td>The engine did not run it</td>#', $notRun);
+        $this->assertStringContainsString('<td>Skipped by Semgrep: Requires Semgrep 2</td>', $notRun);
+        $passed = self::section($html, 'Passed checks');
+        $this->assertStringContainsString('cakephp2-query-concatenation', $passed);
+        $this->assertStringNotContainsString('cakephp2-config-debug', $passed);
+        $this->assertStringNotContainsString('cakephp2-render-request', $passed);
+    }
+
+    /**
+     * The other rules of Semgrep, e.g. p/php, as numbers
+     *
+     * @return void
+     */
+    public function testOtherRules(): void
+    {
+        $findings = [new Finding('php.lang.security.exec-use.exec-use', 'high', 'Exec', 'src/A.php', 3)];
+        $result = new ScanResult($findings, 3, 'Semgrep 1.180.0', engineRules: ['cakephp2-query-concatenation', 'php.lang.security.exec-use.exec-use', 'php.lang.security.eval-use.eval-use', 'php.lang.security.md5-loose-equality.md5-loose-equality']);
+        $html = self::html(new Config(project: SemgrepEngineTest::APP, semgrepConfigs: ['p/php', 'rules/app.yml']), $result);
+
+        $other = self::section($html, 'Other rules of Semgrep');
+        $this->assertStringContainsString('<thead><tr><th>Rules</th><th>Name</th><th>Ran</th><th>Found places</th><th>Found nothing</th></tr></thead>', $other);
+        $this->assertMatchesRegularExpression('#<td class="mono">p/php, rules/app.yml</td>\s*<td>Rules of the Semgrep Registry and of the project</td>\s*<td>3</td>\s*<td>1</td>\s*<td>2</td>#', $other);
+
+        // Unknown without the timing of Semgrep
+        $result->engineRules = null;
+        $other = self::section(self::html(new Config(project: SemgrepEngineTest::APP), $result), 'Other rules of Semgrep');
+        $this->assertStringContainsString('Semgrep did not tell which rules ran', $other);
+        $this->assertMatchesRegularExpression('#<td>-</td>\s*<td>1</td>\s*<td>-</td>#', $other);
+
+        // PHPStan runs the rules of this package only
+        $html = self::html(new Config(project: SemgrepEngineTest::APP, engine: 'phpstan'), new ScanResult([], 3, 'PHPStan 2.1.0'));
+        $this->assertStringNotContainsString('Other rules of Semgrep', $html);
+    }
+
+    public function testChecksInJapanese(): void
+    {
+        $html = self::html(new Config(project: SemgrepEngineTest::APP, language: 'ja'), new ScanResult([], 3, 'Semgrep 1.180.0'));
+
+        $this->assertStringContainsString('<h2>確認した項目</h2>', $html);
+        $this->assertStringContainsString('<h3>確認した項目（問題なし）</h3>', $html);
+        $this->assertStringContainsString('<h3>実行しなかった項目</h3>', $html);
+        $this->assertMatchesRegularExpression('#<h3>1\. 緊急</h3>\s*<p class="empty">なし</p>#', $html);
+    }
+
+    /**
+     * The table of checks of a heading
+     *
+     * @param string $html HTML
+     * @param string $title Heading
+     * @return string
+     */
+    private static function section(string $html, string $title): string
+    {
+        $start = strpos($html, '<h3>' . $title . '</h3>');
+        self::assertNotFalse($start, $title);
+        $end = strpos($html, '</div>', $start);
+
+        return substr($html, $start, $end - $start);
     }
 
     public function testTitleOfAnotherRule(): void

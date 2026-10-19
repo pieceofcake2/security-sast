@@ -92,7 +92,8 @@ YAML;
             '-v', $rules . ':/rules:ro',
             '-w', '/src',
             $this->image,
-            'semgrep', 'scan', '--json', '--metrics=off', '--quiet', '--disable-version-check', '--scan-unknown-extensions',
+            // --time: the timing in the JSON lists the rules that ran
+            'semgrep', 'scan', '--json', '--time', '--metrics=off', '--quiet', '--disable-version-check', '--scan-unknown-extensions',
             '--config', '/rules/cakephp2.yml',
         ];
         foreach ($this->configs as $config) {
@@ -193,7 +194,7 @@ YAML;
             $metadata = is_array($extra['metadata'] ?? null) ? $extra['metadata'] : [];
             $id = (string)($result['check_id'] ?? '');
             // Rules of a local file are named after its path, e.g. rules.cakephp2-query-concatenation
-            $rule = str_contains($id, 'cakephp2-') ? substr($id, (int)strrpos($id, 'cakephp2-')) : $id;
+            $rule = self::ruleId($id);
             $file = (string)($result['path'] ?? '');
             $line = (int)($result['start']['line'] ?? 0);
             $endLine = (int)($result['end']['line'] ?? $line);
@@ -223,7 +224,62 @@ YAML;
             is_array($scanned) ? count($scanned) : 0,
             'Semgrep' . (is_string($data['version'] ?? null) ? ' ' . $data['version'] : ''),
             self::errors($data),
+            engineRules: self::rulesRun($data),
+            skippedRules: self::skippedRules($data),
         );
+    }
+
+    /**
+     * The ID of a rule of Semgrep: the rules of a local file are named after its path, e.g.
+     * `rules.cakephp2-query-concatenation` is `cakephp2-query-concatenation`
+     *
+     * @param string $id ID of Semgrep
+     * @return string
+     */
+    private static function ruleId(string $id): string
+    {
+        return str_contains($id, 'cakephp2-') ? substr($id, (int)strrpos($id, 'cakephp2-')) : $id;
+    }
+
+    /**
+     * The IDs of the rules that ran, from the timing of the JSON (`--time`), or null without it
+     *
+     * @param array<string, mixed> $data JSON
+     * @return array<string>|null
+     */
+    public static function rulesRun(array $data): ?array
+    {
+        $rules = $data['time']['rules'] ?? null;
+        if (!is_array($rules) || $rules === []) {
+            return null;
+        }
+        $ids = [];
+        foreach ($rules as $rule) {
+            $id = is_array($rule) ? ($rule['id'] ?? null) : $rule;
+            if (is_string($id) && $id !== '') {
+                $ids[] = self::ruleId($id);
+            }
+        }
+
+        return array_values(array_unique($ids));
+    }
+
+    /**
+     * The rules that Semgrep skipped, e.g. for a newer version of Semgrep, and why
+     *
+     * @param array<string, mixed> $data JSON
+     * @return array<array{id: string, reason: string}>
+     */
+    public static function skippedRules(array $data): array
+    {
+        $skipped = [];
+        foreach (is_array($data['skipped_rules'] ?? null) ? $data['skipped_rules'] : [] as $rule) {
+            if (is_array($rule) && is_string($rule['rule_id'] ?? null)) {
+                $skipped[] = ['id' => self::ruleId($rule['rule_id']), 'reason' => trim((string)preg_replace('/\s+/', ' ', is_string($rule['details'] ?? null) ? $rule['details'] : ''))];
+            }
+        }
+
+        return $skipped;
     }
 
     /**

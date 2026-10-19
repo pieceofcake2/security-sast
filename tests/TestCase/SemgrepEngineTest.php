@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace PieceOfCake2\SecuritySast\Test;
 
 use PHPUnit\Framework\TestCase;
+use PieceOfCake2\SecuritySast\RuleCatalog;
 use PieceOfCake2\SecuritySast\SemgrepEngine;
 use RuntimeException;
 
@@ -126,7 +127,7 @@ class SemgrepEngineTest extends TestCase
 
         $command = implode(' ', $commands[0]);
         $this->assertStringStartsWith('docker run --rm -v ' . realpath(self::APP) . ':/src:ro -v ', $command);
-        $this->assertStringContainsString(':/rules:ro -w /src semgrep/semgrep:1.180.0 semgrep scan --json --metrics=off', $command);
+        $this->assertStringContainsString(':/rules:ro -w /src semgrep/semgrep:1.180.0 semgrep scan --json --time --metrics=off', $command);
         $this->assertStringContainsString(' --scan-unknown-extensions ', $command);
         $this->assertStringContainsString('--config /rules/cakephp2.yml --config p/php --config /src/rules/app.yml --include /src --include /templates --exclude /vendor . templates/Emails/html/default.ctp templates/Posts/edit.ctp templates/Posts/index.php templates/Posts/links.ctp templates/Posts/parity.ctp templates/Posts/raw.ctp templates/Posts/request.ctp templates/Posts/view.ctp', $command);
     }
@@ -180,6 +181,29 @@ class SemgrepEngineTest extends TestCase
         $this->assertSame('$posts = $this->Post->query("SELECT * FROM posts WHERE title LIKE \'%" . $q . "%\'");', $query->code);
         $this->assertSame(['A03:2021 - Injection'], $query->owasp);
         $this->assertSame('MEDIUM', $query->confidence);
+    }
+
+    /**
+     * The rules that ran, from the timing of `--time`, with the IDs of the rules of a local file without its path
+     *
+     * @return void
+     */
+    public function testRulesRun(): void
+    {
+        $data = [
+            'results' => [],
+            'time' => ['rules' => ['rules.cakephp2-query-concatenation', 'php.lang.security.exec-use.exec-use', ['id' => 'php.lang.security.eval-use.eval-use'], 'php.lang.security.exec-use.exec-use']],
+            'skipped_rules' => [['rule_id' => 'php.lang.security.new-rule', 'details' => "Requires a\nnewer version", 'position' => []]],
+        ];
+        $result = SemgrepEngine::result($data, (string)realpath(self::APP));
+
+        $this->assertSame(['cakephp2-query-concatenation', 'php.lang.security.exec-use.exec-use', 'php.lang.security.eval-use.eval-use'], $result->engineRules);
+        $this->assertSame([['id' => 'php.lang.security.new-rule', 'reason' => 'Requires a newer version']], $result->skippedRules);
+
+        // Without --time, or an older Semgrep: unknown
+        $data = json_decode((string)file_get_contents(__DIR__ . DS . '..' . DS . 'fixtures' . DS . 'semgrep.json'), true);
+        $this->assertNull(SemgrepEngine::result($data, (string)realpath(self::APP))->engineRules);
+        $this->assertSame([], SemgrepEngine::result(['skipped_rules' => 0], (string)realpath(self::APP))->skippedRules);
     }
 
     public function testResultOfAViewGivenTwice(): void
@@ -279,6 +303,12 @@ class SemgrepEngineTest extends TestCase
         $result = (new SemgrepEngine())->scan(self::APP, ['src', 'templates']);
 
         $this->assertSame(self::EXPECTED, self::places(array_filter($result->findings, static fn($finding): bool => str_starts_with($finding->rule, 'cakephp2-'))));
+        // The rules that ran (--time): those of this package and of the Registry (p/php)
+        $this->assertNotNull($result->engineRules);
+        foreach (array_filter(array_keys(RuleCatalog::RULES), [RuleCatalog::class, 'isCode']) as $rule) {
+            $this->assertContains($rule, $result->engineRules);
+        }
+        $this->assertGreaterThan(10, count(array_filter($result->engineRules, static fn(string $rule): bool => !str_starts_with($rule, 'cakephp2-'))));
 
         $result = (new SemgrepEngine(safeViewVariables: ['body_html']))->scan(self::APP, ['templates']);
 
