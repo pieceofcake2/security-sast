@@ -293,9 +293,11 @@ them in the view, although they are of `$this`: `$this->request` (its `query()`,
 To keep the number of findings small, these are not reported:
 
 - the output of a helper or of a function call
+- a value cast to a number with `(int)` or `(float)`, e.g. `<?= (int)$level ?>`; the other casts, e.g.
+  `(string)`, are reported as the value they cast
 - a variable set in the view, before it is printed, to the output of a helper (not a value of the request or of
-  the session, below), to `h()`, to `count()`, to
-  a number with `(int)` or `(float)`, to a string literal, or to a translation of string literals only
+  the session, below), to `h()`, to `count()`, to a number (a literal such as `3`, `-1` or `1.5`, or a cast with
+  `(int)` or `(float)`), to a string literal, or to a translation of string literals only
   (`__('...')`, `__d('...', '...')`, `__x('...', '...')`, `__dx('...', '...', '...')`); a translation with
   values, e.g. `__('Hello %s', $name)`, is reported
 - `$content_for_layout` and `$scripts_for_layout`, the HTML of the layouts
@@ -306,6 +308,8 @@ To keep the number of findings small, these are not reported:
 <?= $link ?>            <!-- not reported: a helper -->
 <?php $count = count($posts); ?>
 <?= $count ?>           <!-- not reported: a number -->
+<?php $width = 3; ?>
+<?= $width ?>           <!-- not reported: a number -->
 <?php $docsUrl = 'https://example.com/docs/'; ?>
 <?= $docsUrl ?>         <!-- not reported: a string literal -->
 <?= $content_for_layout ?>  <!-- not reported: the layout -->

@@ -1282,6 +1282,134 @@
    }
   },
   {
+   "check_id": "rules.cakephp2-view-unescaped-output",
+   "path": "templates/Posts/parity.ctp",
+   "start": {
+    "line": 28,
+    "col": 1,
+    "offset": 0
+   },
+   "end": {
+    "line": 28,
+    "col": 21,
+    "offset": 0
+   },
+   "extra": {
+    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "<p><?= $level ?></p>",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-view-unescaped-output",
+   "path": "templates/Posts/parity.ctp",
+   "start": {
+    "line": 29,
+    "col": 1,
+    "offset": 0
+   },
+   "end": {
+    "line": 29,
+    "col": 20,
+    "offset": 0
+   },
+   "extra": {
+    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "<p><?= $unit ?></p>",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-view-unescaped-output",
+   "path": "templates/Posts/parity.ctp",
+   "start": {
+    "line": 30,
+    "col": 1,
+    "offset": 0
+   },
+   "end": {
+    "line": 30,
+    "col": 29,
+    "offset": 0
+   },
+   "extra": {
+    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "<p><?= (string)$level ?></p>",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-view-unescaped-output",
+   "path": "templates/Posts/parity.ctp",
+   "start": {
+    "line": 31,
+    "col": 1,
+    "offset": 0
+   },
+   "end": {
+    "line": 31,
+    "col": 47,
+    "offset": 0
+   },
+   "extra": {
+    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "<p><?= (bool)$this->request->query('q') ?></p>",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
    "check_id": "rules.cakephp2-conditions-string",
    "path": "src/Controller/PostsController.php",
    "start": {

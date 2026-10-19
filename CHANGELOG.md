@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## Unreleased
+
+- `cakephp2-view-unescaped-output` no longer reports, with either engine, a variable set in the view to a number
+  literal (`$width = 3;`, `-1`, `1.5`), which the docs list as safe; and Semgrep no longer reports a value cast to
+  a number and printed as it is (`<?= (int)$level ?>`, `(float)`), nor a variable set to a value of the request
+  cast to a number, as PHPStan does: Semgrep matched the value inside the cast. The other casts, e.g.
+  `<?= (string)$level ?>`, are reported by both engines as the value they cast, which PHPStan left out
+
 ## 1.0.5
 
 - New rule `cakephp2-view-raw-output` of a new risk, Info, which never fails the scan: HTML printed in a view with
