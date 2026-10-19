@@ -325,6 +325,9 @@ rules:
           - metavariable-regex:
               metavariable: $X
               regex: '\A\$(?!this\b)(?!(?:content_for_layout|scripts_for_layout)\b)[A-Za-z_]\w*(?:\[(?:[^\[\]]|\[[^\]]*\])*\]|->\w+)*\z'
+          # A number cast with (int) or (float): Semgrep matches the variable in the cast as well
+          - pattern-not: echo (int)$Y;
+          - pattern-not: echo (float)$Y;
           # A variable that holds the output of a helper, an escaped value or a number
           - pattern-not-inside: |
               $X = $this->$HELPER->$METHOD(...);
@@ -361,6 +364,16 @@ rules:
           - pattern-not-inside: |
               $X = (float)$Y;
               ...
+          # A number literal, e.g. 3, -1 or 1.5
+          - pattern-not:
+              patterns:
+                - pattern-inside: |
+                    $X = $N;
+                    ...
+                - metavariable-regex:
+                    metavariable: $N
+                    regex: '\A[-+]?(?:(?:\d[\d_]*(?:\.[\d_]*)?|\.\d[\d_]*)(?:[eE][-+]?\d+)?|0[xX][\da-fA-F_]+|0[bB][01_]+|0[oO][0-7_]+)\z'
+                - pattern: echo $X;
       # A value of the request or of the session, which is not the output of a helper: printed as it is, or through
       # a variable set to it
       - patterns:
@@ -368,6 +381,9 @@ rules:
           - metavariable-regex:
               metavariable: $E
               regex: '\A\$this->(?:(?:request|data|params|passedArgs)\b|Session->read\()'
+          # Cast to a number, as above
+          - pattern-not: echo (int)$Y;
+          - pattern-not: echo (float)$Y;
       - patterns:
           - pattern: echo $X;
           - metavariable-regex:
@@ -381,6 +397,12 @@ rules:
               regex: '\A\$this->(?:(?:request|data|params|passedArgs)\b|Session->read\()'
           - pattern-not-inside: |
               $X = h(...);
+              ...
+          - pattern-not-inside: |
+              $X = (int)$Y;
+              ...
+          - pattern-not-inside: |
+              $X = (float)$Y;
               ...
       # A variable set to a string literal, then to another value, as PHPStan takes the last assignment
       - patterns:
@@ -403,6 +425,9 @@ rules:
                 - pattern-not: (int)$W
                 - pattern-not: (float)$W
                 - pattern-not: $this->$HELPER->$METHOD(...)
+                - metavariable-regex:
+                    metavariable: $Z
+                    regex: '\A(?![-+]?(?:(?:\d[\d_]*(?:\.[\d_]*)?|\.\d[\d_]*)(?:[eE][-+]?\d+)?|0[xX][\da-fA-F_]+|0[bB][01_]+|0[oO][0-7_]+)\z)'
     paths:
       include:
         - "**/templates/**/*.ctp"

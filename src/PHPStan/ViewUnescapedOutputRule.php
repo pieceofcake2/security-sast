@@ -7,14 +7,19 @@ use PhpParser\Node;
 use PhpParser\Node\Expr;
 use PhpParser\Node\Expr\ArrayDimFetch;
 use PhpParser\Node\Expr\Assign;
+use PhpParser\Node\Expr\Cast;
 use PhpParser\Node\Expr\Cast\Double;
 use PhpParser\Node\Expr\Cast\Int_;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\PropertyFetch;
+use PhpParser\Node\Expr\UnaryMinus;
+use PhpParser\Node\Expr\UnaryPlus;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
+use PhpParser\Node\Scalar\Float_;
+use PhpParser\Node\Scalar\Int_ as IntLiteral;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\Echo_;
 use PhpParser\NodeFinder;
@@ -99,6 +104,13 @@ final class ViewUnescapedOutputRule implements Rule
                     $errors[] = Nodes::error('cakephp2-view-raw-output', $statement->getStartLine());
                     break;
                 }
+                // A number cast with (int) or (float) is safe; the other casts, e.g. (string), print the value
+                while ($expr instanceof Cast) {
+                    if ($expr instanceof Int_ || $expr instanceof Double) {
+                        continue 2;
+                    }
+                    $expr = $expr->expr;
+                }
                 if (preg_match(self::REQUEST, $printer->prettyPrintExpr($expr))) {
                     $errors[] = Nodes::error('cakephp2-view-unescaped-output', $statement->getStartLine());
                     break;
@@ -122,8 +134,8 @@ final class ViewUnescapedOutputRule implements Rule
     }
 
     /**
-     * Whether a value is safe to print: the output of a helper, an escaped value, a number, a string literal or a
-     * translation of string literals
+     * Whether a value is safe to print: the output of a helper, an escaped value, a number (a literal or a cast), a
+     * string literal or a translation of string literals
      *
      * @param \PhpParser\Node\Expr $expr Value
      * @return bool
@@ -133,7 +145,10 @@ final class ViewUnescapedOutputRule implements Rule
         if (preg_match(self::REQUEST, (new Standard())->prettyPrintExpr($expr))) {
             return false;
         }
-        if ($expr instanceof Int_ || $expr instanceof Double || $expr instanceof String_) {
+        if ($expr instanceof UnaryMinus || $expr instanceof UnaryPlus) {
+            $expr = $expr->expr instanceof IntLiteral || $expr->expr instanceof Float_ ? $expr->expr : $expr;
+        }
+        if ($expr instanceof Int_ || $expr instanceof Double || $expr instanceof IntLiteral || $expr instanceof Float_ || $expr instanceof String_) {
             return true;
         }
         if ($expr instanceof FuncCall && $expr->name instanceof Name) {
