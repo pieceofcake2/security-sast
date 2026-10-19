@@ -12,6 +12,7 @@ use PieceOfCake2\SecuritySast\Command;
 use PieceOfCake2\SecuritySast\Config;
 use PieceOfCake2\SecuritySast\ConfigCheck;
 use PieceOfCake2\SecuritySast\PhpstanEngine;
+use PieceOfCake2\SecuritySast\RuleCatalog;
 
 class CommandTest extends TestCase
 {
@@ -203,6 +204,30 @@ class CommandTest extends TestCase
         $this->assertSame(Command::ERROR, $code);
         $this->assertStringContainsString('the configuration was not checked: The configuration could not be loaded: Error: Class not found', (string)stream_get_contents($stderr));
         $this->assertFileExists($project . DS . 'report.pdf');
+    }
+
+    /**
+     * The rules that do not run, and why: the checks of the configuration and of the CakePHP of the composer.lock
+     *
+     * @return void
+     */
+    public function testNotRun(): void
+    {
+        $config = static fn(string $project, bool $check = true): Config => new Config(project: $project, configCheck: $check);
+        $configRules = array_values(array_filter(array_keys(RuleCatalog::RULES), static fn(string $rule): bool => str_starts_with($rule, 'cakephp2-config-')));
+        $this->assertCount(8, $configRules);
+
+        $notRun = Command::notRun($config(FrameworkTest::project('pieceofcake2/cakephp', 'v2.12.11')), true, false);
+        $this->assertSame([], $notRun);
+
+        $notRun = Command::notRun($config(FrameworkTest::project('pieceofcake2/cakephp', 'v2.12.10'), false), true, false);
+        $this->assertSame(array_fill_keys($configRules, 'notRun.configOff'), $notRun);
+
+        $notRun = Command::notRun($config(FrameworkTest::project('pieceofcake2/cakephp', 'dev-master')), false, true);
+        $this->assertSame(['cakephp2-framework-protocol-relative-here' => 'notRun.frameworkBranch'] + array_fill_keys($configRules, 'notRun.configError'), $notRun);
+
+        $notRun = Command::notRun($config(SemgrepEngineTest::APP), false, false);
+        $this->assertSame(['cakephp2-framework-protocol-relative-here' => 'notRun.noFramework'] + array_fill_keys($configRules, 'notRun.configNotApplicable'), $notRun);
     }
 
     public function testRunWithAnInvalidOption(): void

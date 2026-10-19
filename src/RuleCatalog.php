@@ -191,6 +191,28 @@ final class RuleCatalog
     }
 
     /**
+     * Whether a rule checks the code, with the engine: not a check of the configuration or of the framework
+     *
+     * @param string $id ID of the rule
+     * @return bool
+     */
+    public static function isCode(string $id): bool
+    {
+        return (self::RULES[$id]['identifier'] ?? '') !== '';
+    }
+
+    /**
+     * The numbers of the CWE of a rule, e.g. `CWE-89`
+     *
+     * @param string $id ID of the rule
+     * @return array<string>
+     */
+    public static function cweIds(string $id): array
+    {
+        return array_map(static fn(string $cwe): string => explode(':', $cwe)[0], self::RULES[$id]['cwe'] ?? []);
+    }
+
+    /**
      * The message of a rule
      *
      * @param string $id ID of the rule

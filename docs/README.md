@@ -176,17 +176,24 @@ file with `--settings`.
 - [Sample report (English, PDF)](https://pieceofcake2.github.io/security-sast/report-sample.pdf)
 - [Sample report (Japanese, PDF)](https://pieceofcake2.github.io/security-sast/report-sample-ja.pdf)
 
-![The cover, the findings by risk and the pages of two rules, of the code and of the configuration](img/report-sample.png)
+![The cover, the findings by risk, the passed checks and the page of a rule](img/report-sample.png)
 
 1. **Cover**: the result, the numbers of findings by risk, the repository, branch and commit, the scanned paths
    and the number of files, the rules, the `APP_ENV` of the configuration, the threshold, and the date,
    environment and software of the run (the engine and its version)
-2. **Findings by risk**: Critical, High, Medium, Low, Unknown and Info (never fails); each rule that found places, with their
-   number, and a link to its page
-3. **A page for each rule**: its title, ID, risk, CWE, OWASP Top 10 category and confidence, what it found and
-   how to fix it, then each place (file and line) with its code, up to 100 places
-4. **Suppressed findings**, when comments of the code suppress some: each comment with its place, its rules,
+2. **Findings by risk**: Critical, High, Medium and Low, also without findings (`None`), then Unknown and Info
+   (never fails) when a rule found some; each rule that found places, with their number, and a link to its page.
+   **Suppressed findings**, when comments of the code suppress some: each comment with its place, its rules,
    its reason and the code ([Suppressing a Finding](#suppressing-a-finding))
+3. **Checks**: what was checked besides the findings
+   - **Passed checks**: the rules of this package that ran and found nothing, with their risk and CWE
+   - **Other rules of Semgrep**: the rules of `--semgrep-config` (e.g. `p/php`), too many to list: the number of
+     the rules that ran, that found places and that found nothing (Semgrep tells which rules ran with `--time`)
+   - **Not run**: the rules that did not run, and why: the checks of the configuration when they are turned off
+     (`--config-check=0`) or there is no configuration to load, the check of the CakePHP of `composer.lock` without
+     one, and the rules that Semgrep skipped
+4. **A page for each rule**: its title, ID, risk, CWE, OWASP Top 10 category and confidence, what it found and
+   how to fix it, then each place (file and line) with its code, up to 100 places
 
 The risks of Semgrep are `ERROR` (high), `WARNING` (medium) and `INFO` (low). The rules of this package set
 their own risks (see [Rules](rules.md)).

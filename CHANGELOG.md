@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## Unreleased
+
+- The report lists what was checked besides the findings, on pages after the findings by risk
+  (pieceofcake2/report 1.1):
+  - **Passed checks**: the rules of this package that ran and found nothing, with their risk and CWE
+  - **Other rules of Semgrep**: the number of the rules of `--semgrep-config` (e.g. `p/php`) that ran, that found
+    places and that found nothing. Semgrep runs with `--time`, whose timing lists the rules that ran
+  - **Not run**: the rules that did not run and why: the checks of the configuration when it is turned off, not
+    found or not loaded, the check of the CakePHP of `composer.lock` without one or for a branch, a rule of the code
+    that Semgrep did not run, and the rules that Semgrep skipped (`skipped_rules`)
+- The findings by risk show Critical, High, Medium and Low also without findings (`None`), so that a reader tells a
+  risk without findings from one that was left out. Unknown and Info are shown when a rule found places, as on the
+  cover
+
 ## 1.1.0
 
 - `cakephp2-redirect-request` no longer reports, with either engine, a URL of the origin of the application: a
