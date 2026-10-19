@@ -319,8 +319,8 @@ rules:
     pattern: echo raw(...);
     paths:
       include:
-        - "**/templates/**/*.ctp"
-        - "**/View/**/*.ctp"
+        - "**/templates/**/*.ctp.php"
+        - "**/View/**/*.ctp.php"
       # The text mails are not HTML
       exclude:
         - "**/Emails/text/**"
@@ -451,8 +451,8 @@ rules:
                     regex: '\A(?![-+]?(?:(?:\d[\d_]*(?:\.[\d_]*)?|\.\d[\d_]*)(?:[eE][-+]?\d+)?|0[xX][\da-fA-F_]+|0[bB][01_]+|0[oO][0-7_]+)\z)'
     paths:
       include:
-        - "**/templates/**/*.ctp"
-        - "**/View/**/*.ctp"
+        - "**/templates/**/*.ctp.php"
+        - "**/View/**/*.ctp.php"
       # The text mails are not HTML
       exclude:
         - "**/Emails/text/**"

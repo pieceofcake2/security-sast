@@ -106,6 +106,9 @@ final class ReportBuilder
         if ($result->errors !== []) {
             $notes[] = $this->t('note.errors', ['count' => count($result->errors), 'first' => mb_strimwidth($result->errors[0], 0, 200, '…')]);
         }
+        if ($result->viewErrors !== []) {
+            $notes[] = $this->t('note.viewErrors', ['count' => count($result->viewErrors)]);
+        }
         // Semgrep also leaves out the paths of the .semgrepignore of the project
         if ($config->engine === 'semgrep' && is_file($config->project . DIRECTORY_SEPARATOR . '.semgrepignore')) {
             $notes[] = $this->t('note.semgrepignore');

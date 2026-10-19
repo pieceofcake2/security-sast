@@ -15,7 +15,7 @@ class PhpstanEngineTest extends TestCase
 
         // The same places as the Semgrep rules, and no other error of PHPStan
         $this->assertSame(SemgrepEngineTest::EXPECTED, SemgrepEngineTest::places($result->findings));
-        $this->assertSame(15, $result->files);
+        $this->assertSame(17, $result->files);
         $this->assertStringStartsWith('PHPStan 2.', $result->engine);
         $view = array_values(array_filter($result->findings, static fn($finding): bool => $finding->file === 'templates/Posts/view.ctp'))[0];
         $this->assertSame('<div><?= $post[\'Post\'][\'body\'] ?></div>', $view->code);
@@ -45,30 +45,11 @@ class PhpstanEngineTest extends TestCase
     {
         $result = (new PhpstanEngine(null, null, ['ctp', 'php', 'html']))->scan(SemgrepEngineTest::APP, ['src', 'templates']);
 
-        $views = array_values(array_filter(SemgrepEngineTest::places($result->findings), static fn(string $place): bool => str_starts_with($place, 'cakephp2-view-unescaped')));
-        $this->assertSame([
-            'cakephp2-view-unescaped-output templates/Elements/banner.html:1',
-            'cakephp2-view-unescaped-output templates/Emails/html/default.ctp:1',
-            'cakephp2-view-unescaped-output templates/Posts/edit.ctp:10',
-            'cakephp2-view-unescaped-output templates/Posts/edit.ctp:12',
-            'cakephp2-view-unescaped-output templates/Posts/index.php:2',
-            'cakephp2-view-unescaped-output templates/Posts/links.ctp:11',
-            'cakephp2-view-unescaped-output templates/Posts/links.ctp:12',
-            'cakephp2-view-unescaped-output templates/Posts/links.ctp:13',
-            'cakephp2-view-unescaped-output templates/Posts/parity.ctp:28',
-            'cakephp2-view-unescaped-output templates/Posts/parity.ctp:29',
-            'cakephp2-view-unescaped-output templates/Posts/parity.ctp:30',
-            'cakephp2-view-unescaped-output templates/Posts/parity.ctp:31',
-            'cakephp2-view-unescaped-output templates/Posts/parity.ctp:7',
-            'cakephp2-view-unescaped-output templates/Posts/parity.ctp:8',
-            'cakephp2-view-unescaped-output templates/Posts/request.ctp:10',
-            'cakephp2-view-unescaped-output templates/Posts/request.ctp:6',
-            'cakephp2-view-unescaped-output templates/Posts/request.ctp:7',
-            'cakephp2-view-unescaped-output templates/Posts/request.ctp:9',
-            'cakephp2-view-unescaped-output templates/Posts/view.ctp:2',
-            'cakephp2-view-unescaped-output templates/Posts/view.ctp:3',
-        ], $views);
-        $this->assertSame(16, $result->files);
+        // The same places as the Semgrep rules
+        $expected = array_merge(SemgrepEngineTest::EXPECTED, SemgrepEngineTest::HTML_VIEWS);
+        sort($expected);
+        $this->assertSame($expected, SemgrepEngineTest::places($result->findings));
+        $this->assertSame(19, $result->files);
     }
 
     public function testScanWithSafeViewVariables(): void
@@ -129,9 +110,9 @@ class PhpstanEngineTest extends TestCase
 
     public function testCountFiles(): void
     {
-        $this->assertSame(15, PhpstanEngine::countFiles(SemgrepEngineTest::APP, ['src', 'templates']));
-        $this->assertSame(14, PhpstanEngine::countFiles(SemgrepEngineTest::APP, ['src', 'templates'], ['src/Model']));
-        $this->assertSame(16, PhpstanEngine::countFiles(SemgrepEngineTest::APP, ['src', 'templates'], [], ['ctp', 'php', 'html']));
+        $this->assertSame(17, PhpstanEngine::countFiles(SemgrepEngineTest::APP, ['src', 'templates']));
+        $this->assertSame(16, PhpstanEngine::countFiles(SemgrepEngineTest::APP, ['src', 'templates'], ['src/Model']));
+        $this->assertSame(19, PhpstanEngine::countFiles(SemgrepEngineTest::APP, ['src', 'templates'], [], ['ctp', 'php', 'html']));
         $this->assertSame(1, PhpstanEngine::countFiles(SemgrepEngineTest::APP, ['templates/Posts/view.ctp']));
     }
 

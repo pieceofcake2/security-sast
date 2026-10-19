@@ -1,5 +1,26 @@
 # CHANGELOG
 
+## Unreleased
+
+- Semgrep reads every view as PHP, checked on the same code with Semgrep 1.180.0 in Docker: the views were given
+  to Semgrep one by one with `--scan-unknown-extensions`, which reads a file of an extension that it does not know
+  with the rules of every language, and one that it knows with those of its language only:
+  - A view of an extension of HTML, e.g. `.html` with `--view-extensions=ctp,php,html` or the `$ext` of
+    `AppController`, was read as HTML only, so that `cakephp2-view-unescaped-output` and `cakephp2-view-raw-output`
+    found nothing in it with Semgrep. On a real application with `.html` views, Semgrep found 4 places, PHPStan 273;
+    Semgrep now finds the same 273
+  - A `.ctp` view was also read with the rules of JavaScript, JSON, Python, ... of the Registry (e.g.
+    `p/security-audit`, `p/owasp-top-ten`), whose parsers reported errors on the PHP and the HTML (e.g.
+    `Lexical error ... WIERD end of file in quoted string`, 172 on that application), and found places that are not
+    there. Semgrep read the PHP of the views without errors
+- The views are copied, with the same lines, to a temporary directory mounted at `/views`: as `.php` files for the
+  rules of PHP, and as `.html` files for those of HTML (e.g. `templates/Posts/view.ctp.php` and `.ctp.html`), so
+  that `html.security.plaintext-http-link` of the Registry still reads the `.ctp` views. The findings, the errors
+  and the number of the files are those of the views. The `.semgrepignore` of the project applies to the copies,
+  which the views given one by one did not follow
+- The errors of the rules of HTML in the views, which read the PHP of a template only in part, are said apart from
+  the files that could not be read, in a note of the cover (`ScanResult::$viewErrors`)
+
 ## 1.2.0
 
 - The report lists what was checked besides the findings, on pages after the findings by risk

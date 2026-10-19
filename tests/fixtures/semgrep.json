@@ -2,6 +2,902 @@
  "version": "1.180.0",
  "results": [
   {
+   "check_id": "rules.cakephp2-view-unescaped-output",
+   "path": "/views/templates/Emails/html/default.ctp.php",
+   "start": {
+    "line": 1,
+    "col": 7,
+    "offset": 6
+   },
+   "end": {
+    "line": 1,
+    "col": 21,
+    "offset": 20
+   },
+   "extra": {
+    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-view-unescaped-output",
+   "path": "/views/templates/Layouts/error.ctp.php",
+   "start": {
+    "line": 14,
+    "col": 9,
+    "offset": 381
+   },
+   "end": {
+    "line": 14,
+    "col": 21,
+    "offset": 393
+   },
+   "extra": {
+    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-view-unescaped-output",
+   "path": "/views/templates/Posts/edit.ctp.php",
+   "start": {
+    "line": 10,
+    "col": 6,
+    "offset": 288
+   },
+   "end": {
+    "line": 10,
+    "col": 23,
+    "offset": 305
+   },
+   "extra": {
+    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-view-unescaped-output",
+   "path": "/views/templates/Posts/edit.ctp.php",
+   "start": {
+    "line": 12,
+    "col": 4,
+    "offset": 361
+   },
+   "end": {
+    "line": 12,
+    "col": 19,
+    "offset": 376
+   },
+   "extra": {
+    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-view-unescaped-output",
+   "path": "/views/templates/Posts/links.ctp.php",
+   "start": {
+    "line": 11,
+    "col": 7,
+    "offset": 271
+   },
+   "end": {
+    "line": 11,
+    "col": 18,
+    "offset": 282
+   },
+   "extra": {
+    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-view-unescaped-output",
+   "path": "/views/templates/Posts/links.ctp.php",
+   "start": {
+    "line": 12,
+    "col": 7,
+    "offset": 292
+   },
+   "end": {
+    "line": 12,
+    "col": 22,
+    "offset": 307
+   },
+   "extra": {
+    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-view-unescaped-output",
+   "path": "/views/templates/Posts/links.ctp.php",
+   "start": {
+    "line": 13,
+    "col": 7,
+    "offset": 317
+   },
+   "end": {
+    "line": 13,
+    "col": 19,
+    "offset": 329
+   },
+   "extra": {
+    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-view-unescaped-output",
+   "path": "/views/templates/Posts/mixed.ctp.php",
+   "start": {
+    "line": 7,
+    "col": 23,
+    "offset": 213
+   },
+   "end": {
+    "line": 7,
+    "col": 49,
+    "offset": 239
+   },
+   "extra": {
+    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-view-unescaped-output",
+   "path": "/views/templates/Posts/mixed.ctp.php",
+   "start": {
+    "line": 7,
+    "col": 51,
+    "offset": 241
+   },
+   "end": {
+    "line": 7,
+    "col": 80,
+    "offset": 270
+   },
+   "extra": {
+    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-view-unescaped-output",
+   "path": "/views/templates/Posts/mixed.ctp.php",
+   "start": {
+    "line": 11,
+    "col": 43,
+    "offset": 377
+   },
+   "end": {
+    "line": 11,
+    "col": 72,
+    "offset": 406
+   },
+   "extra": {
+    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-view-unescaped-output",
+   "path": "/views/templates/Posts/mixed.ctp.php",
+   "start": {
+    "line": 16,
+    "col": 24,
+    "offset": 519
+   },
+   "end": {
+    "line": 16,
+    "col": 53,
+    "offset": 548
+   },
+   "extra": {
+    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-view-unescaped-output",
+   "path": "/views/templates/Posts/mixed.ctp.php",
+   "start": {
+    "line": 20,
+    "col": 28,
+    "offset": 636
+   },
+   "end": {
+    "line": 20,
+    "col": 42,
+    "offset": 650
+   },
+   "extra": {
+    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-view-unescaped-output",
+   "path": "/views/templates/Posts/mixed.ctp.php",
+   "start": {
+    "line": 21,
+    "col": 4,
+    "offset": 668
+   },
+   "end": {
+    "line": 21,
+    "col": 33,
+    "offset": 697
+   },
+   "extra": {
+    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-view-unescaped-output",
+   "path": "/views/templates/Posts/parity.ctp.php",
+   "start": {
+    "line": 7,
+    "col": 4,
+    "offset": 82
+   },
+   "end": {
+    "line": 7,
+    "col": 16,
+    "offset": 94
+   },
+   "extra": {
+    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-view-unescaped-output",
+   "path": "/views/templates/Posts/parity.ctp.php",
+   "start": {
+    "line": 8,
+    "col": 4,
+    "offset": 102
+   },
+   "end": {
+    "line": 8,
+    "col": 43,
+    "offset": 141
+   },
+   "extra": {
+    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-view-unescaped-output",
+   "path": "/views/templates/Posts/parity.ctp.php",
+   "start": {
+    "line": 28,
+    "col": 4,
+    "offset": 611
+   },
+   "end": {
+    "line": 28,
+    "col": 17,
+    "offset": 624
+   },
+   "extra": {
+    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-view-unescaped-output",
+   "path": "/views/templates/Posts/parity.ctp.php",
+   "start": {
+    "line": 29,
+    "col": 4,
+    "offset": 632
+   },
+   "end": {
+    "line": 29,
+    "col": 16,
+    "offset": 644
+   },
+   "extra": {
+    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-view-unescaped-output",
+   "path": "/views/templates/Posts/parity.ctp.php",
+   "start": {
+    "line": 30,
+    "col": 4,
+    "offset": 652
+   },
+   "end": {
+    "line": 30,
+    "col": 25,
+    "offset": 673
+   },
+   "extra": {
+    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-view-unescaped-output",
+   "path": "/views/templates/Posts/parity.ctp.php",
+   "start": {
+    "line": 31,
+    "col": 4,
+    "offset": 681
+   },
+   "end": {
+    "line": 31,
+    "col": 43,
+    "offset": 720
+   },
+   "extra": {
+    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-view-raw-output",
+   "path": "/views/templates/Posts/raw.ctp.php",
+   "start": {
+    "line": 2,
+    "col": 6,
+    "offset": 76
+   },
+   "end": {
+    "line": 2,
+    "col": 44,
+    "offset": 114
+   },
+   "extra": {
+    "message": "HTML is printed without escaping on purpose with raw(). Check that it is built by the application or sanitized, never a value of the request.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "INFO",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-view-raw-output",
+   "path": "/views/templates/Posts/raw.ctp.php",
+   "start": {
+    "line": 3,
+    "col": 7,
+    "offset": 127
+   },
+   "end": {
+    "line": 3,
+    "col": 72,
+    "offset": 192
+   },
+   "extra": {
+    "message": "HTML is printed without escaping on purpose with raw(). Check that it is built by the application or sanitized, never a value of the request.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "INFO",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-view-unescaped-output",
+   "path": "/views/templates/Posts/request.ctp.php",
+   "start": {
+    "line": 6,
+    "col": 10,
+    "offset": 139
+   },
+   "end": {
+    "line": 6,
+    "col": 18,
+    "offset": 147
+   },
+   "extra": {
+    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-view-unescaped-output",
+   "path": "/views/templates/Posts/request.ctp.php",
+   "start": {
+    "line": 7,
+    "col": 10,
+    "offset": 164
+   },
+   "end": {
+    "line": 7,
+    "col": 21,
+    "offset": 175
+   },
+   "extra": {
+    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-view-unescaped-output",
+   "path": "/views/templates/Posts/request.ctp.php",
+   "start": {
+    "line": 9,
+    "col": 4,
+    "offset": 214
+   },
+   "end": {
+    "line": 9,
+    "col": 48,
+    "offset": 258
+   },
+   "extra": {
+    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-view-unescaped-output",
+   "path": "/views/templates/Posts/request.ctp.php",
+   "start": {
+    "line": 10,
+    "col": 4,
+    "offset": 266
+   },
+   "end": {
+    "line": 10,
+    "col": 39,
+    "offset": 301
+   },
+   "extra": {
+    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-view-unescaped-output",
+   "path": "/views/templates/Posts/view.ctp.php",
+   "start": {
+    "line": 2,
+    "col": 6,
+    "offset": 47
+   },
+   "end": {
+    "line": 2,
+    "col": 34,
+    "offset": 75
+   },
+   "extra": {
+    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-view-unescaped-output",
+   "path": "/views/templates/Posts/view.ctp.php",
+   "start": {
+    "line": 3,
+    "col": 10,
+    "offset": 91
+   },
+   "end": {
+    "line": 3,
+    "col": 40,
+    "offset": 121
+   },
+   "extra": {
+    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
+    "metadata": {
+     "cwe": [
+      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "LOW"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-security-csrf-disabled",
+   "path": "src/Controller/ApiController.php",
+   "start": {
+    "line": 4,
+    "col": 26,
+    "offset": 75
+   },
+   "end": {
+    "line": 4,
+    "col": 89,
+    "offset": 138
+   },
+   "extra": {
+    "message": "The CSRF check or the form tampering check of SecurityComponent is turned off. Turn it off only for the actions that need it, e.g. with unlockedActions.",
+    "metadata": {
+     "cwe": [
+      "CWE-352: Cross-Site Request Forgery (CSRF)"
+     ],
+     "owasp": [
+      "A01:2021 - Broken Access Control"
+     ],
+     "category": "security",
+     "confidence": "MEDIUM"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
    "check_id": "rules.cakephp2-security-csrf-disabled",
    "path": "src/Controller/PostsController.php",
    "start": {
@@ -79,7 +975,7 @@
     "offset": 502
    },
    "extra": {
-    "message": "SQL built from a string with a variable is passed to Model::query(). Use the values array of query() ($this->Model->query('... WHERE id = ?', [$id])) or find() with conditions arrays.",
+    "message": "SQL built from a string with a variable is passed to Model::query() (or fetchAll(), execute()). Use the values array of query() ($this->Model->query('... WHERE id = ?', [$id])) or find() with conditions arrays.",
     "metadata": {
      "cwe": [
       "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
@@ -111,7 +1007,7 @@
     "offset": 575
    },
    "extra": {
-    "message": "SQL built from a string with a variable is passed to Model::query(). Use the values array of query() ($this->Model->query('... WHERE id = ?', [$id])) or find() with conditions arrays.",
+    "message": "SQL built from a string with a variable is passed to Model::query() (or fetchAll(), execute()). Use the values array of query() ($this->Model->query('... WHERE id = ?', [$id])) or find() with conditions arrays.",
     "metadata": {
      "cwe": [
       "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
@@ -143,7 +1039,7 @@
     "offset": 734
    },
    "extra": {
-    "message": "A conditions string with a variable is passed to find(), deleteAll() or updateAll(). Use a conditions array (['Post.title' => $title]) so that the value is escaped.",
+    "message": "A conditions string with a variable is passed to find(), deleteAll(), updateAll(), field() or hasAny(), or as a value of the fields of updateAll(). Use a conditions array (['Post.title' => $title]) so that the value is escaped.",
     "metadata": {
      "cwe": [
       "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
@@ -335,7 +1231,7 @@
     "offset": 1583
    },
    "extra": {
-    "message": "A conditions string with a variable is passed to find(), deleteAll() or updateAll(). Use a conditions array (['Post.title' => $title]) so that the value is escaped.",
+    "message": "A conditions string with a variable is passed to find(), deleteAll(), updateAll(), field() or hasAny(), or as a value of the fields of updateAll(). Use a conditions array (['Post.title' => $title]) so that the value is escaped.",
     "metadata": {
      "cwe": [
       "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
@@ -367,7 +1263,7 @@
     "offset": 1665
    },
    "extra": {
-    "message": "A conditions string with a variable is passed to find(), deleteAll() or updateAll(). Use a conditions array (['Post.title' => $title]) so that the value is escaped.",
+    "message": "A conditions string with a variable is passed to find(), deleteAll(), updateAll(), field() or hasAny(), or as a value of the fields of updateAll(). Use a conditions array (['Post.title' => $title]) so that the value is escaped.",
     "metadata": {
      "cwe": [
       "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
@@ -399,7 +1295,7 @@
     "offset": 1873
    },
    "extra": {
-    "message": "SQL built from a string with a variable is passed to Model::query(). Use the values array of query() ($this->Model->query('... WHERE id = ?', [$id])) or find() with conditions arrays.",
+    "message": "SQL built from a string with a variable is passed to Model::query() (or fetchAll(), execute()). Use the values array of query() ($this->Model->query('... WHERE id = ?', [$id])) or find() with conditions arrays.",
     "metadata": {
      "cwe": [
       "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
@@ -431,7 +1327,7 @@
     "offset": 1921
    },
    "extra": {
-    "message": "SQL built from a string with a variable is passed to Model::query(). Use the values array of query() ($this->Model->query('... WHERE id = ?', [$id])) or find() with conditions arrays.",
+    "message": "SQL built from a string with a variable is passed to Model::query() (or fetchAll(), execute()). Use the values array of query() ($this->Model->query('... WHERE id = ?', [$id])) or find() with conditions arrays.",
     "metadata": {
      "cwe": [
       "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
@@ -463,7 +1359,7 @@
     "offset": 2101
    },
    "extra": {
-    "message": "A conditions string with a variable is passed to find(), deleteAll() or updateAll(). Use a conditions array (['Post.title' => $title]) so that the value is escaped.",
+    "message": "A conditions string with a variable is passed to find(), deleteAll(), updateAll(), field() or hasAny(), or as a value of the fields of updateAll(). Use a conditions array (['Post.title' => $title]) so that the value is escaped.",
     "metadata": {
      "cwe": [
       "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
@@ -571,6 +1467,454 @@
      "confidence": "HIGH"
     },
     "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-conditions-string",
+   "path": "src/Controller/PostsController.php",
+   "start": {
+    "line": 77,
+    "col": 34,
+    "offset": 2617
+   },
+   "end": {
+    "line": 77,
+    "col": 86,
+    "offset": 2669
+   },
+   "extra": {
+    "message": "A conditions string with a variable is passed to find(), deleteAll(), updateAll(), field() or hasAny(), or as a value of the fields of updateAll(). Use a conditions array (['Post.title' => $title]) so that the value is escaped.",
+    "metadata": {
+     "cwe": [
+      "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "MEDIUM"
+    },
+    "severity": "ERROR",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-conditions-string",
+   "path": "src/Controller/PostsController.php",
+   "start": {
+    "line": 78,
+    "col": 27,
+    "offset": 2698
+   },
+   "end": {
+    "line": 78,
+    "col": 83,
+    "offset": 2754
+   },
+   "extra": {
+    "message": "A conditions string with a variable is passed to find(), deleteAll(), updateAll(), field() or hasAny(), or as a value of the fields of updateAll(). Use a conditions array (['Post.title' => $title]) so that the value is escaped.",
+    "metadata": {
+     "cwe": [
+      "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "MEDIUM"
+    },
+    "severity": "ERROR",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-conditions-string",
+   "path": "src/Controller/PostsController.php",
+   "start": {
+    "line": 79,
+    "col": 34,
+    "offset": 2789
+   },
+   "end": {
+    "line": 79,
+    "col": 111,
+    "offset": 2866
+   },
+   "extra": {
+    "message": "A conditions string with a variable is passed to find(), deleteAll(), updateAll(), field() or hasAny(), or as a value of the fields of updateAll(). Use a conditions array (['Post.title' => $title]) so that the value is escaped.",
+    "metadata": {
+     "cwe": [
+      "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "MEDIUM"
+    },
+    "severity": "ERROR",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-query-concatenation",
+   "path": "src/Controller/PostsController.php",
+   "start": {
+    "line": 86,
+    "col": 9,
+    "offset": 3048
+   },
+   "end": {
+    "line": 89,
+    "col": 10,
+    "offset": 3122
+   },
+   "extra": {
+    "message": "SQL built from a string with a variable is passed to Model::query() (or fetchAll(), execute()). Use the values array of query() ($this->Model->query('... WHERE id = ?', [$id])) or find() with conditions arrays.",
+    "metadata": {
+     "cwe": [
+      "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "MEDIUM"
+    },
+    "severity": "ERROR",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-unserialize-request",
+   "path": "src/Controller/PostsController.php",
+   "start": {
+    "line": 90,
+    "col": 17,
+    "offset": 3140
+   },
+   "end": {
+    "line": 90,
+    "col": 63,
+    "offset": 3186
+   },
+   "extra": {
+    "message": "A value of the request is passed to unserialize(): it can create objects of any class. Use json_decode().",
+    "metadata": {
+     "cwe": [
+      "CWE-502: Deserialization of Untrusted Data"
+     ],
+     "owasp": [
+      "A08:2021 - Software and Data Integrity Failures"
+     ],
+     "category": "security",
+     "confidence": "HIGH"
+    },
+    "severity": "ERROR",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-query-concatenation",
+   "path": "src/Controller/PostsController.php",
+   "start": {
+    "line": 92,
+    "col": 9,
+    "offset": 3289
+   },
+   "end": {
+    "line": 92,
+    "col": 87,
+    "offset": 3367
+   },
+   "extra": {
+    "message": "SQL built from a string with a variable is passed to Model::query() (or fetchAll(), execute()). Use the values array of query() ($this->Model->query('... WHERE id = ?', [$id])) or find() with conditions arrays.",
+    "metadata": {
+     "cwe": [
+      "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "MEDIUM"
+    },
+    "severity": "ERROR",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-conditions-string",
+   "path": "src/Controller/PostsController.php",
+   "start": {
+    "line": 93,
+    "col": 34,
+    "offset": 3402
+   },
+   "end": {
+    "line": 93,
+    "col": 72,
+    "offset": 3440
+   },
+   "extra": {
+    "message": "A conditions string with a variable is passed to find(), deleteAll(), updateAll(), field() or hasAny(), or as a value of the fields of updateAll(). Use a conditions array (['Post.title' => $title]) so that the value is escaped.",
+    "metadata": {
+     "cwe": [
+      "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "MEDIUM"
+    },
+    "severity": "ERROR",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-conditions-string",
+   "path": "src/Controller/PostsController.php",
+   "start": {
+    "line": 101,
+    "col": 34,
+    "offset": 3668
+   },
+   "end": {
+    "line": 101,
+    "col": 115,
+    "offset": 3749
+   },
+   "extra": {
+    "message": "A conditions string with a variable is passed to find(), deleteAll(), updateAll(), field() or hasAny(), or as a value of the fields of updateAll(). Use a conditions array (['Post.title' => $title]) so that the value is escaped.",
+    "metadata": {
+     "cwe": [
+      "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "MEDIUM"
+    },
+    "severity": "ERROR",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-order-request",
+   "path": "src/Controller/PostsController.php",
+   "start": {
+    "line": 102,
+    "col": 34,
+    "offset": 3785
+   },
+   "end": {
+    "line": 102,
+    "col": 76,
+    "offset": 3827
+   },
+   "extra": {
+    "message": "A value of the request is the order, fields or group of find() or paginate: it goes into the SQL as a name. Map the value to a list of allowed fields.",
+    "metadata": {
+     "cwe": [
+      "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "MEDIUM"
+    },
+    "severity": "ERROR",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-order-request",
+   "path": "src/Controller/PostsController.php",
+   "start": {
+    "line": 103,
+    "col": 27,
+    "offset": 3856
+   },
+   "end": {
+    "line": 103,
+    "col": 71,
+    "offset": 3900
+   },
+   "extra": {
+    "message": "A value of the request is the order, fields or group of find() or paginate: it goes into the SQL as a name. Map the value to a list of allowed fields.",
+    "metadata": {
+     "cwe": [
+      "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "MEDIUM"
+    },
+    "severity": "ERROR",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-query-concatenation",
+   "path": "src/Controller/PostsController.php",
+   "start": {
+    "line": 104,
+    "col": 9,
+    "offset": 3910
+   },
+   "end": {
+    "line": 104,
+    "col": 87,
+    "offset": 3988
+   },
+   "extra": {
+    "message": "SQL built from a string with a variable is passed to Model::query() (or fetchAll(), execute()). Use the values array of query() ($this->Model->query('... WHERE id = ?', [$id])) or find() with conditions arrays.",
+    "metadata": {
+     "cwe": [
+      "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "MEDIUM"
+    },
+    "severity": "ERROR",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-conditions-string",
+   "path": "src/Controller/PostsController.php",
+   "start": {
+    "line": 105,
+    "col": 9,
+    "offset": 3998
+   },
+   "end": {
+    "line": 105,
+    "col": 55,
+    "offset": 4044
+   },
+   "extra": {
+    "message": "A conditions string with a variable is passed to find(), deleteAll(), updateAll(), field() or hasAny(), or as a value of the fields of updateAll(). Use a conditions array (['Post.title' => $title]) so that the value is escaped.",
+    "metadata": {
+     "cwe": [
+      "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "MEDIUM"
+    },
+    "severity": "ERROR",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-conditions-string",
+   "path": "src/Controller/PostsController.php",
+   "start": {
+    "line": 106,
+    "col": 9,
+    "offset": 4054
+   },
+   "end": {
+    "line": 106,
+    "col": 48,
+    "offset": 4093
+   },
+   "extra": {
+    "message": "A conditions string with a variable is passed to find(), deleteAll(), updateAll(), field() or hasAny(), or as a value of the fields of updateAll(). Use a conditions array (['Post.title' => $title]) so that the value is escaped.",
+    "metadata": {
+     "cwe": [
+      "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "MEDIUM"
+    },
+    "severity": "ERROR",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-conditions-string",
+   "path": "src/Controller/PostsController.php",
+   "start": {
+    "line": 107,
+    "col": 9,
+    "offset": 4103
+   },
+   "end": {
+    "line": 107,
+    "col": 83,
+    "offset": 4177
+   },
+   "extra": {
+    "message": "A conditions string with a variable is passed to find(), deleteAll(), updateAll(), field() or hasAny(), or as a value of the fields of updateAll(). Use a conditions array (['Post.title' => $title]) so that the value is escaped.",
+    "metadata": {
+     "cwe": [
+      "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
+     ],
+     "owasp": [
+      "A03:2021 - Injection"
+     ],
+     "category": "security",
+     "confidence": "MEDIUM"
+    },
+    "severity": "ERROR",
     "fingerprint": "requires login",
     "lines": "requires login",
     "validation_state": "NO_VALIDATOR",
@@ -803,102 +2147,6 @@
   },
   {
    "check_id": "rules.cakephp2-view-unescaped-output",
-   "path": "templates/Emails/html/default.ctp",
-   "start": {
-    "line": 1,
-    "col": 7,
-    "offset": 6
-   },
-   "end": {
-    "line": 1,
-    "col": 21,
-    "offset": 20
-   },
-   "extra": {
-    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
-    "metadata": {
-     "cwe": [
-      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
-     ],
-     "owasp": [
-      "A03:2021 - Injection"
-     ],
-     "category": "security",
-     "confidence": "LOW"
-    },
-    "severity": "WARNING",
-    "fingerprint": "requires login",
-    "lines": "requires login",
-    "validation_state": "NO_VALIDATOR",
-    "engine_kind": "OSS"
-   }
-  },
-  {
-   "check_id": "rules.cakephp2-view-unescaped-output",
-   "path": "templates/Posts/edit.ctp",
-   "start": {
-    "line": 10,
-    "col": 6,
-    "offset": 288
-   },
-   "end": {
-    "line": 10,
-    "col": 23,
-    "offset": 305
-   },
-   "extra": {
-    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
-    "metadata": {
-     "cwe": [
-      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
-     ],
-     "owasp": [
-      "A03:2021 - Injection"
-     ],
-     "category": "security",
-     "confidence": "LOW"
-    },
-    "severity": "WARNING",
-    "fingerprint": "requires login",
-    "lines": "requires login",
-    "validation_state": "NO_VALIDATOR",
-    "engine_kind": "OSS"
-   }
-  },
-  {
-   "check_id": "rules.cakephp2-view-unescaped-output",
-   "path": "templates/Posts/edit.ctp",
-   "start": {
-    "line": 12,
-    "col": 4,
-    "offset": 361
-   },
-   "end": {
-    "line": 12,
-    "col": 19,
-    "offset": 376
-   },
-   "extra": {
-    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
-    "metadata": {
-     "cwe": [
-      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
-     ],
-     "owasp": [
-      "A03:2021 - Injection"
-     ],
-     "category": "security",
-     "confidence": "LOW"
-    },
-    "severity": "WARNING",
-    "fingerprint": "requires login",
-    "lines": "requires login",
-    "validation_state": "NO_VALIDATOR",
-    "engine_kind": "OSS"
-   }
-  },
-  {
-   "check_id": "rules.cakephp2-view-unescaped-output",
    "path": "templates/Posts/index.php",
    "start": {
     "line": 2,
@@ -928,1059 +2176,37 @@
     "validation_state": "NO_VALIDATOR",
     "engine_kind": "OSS"
    }
-  },
-  {
-   "check_id": "rules.cakephp2-view-unescaped-output",
-   "path": "templates/Posts/links.ctp",
-   "start": {
-    "line": 11,
-    "col": 7,
-    "offset": 271
-   },
-   "end": {
-    "line": 11,
-    "col": 18,
-    "offset": 282
-   },
-   "extra": {
-    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
-    "metadata": {
-     "cwe": [
-      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
-     ],
-     "owasp": [
-      "A03:2021 - Injection"
-     ],
-     "category": "security",
-     "confidence": "LOW"
-    },
-    "severity": "WARNING",
-    "fingerprint": "requires login",
-    "lines": "requires login",
-    "validation_state": "NO_VALIDATOR",
-    "engine_kind": "OSS"
-   }
-  },
-  {
-   "check_id": "rules.cakephp2-view-unescaped-output",
-   "path": "templates/Posts/links.ctp",
-   "start": {
-    "line": 12,
-    "col": 7,
-    "offset": 292
-   },
-   "end": {
-    "line": 12,
-    "col": 22,
-    "offset": 307
-   },
-   "extra": {
-    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
-    "metadata": {
-     "cwe": [
-      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
-     ],
-     "owasp": [
-      "A03:2021 - Injection"
-     ],
-     "category": "security",
-     "confidence": "LOW"
-    },
-    "severity": "WARNING",
-    "fingerprint": "requires login",
-    "lines": "requires login",
-    "validation_state": "NO_VALIDATOR",
-    "engine_kind": "OSS"
-   }
-  },
-  {
-   "check_id": "rules.cakephp2-view-unescaped-output",
-   "path": "templates/Posts/links.ctp",
-   "start": {
-    "line": 13,
-    "col": 7,
-    "offset": 317
-   },
-   "end": {
-    "line": 13,
-    "col": 19,
-    "offset": 329
-   },
-   "extra": {
-    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
-    "metadata": {
-     "cwe": [
-      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
-     ],
-     "owasp": [
-      "A03:2021 - Injection"
-     ],
-     "category": "security",
-     "confidence": "LOW"
-    },
-    "severity": "WARNING",
-    "fingerprint": "requires login",
-    "lines": "requires login",
-    "validation_state": "NO_VALIDATOR",
-    "engine_kind": "OSS"
-   }
-  },
-  {
-   "check_id": "rules.cakephp2-view-unescaped-output",
-   "path": "templates/Posts/view.ctp",
-   "start": {
-    "line": 2,
-    "col": 6,
-    "offset": 47
-   },
-   "end": {
-    "line": 2,
-    "col": 34,
-    "offset": 75
-   },
-   "extra": {
-    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
-    "metadata": {
-     "cwe": [
-      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
-     ],
-     "owasp": [
-      "A03:2021 - Injection"
-     ],
-     "category": "security",
-     "confidence": "LOW"
-    },
-    "severity": "WARNING",
-    "fingerprint": "requires login",
-    "lines": "requires login",
-    "validation_state": "NO_VALIDATOR",
-    "engine_kind": "OSS"
-   }
-  },
-  {
-   "check_id": "rules.cakephp2-view-unescaped-output",
-   "path": "templates/Posts/view.ctp",
-   "start": {
-    "line": 3,
-    "col": 10,
-    "offset": 91
-   },
-   "end": {
-    "line": 3,
-    "col": 40,
-    "offset": 121
-   },
-   "extra": {
-    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
-    "metadata": {
-     "cwe": [
-      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
-     ],
-     "owasp": [
-      "A03:2021 - Injection"
-     ],
-     "category": "security",
-     "confidence": "LOW"
-    },
-    "severity": "WARNING",
-    "fingerprint": "requires login",
-    "lines": "requires login",
-    "validation_state": "NO_VALIDATOR",
-    "engine_kind": "OSS"
-   }
-  },
-  {
-   "check_id": "rules.cakephp2-view-unescaped-output",
-   "path": "templates/Posts/request.ctp",
-   "start": {
-    "line": 6,
-    "col": 1,
-    "offset": 0
-   },
-   "end": {
-    "line": 6,
-    "col": 25,
-    "offset": 0
-   },
-   "extra": {
-    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
-    "metadata": {
-     "cwe": [
-      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
-     ],
-     "owasp": [
-      "A03:2021 - Injection"
-     ],
-     "category": "security",
-     "confidence": "LOW"
-    },
-    "severity": "WARNING",
-    "fingerprint": "requires login",
-    "lines": "<p><?php echo $q; ?></p>",
-    "validation_state": "NO_VALIDATOR",
-    "engine_kind": "OSS"
-   }
-  },
-  {
-   "check_id": "rules.cakephp2-view-unescaped-output",
-   "path": "templates/Posts/request.ctp",
-   "start": {
-    "line": 7,
-    "col": 1,
-    "offset": 0
-   },
-   "end": {
-    "line": 7,
-    "col": 28,
-    "offset": 0
-   },
-   "extra": {
-    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
-    "metadata": {
-     "cwe": [
-      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
-     ],
-     "owasp": [
-      "A03:2021 - Injection"
-     ],
-     "category": "security",
-     "confidence": "LOW"
-    },
-    "severity": "WARNING",
-    "fingerprint": "requires login",
-    "lines": "<p><?php echo $name; ?></p>",
-    "validation_state": "NO_VALIDATOR",
-    "engine_kind": "OSS"
-   }
-  },
-  {
-   "check_id": "rules.cakephp2-view-unescaped-output",
-   "path": "templates/Posts/request.ctp",
-   "start": {
-    "line": 9,
-    "col": 1,
-    "offset": 0
-   },
-   "end": {
-    "line": 9,
-    "col": 52,
-    "offset": 0
-   },
-   "extra": {
-    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
-    "metadata": {
-     "cwe": [
-      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
-     ],
-     "owasp": [
-      "A03:2021 - Injection"
-     ],
-     "category": "security",
-     "confidence": "LOW"
-    },
-    "severity": "WARNING",
-    "fingerprint": "requires login",
-    "lines": "<p><?= $this->request->data['Post']['title'] ?></p>",
-    "validation_state": "NO_VALIDATOR",
-    "engine_kind": "OSS"
-   }
-  },
-  {
-   "check_id": "rules.cakephp2-view-unescaped-output",
-   "path": "templates/Posts/request.ctp",
-   "start": {
-    "line": 10,
-    "col": 1,
-    "offset": 0
-   },
-   "end": {
-    "line": 10,
-    "col": 43,
-    "offset": 0
-   },
-   "extra": {
-    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
-    "metadata": {
-     "cwe": [
-      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
-     ],
-     "owasp": [
-      "A03:2021 - Injection"
-     ],
-     "category": "security",
-     "confidence": "LOW"
-    },
-    "severity": "WARNING",
-    "fingerprint": "requires login",
-    "lines": "<p><?= $this->data['Post']['title'] ?></p>",
-    "validation_state": "NO_VALIDATOR",
-    "engine_kind": "OSS"
-   }
-  },
-  {
-   "check_id": "rules.cakephp2-conditions-string",
-   "path": "src/Controller/PostsController.php",
-   "start": {
-    "line": 77,
-    "col": 34,
-    "offset": 0
-   },
-   "end": {
-    "line": 77,
-    "col": 87,
-    "offset": 0
-   },
-   "extra": {
-    "message": "A conditions string with a variable is passed to find(), deleteAll() or updateAll(). Use a conditions array (['Post.title' => $title]) so that the value is escaped.",
-    "metadata": {
-     "cwe": [
-      "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
-     ],
-     "owasp": [
-      "A03:2021 - Injection"
-     ],
-     "category": "security",
-     "confidence": "MEDIUM"
-    },
-    "severity": "ERROR",
-    "fingerprint": "requires login",
-    "lines": "        $this->Post->find('all', ['recursive' => -1, 'conditions' => \"Post.id = $id\"]);",
-    "validation_state": "NO_VALIDATOR",
-    "engine_kind": "OSS"
-   }
-  },
-  {
-   "check_id": "rules.cakephp2-conditions-string",
-   "path": "src/Controller/PostsController.php",
-   "start": {
-    "line": 78,
-    "col": 34,
-    "offset": 0
-   },
-   "end": {
-    "line": 78,
-    "col": 83,
-    "offset": 0
-   },
-   "extra": {
-    "message": "A conditions string with a variable is passed to find(), deleteAll() or updateAll(). Use a conditions array (['Post.title' => $title]) so that the value is escaped.",
-    "metadata": {
-     "cwe": [
-      "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
-     ],
-     "owasp": [
-      "A03:2021 - Injection"
-     ],
-     "category": "security",
-     "confidence": "MEDIUM"
-    },
-    "severity": "ERROR",
-    "fingerprint": "requires login",
-    "lines": "        $this->paginate = ['limit' => 20, 'conditions' => 'Post.user_id = ' . $id];",
-    "validation_state": "NO_VALIDATOR",
-    "engine_kind": "OSS"
-   }
-  },
-  {
-   "check_id": "rules.cakephp2-conditions-string",
-   "path": "src/Controller/PostsController.php",
-   "start": {
-    "line": 79,
-    "col": 34,
-    "offset": 0
-   },
-   "end": {
-    "line": 79,
-    "col": 112,
-    "offset": 0
-   },
-   "extra": {
-    "message": "A conditions string with a variable is passed to find(), deleteAll() or updateAll(). Use a conditions array (['Post.title' => $title]) so that the value is escaped.",
-    "metadata": {
-     "cwe": [
-      "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
-     ],
-     "owasp": [
-      "A03:2021 - Injection"
-     ],
-     "category": "security",
-     "confidence": "MEDIUM"
-    },
-    "severity": "ERROR",
-    "fingerprint": "requires login",
-    "lines": "        $this->Post->find('all', ['recursive' => -1, 'conditions' => ['Post.published' => 1, \"Post.id = $id\"]]);",
-    "validation_state": "NO_VALIDATOR",
-    "engine_kind": "OSS"
-   }
-  },
-  {
-   "check_id": "rules.cakephp2-query-concatenation",
-   "path": "src/Controller/PostsController.php",
-   "start": {
-    "line": 86,
-    "col": 1,
-    "offset": 0
-   },
-   "end": {
-    "line": 86,
-    "col": 34,
-    "offset": 0
-   },
-   "extra": {
-    "message": "SQL built from a string with a variable is passed to Model::query(). Use the values array of query() ($this->Model->query('... WHERE id = ?', [$id])) or find() with conditions arrays.",
-    "metadata": {
-     "cwe": [
-      "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
-     ],
-     "owasp": [
-      "A03:2021 - Injection"
-     ],
-     "category": "security",
-     "confidence": "MEDIUM"
-    },
-    "severity": "ERROR",
-    "fingerprint": "requires login",
-    "lines": "        $this->Post->query(<<<SQL",
-    "validation_state": "NO_VALIDATOR",
-    "engine_kind": "OSS"
-   }
-  },
-  {
-   "check_id": "rules.cakephp2-unserialize-request",
-   "path": "src/Controller/PostsController.php",
-   "start": {
-    "line": 90,
-    "col": 1,
-    "offset": 0
-   },
-   "end": {
-    "line": 90,
-    "col": 64,
-    "offset": 0
-   },
-   "extra": {
-    "message": "A value of the request is passed to unserialize(): it can create objects of any class. Use json_decode().",
-    "metadata": {
-     "cwe": [
-      "CWE-502: Deserialization of Untrusted Data"
-     ],
-     "owasp": [
-      "A08:2021 - Software and Data Integrity Failures"
-     ],
-     "category": "security",
-     "confidence": "HIGH"
-    },
-    "severity": "ERROR",
-    "fingerprint": "requires login",
-    "lines": "        $data = unserialize($this->request['data']['payload']);",
-    "validation_state": "NO_VALIDATOR",
-    "engine_kind": "OSS"
-   }
-  },
-  {
-   "check_id": "rules.cakephp2-query-concatenation",
-   "path": "src/Controller/PostsController.php",
-   "start": {
-    "line": 92,
-    "col": 1,
-    "offset": 0
-   },
-   "end": {
-    "line": 92,
-    "col": 88,
-    "offset": 0
-   },
-   "extra": {
-    "message": "SQL built from a string with a variable is passed to Model::query(). Use the values array of query() ($this->Model->query('... WHERE id = ?', [$id])) or find() with conditions arrays.",
-    "metadata": {
-     "cwe": [
-      "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
-     ],
-     "owasp": [
-      "A03:2021 - Injection"
-     ],
-     "category": "security",
-     "confidence": "MEDIUM"
-    },
-    "severity": "ERROR",
-    "fingerprint": "requires login",
-    "lines": "        $this->Post->query($id ? 'SELECT * FROM posts WHERE id = ' . $id : 'SELECT 1');",
-    "validation_state": "NO_VALIDATOR",
-    "engine_kind": "OSS"
-   }
-  },
-  {
-   "check_id": "rules.cakephp2-conditions-string",
-   "path": "src/Controller/PostsController.php",
-   "start": {
-    "line": 93,
-    "col": 1,
-    "offset": 0
-   },
-   "end": {
-    "line": 93,
-    "col": 74,
-    "offset": 0
-   },
-   "extra": {
-    "message": "A conditions string with a variable is passed to find(), deleteAll() or updateAll(). Use a conditions array (['Post.title' => $title]) so that the value is escaped.",
-    "metadata": {
-     "cwe": [
-      "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
-     ],
-     "owasp": [
-      "A03:2021 - Injection"
-     ],
-     "category": "security",
-     "confidence": "MEDIUM"
-    },
-    "severity": "ERROR",
-    "fingerprint": "requires login",
-    "lines": "        $this->Post->find('all', ['conditions' => ['Post.' . $id => 1]]);",
-    "validation_state": "NO_VALIDATOR",
-    "engine_kind": "OSS"
-   }
-  },
-  {
-   "check_id": "rules.cakephp2-view-unescaped-output",
-   "path": "templates/Posts/parity.ctp",
-   "start": {
-    "line": 7,
-    "col": 1,
-    "offset": 0
-   },
-   "end": {
-    "line": 7,
-    "col": 20,
-    "offset": 0
-   },
-   "extra": {
-    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
-    "metadata": {
-     "cwe": [
-      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
-     ],
-     "owasp": [
-      "A03:2021 - Injection"
-     ],
-     "category": "security",
-     "confidence": "LOW"
-    },
-    "severity": "WARNING",
-    "fingerprint": "requires login",
-    "lines": "<p><?= $name ?></p>",
-    "validation_state": "NO_VALIDATOR",
-    "engine_kind": "OSS"
-   }
-  },
-  {
-   "check_id": "rules.cakephp2-view-unescaped-output",
-   "path": "templates/Posts/parity.ctp",
-   "start": {
-    "line": 8,
-    "col": 1,
-    "offset": 0
-   },
-   "end": {
-    "line": 8,
-    "col": 47,
-    "offset": 0
-   },
-   "extra": {
-    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
-    "metadata": {
-     "cwe": [
-      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
-     ],
-     "owasp": [
-      "A03:2021 - Injection"
-     ],
-     "category": "security",
-     "confidence": "LOW"
-    },
-    "severity": "WARNING",
-    "fingerprint": "requires login",
-    "lines": "<p><?= $labels[$post['Post']['status']] ?></p>",
-    "validation_state": "NO_VALIDATOR",
-    "engine_kind": "OSS"
-   }
-  },
-  {
-   "check_id": "rules.cakephp2-view-unescaped-output",
-   "path": "templates/Posts/parity.ctp",
-   "start": {
-    "line": 28,
-    "col": 1,
-    "offset": 0
-   },
-   "end": {
-    "line": 28,
-    "col": 21,
-    "offset": 0
-   },
-   "extra": {
-    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
-    "metadata": {
-     "cwe": [
-      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
-     ],
-     "owasp": [
-      "A03:2021 - Injection"
-     ],
-     "category": "security",
-     "confidence": "LOW"
-    },
-    "severity": "WARNING",
-    "fingerprint": "requires login",
-    "lines": "<p><?= $level ?></p>",
-    "validation_state": "NO_VALIDATOR",
-    "engine_kind": "OSS"
-   }
-  },
-  {
-   "check_id": "rules.cakephp2-view-unescaped-output",
-   "path": "templates/Posts/parity.ctp",
-   "start": {
-    "line": 29,
-    "col": 1,
-    "offset": 0
-   },
-   "end": {
-    "line": 29,
-    "col": 20,
-    "offset": 0
-   },
-   "extra": {
-    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
-    "metadata": {
-     "cwe": [
-      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
-     ],
-     "owasp": [
-      "A03:2021 - Injection"
-     ],
-     "category": "security",
-     "confidence": "LOW"
-    },
-    "severity": "WARNING",
-    "fingerprint": "requires login",
-    "lines": "<p><?= $unit ?></p>",
-    "validation_state": "NO_VALIDATOR",
-    "engine_kind": "OSS"
-   }
-  },
-  {
-   "check_id": "rules.cakephp2-view-unescaped-output",
-   "path": "templates/Posts/parity.ctp",
-   "start": {
-    "line": 30,
-    "col": 1,
-    "offset": 0
-   },
-   "end": {
-    "line": 30,
-    "col": 29,
-    "offset": 0
-   },
-   "extra": {
-    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
-    "metadata": {
-     "cwe": [
-      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
-     ],
-     "owasp": [
-      "A03:2021 - Injection"
-     ],
-     "category": "security",
-     "confidence": "LOW"
-    },
-    "severity": "WARNING",
-    "fingerprint": "requires login",
-    "lines": "<p><?= (string)$level ?></p>",
-    "validation_state": "NO_VALIDATOR",
-    "engine_kind": "OSS"
-   }
-  },
-  {
-   "check_id": "rules.cakephp2-view-unescaped-output",
-   "path": "templates/Posts/parity.ctp",
-   "start": {
-    "line": 31,
-    "col": 1,
-    "offset": 0
-   },
-   "end": {
-    "line": 31,
-    "col": 47,
-    "offset": 0
-   },
-   "extra": {
-    "message": "A variable is printed in a view without h(). Escape it with h(), or use a helper that escapes.",
-    "metadata": {
-     "cwe": [
-      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
-     ],
-     "owasp": [
-      "A03:2021 - Injection"
-     ],
-     "category": "security",
-     "confidence": "LOW"
-    },
-    "severity": "WARNING",
-    "fingerprint": "requires login",
-    "lines": "<p><?= (bool)$this->request->query('q') ?></p>",
-    "validation_state": "NO_VALIDATOR",
-    "engine_kind": "OSS"
-   }
-  },
-  {
-   "check_id": "rules.cakephp2-conditions-string",
-   "path": "src/Controller/PostsController.php",
-   "start": {
-    "line": 101,
-    "col": 1,
-    "offset": 0
-   },
-   "end": {
-    "line": 101,
-    "col": 117,
-    "offset": 0
-   },
-   "extra": {
-    "message": "A conditions string with a variable is passed to find(), deleteAll() or updateAll(). Use a conditions array (['Post.title' => $title]) so that the value is escaped.",
-    "metadata": {
-     "cwe": [
-      "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
-     ],
-     "owasp": [
-      "A03:2021 - Injection"
-     ],
-     "category": "security",
-     "confidence": "MEDIUM"
-    },
-    "severity": "ERROR",
-    "fingerprint": "requires login",
-    "lines": "        $this->Post->find('all', ['conditions' => ['OR' => [\"Post.title LIKE '%\" . $q . \"%'\", 'Post.body' => $q]]]);",
-    "validation_state": "NO_VALIDATOR",
-    "engine_kind": "OSS"
-   }
-  },
-  {
-   "check_id": "rules.cakephp2-conditions-string",
-   "path": "src/Controller/PostsController.php",
-   "start": {
-    "line": 105,
-    "col": 1,
-    "offset": 0
-   },
-   "end": {
-    "line": 105,
-    "col": 56,
-    "offset": 0
-   },
-   "extra": {
-    "message": "A conditions string with a variable is passed to find(), deleteAll() or updateAll(). Use a conditions array (['Post.title' => $title]) so that the value is escaped.",
-    "metadata": {
-     "cwe": [
-      "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
-     ],
-     "owasp": [
-      "A03:2021 - Injection"
-     ],
-     "category": "security",
-     "confidence": "MEDIUM"
-    },
-    "severity": "ERROR",
-    "fingerprint": "requires login",
-    "lines": "        $this->Post->field('title', 'Post.id = ' . $q);",
-    "validation_state": "NO_VALIDATOR",
-    "engine_kind": "OSS"
-   }
-  },
-  {
-   "check_id": "rules.cakephp2-conditions-string",
-   "path": "src/Controller/PostsController.php",
-   "start": {
-    "line": 106,
-    "col": 1,
-    "offset": 0
-   },
-   "end": {
-    "line": 106,
-    "col": 49,
-    "offset": 0
-   },
-   "extra": {
-    "message": "A conditions string with a variable is passed to find(), deleteAll() or updateAll(). Use a conditions array (['Post.title' => $title]) so that the value is escaped.",
-    "metadata": {
-     "cwe": [
-      "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
-     ],
-     "owasp": [
-      "A03:2021 - Injection"
-     ],
-     "category": "security",
-     "confidence": "MEDIUM"
-    },
-    "severity": "ERROR",
-    "fingerprint": "requires login",
-    "lines": "        $this->Post->hasAny(\"Post.slug = '$q'\");",
-    "validation_state": "NO_VALIDATOR",
-    "engine_kind": "OSS"
-   }
-  },
-  {
-   "check_id": "rules.cakephp2-conditions-string",
-   "path": "src/Controller/PostsController.php",
-   "start": {
-    "line": 107,
-    "col": 1,
-    "offset": 0
-   },
-   "end": {
-    "line": 107,
-    "col": 84,
-    "offset": 0
-   },
-   "extra": {
-    "message": "A conditions string with a variable is passed to find(), deleteAll() or updateAll(). Use a conditions array (['Post.title' => $title]) so that the value is escaped.",
-    "metadata": {
-     "cwe": [
-      "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
-     ],
-     "owasp": [
-      "A03:2021 - Injection"
-     ],
-     "category": "security",
-     "confidence": "MEDIUM"
-    },
-    "severity": "ERROR",
-    "fingerprint": "requires login",
-    "lines": "        $this->Post->updateAll(['Post.title' => \"'\" . $q . \"'\"], ['Post.id' => 1]);",
-    "validation_state": "NO_VALIDATOR",
-    "engine_kind": "OSS"
-   }
-  },
-  {
-   "check_id": "rules.cakephp2-query-concatenation",
-   "path": "src/Controller/PostsController.php",
-   "start": {
-    "line": 104,
-    "col": 1,
-    "offset": 0
-   },
-   "end": {
-    "line": 104,
-    "col": 88,
-    "offset": 0
-   },
-   "extra": {
-    "message": "SQL built from a string with a variable is passed to Model::query(). Use the values array of query() ($this->Model->query('... WHERE id = ?', [$id])) or find() with conditions arrays.",
-    "metadata": {
-     "cwe": [
-      "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
-     ],
-     "owasp": [
-      "A03:2021 - Injection"
-     ],
-     "category": "security",
-     "confidence": "MEDIUM"
-    },
-    "severity": "ERROR",
-    "fingerprint": "requires login",
-    "lines": "        $this->Post->getDataSource()->fetchAll('SELECT * FROM posts WHERE id = ' . $q);",
-    "validation_state": "NO_VALIDATOR",
-    "engine_kind": "OSS"
-   }
-  },
-  {
-   "check_id": "rules.cakephp2-security-csrf-disabled",
-   "path": "src/Controller/ApiController.php",
-   "start": {
-    "line": 4,
-    "col": 1,
-    "offset": 0
-   },
-   "end": {
-    "line": 4,
-    "col": 90,
-    "offset": 0
-   },
-   "extra": {
-    "message": "The CSRF check or the form tampering check of SecurityComponent is turned off. Turn it off only for the actions that need it, e.g. with unlockedActions.",
-    "metadata": {
-     "cwe": [
-      "CWE-352: Cross-Site Request Forgery (CSRF)"
-     ],
-     "owasp": [
-      "A01:2021 - Broken Access Control"
-     ],
-     "category": "security",
-     "confidence": "MEDIUM"
-    },
-    "severity": "WARNING",
-    "fingerprint": "requires login",
-    "lines": "    public $components = ['Security' => ['csrfCheck' => false, 'validatePost' => false]];",
-    "validation_state": "NO_VALIDATOR",
-    "engine_kind": "OSS"
-   }
-  },
-  {
-   "check_id": "rules.cakephp2-order-request",
-   "path": "src/Controller/PostsController.php",
-   "start": {
-    "line": 102,
-    "col": 1,
-    "offset": 0
-   },
-   "end": {
-    "line": 102,
-    "col": 78,
-    "offset": 0
-   },
-   "extra": {
-    "message": "A value of the request is the order, fields or group of find() or paginate: it goes into the SQL as a name. Map the value to a list of allowed fields.",
-    "metadata": {
-     "cwe": [
-      "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
-     ],
-     "owasp": [
-      "A03:2021 - Injection"
-     ],
-     "category": "security",
-     "confidence": "MEDIUM"
-    },
-    "severity": "ERROR",
-    "fingerprint": "requires login",
-    "lines": "        $this->Post->find('all', ['order' => $this->request->query('sort')]);",
-    "validation_state": "NO_VALIDATOR",
-    "engine_kind": "OSS"
-   }
-  },
-  {
-   "check_id": "rules.cakephp2-order-request",
-   "path": "src/Controller/PostsController.php",
-   "start": {
-    "line": 103,
-    "col": 1,
-    "offset": 0
-   },
-   "end": {
-    "line": 103,
-    "col": 72,
-    "offset": 0
-   },
-   "extra": {
-    "message": "A value of the request is the order, fields or group of find() or paginate: it goes into the SQL as a name. Map the value to a list of allowed fields.",
-    "metadata": {
-     "cwe": [
-      "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
-     ],
-     "owasp": [
-      "A03:2021 - Injection"
-     ],
-     "category": "security",
-     "confidence": "MEDIUM"
-    },
-    "severity": "ERROR",
-    "fingerprint": "requires login",
-    "lines": "        $this->paginate = ['fields' => $this->request->data('fields')];",
-    "validation_state": "NO_VALIDATOR",
-    "engine_kind": "OSS"
-   }
-  },
-  {
-   "check_id": "rules.cakephp2-view-raw-output",
-   "path": "templates/Posts/raw.ctp",
-   "start": {
-    "line": 2,
-    "col": 1,
-    "offset": 0
-   },
-   "end": {
-    "line": 2,
-    "col": 50,
-    "offset": 0
-   },
-   "extra": {
-    "message": "HTML is printed without escaping on purpose with raw(). Check that it is built by the application or sanitized, never a value of the request.",
-    "metadata": {
-     "cwe": [
-      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
-     ],
-     "owasp": [
-      "A03:2021 - Injection"
-     ],
-     "category": "security",
-     "confidence": "LOW"
-    },
-    "severity": "INFO",
-    "fingerprint": "requires login",
-    "lines": "<div><?= raw($post['Post']['body_html']) ?></div>",
-    "validation_state": "NO_VALIDATOR",
-    "engine_kind": "OSS"
-   }
-  },
-  {
-   "check_id": "rules.cakephp2-view-raw-output",
-   "path": "templates/Posts/raw.ctp",
-   "start": {
-    "line": 3,
-    "col": 1,
-    "offset": 0
-   },
-   "end": {
-    "line": 3,
-    "col": 75,
-    "offset": 0
-   },
-   "extra": {
-    "message": "HTML is printed without escaping on purpose with raw(). Check that it is built by the application or sanitized, never a value of the request.",
-    "metadata": {
-     "cwe": [
-      "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
-     ],
-     "owasp": [
-      "A03:2021 - Injection"
-     ],
-     "category": "security",
-     "confidence": "LOW"
-    },
-    "severity": "INFO",
-    "fingerprint": "requires login",
-    "lines": "<?php echo raw($this->Text->autoParagraph($post['Post']['body_html'])); ?>",
-    "validation_state": "NO_VALIDATOR",
-    "engine_kind": "OSS"
-   }
   }
  ],
  "errors": [],
  "paths": {
   "scanned": [
+   "/views/templates/Emails/html/default.ctp.php",
+   "/views/templates/Layouts/error.ctp.php",
+   "/views/templates/Posts/edit.ctp.php",
+   "/views/templates/Posts/links.ctp.php",
+   "/views/templates/Posts/mixed.ctp.php",
+   "/views/templates/Posts/parity.ctp.php",
+   "/views/templates/Posts/raw.ctp.php",
+   "/views/templates/Posts/request.ctp.php",
+   "/views/templates/Posts/view.ctp.php",
+   "src/Controller/ApiController.php",
    "src/Controller/ExportController.php",
    "src/Controller/PostsController.php",
    "src/Model/Post.php",
-   "templates/Emails/html/default.ctp",
-   "templates/Posts/edit.ctp",
-   "templates/Posts/index.php",
-   "templates/Posts/links.ctp",
-   "templates/Posts/view.ctp",
-   "templates/Posts/request.ctp",
-   "templates/Posts/parity.ctp",
-   "src/Controller/ApiController.php",
    "src/View/AppView.php",
    "src/View/Helper/PostHelper.php",
-   "templates/Posts/raw.ctp"
+   "templates/Posts/index.php"
   ]
  },
  "time": {
   "rules": [],
-  "rules_parse_time": 0.0017910003662109375,
+  "rules_parse_time": 0.0023751258850097656,
   "profiling_times": {
-   "config_time": 0.5954880714416504,
-   "core_time": 1.2810394763946533,
-   "ignores_time": 0.0001499652862548828,
-   "total_time": 1.8904061317443848
+   "config_time": 0.3039743900299072,
+   "core_time": 1.2074484825134277,
+   "ignores_time": 0.00019693374633789062,
+   "total_time": 1.5221185684204102
   },
   "parsing_time": {
    "total_time": 0.0,
@@ -1995,10 +2221,10 @@
    "very_slow_files": []
   },
   "scanning_time": {
-   "total_time": 1.2737822532653809,
+   "total_time": 2.1484909057617188,
    "per_file_time": {
-    "mean": 0.1592227816581726,
-    "std_dev": 0.004326244217363495
+    "mean": 0.13428068161010742,
+    "std_dev": 0.009469292107965543
    },
    "very_slow_stats": {
     "time_ratio": 0.0,
@@ -2035,13 +2261,13 @@
    "project_level_time": 0.0,
    "file_level_time": 0.0,
    "rules_with_project_prefilters_ratio": 0.0,
-   "rules_with_file_prefilters_ratio": 0.7868852459016393,
-   "rules_selected_ratio": 0.3114754098360656,
-   "rules_matched_ratio": 0.3114754098360656
+   "rules_with_file_prefilters_ratio": 0.6081081081081081,
+   "rules_selected_ratio": 0.44594594594594594,
+   "rules_matched_ratio": 0.44594594594594594
   },
   "targets": [],
-  "total_bytes": 0,
-  "max_memory_bytes": 119015488
+  "total_bytes": 10749,
+  "max_memory_bytes": 131815872
  },
  "engine_requested": "OSS",
  "skipped_rules": [],

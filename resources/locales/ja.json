@@ -25,6 +25,7 @@
     "occurrences.more": "ほか {count} 箇所",
     "note.none": "検査したファイルに指摘はありませんでした。",
     "note.errors": "エンジンが {count} 件のエラー（読めなかったファイルなど）を報告しました。例: {first}",
+    "note.viewErrors": "Semgrep の HTML のルールが、PHP を含むビューを一部しか読めなかったとして {count} 件のエラーを報告しました。PHP のルールは、ビューを PHP として読んでいます。",
     "note.semgrepignore": "Semgrep は、プロジェクトの .semgrepignore のパスも除きます。この報告書にはその一覧は載りません。",
     "rule.cakephp2-query-concatenation": "Model::query() に変数を含む SQL",
     "rule.cakephp2-conditions-string": "find()、deleteAll()、updateAll()、field()、hasAny() に変数を含む条件の文字列",

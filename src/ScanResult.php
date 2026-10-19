@@ -26,6 +26,8 @@ final class ScanResult
      * @param array<array{id: string, reason: string}> $skippedRules The rules that the engine skipped, and why
      * @param array<string, string> $notRun The rules of this package that did not run, by ID, with the key of the
      *  message of the reason (`notRun.*`), e.g. the checks of the configuration when it is turned off
+     * @param array<string> $viewErrors Errors of the rules of HTML in the views, which they read in part as they
+     *  contain PHP, e.g. of Semgrep; the views are read as PHP besides
      */
     public function __construct(
         public array $findings = [],
@@ -38,6 +40,7 @@ final class ScanResult
         public ?array $engineRules = null,
         public array $skippedRules = [],
         public array $notRun = [],
+        public array $viewErrors = [],
     ) {
     }
 
