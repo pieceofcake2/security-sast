@@ -1,0 +1,42 @@
+name: Samples
+
+# Records the rules that Semgrep runs for the sample reports (docs/examples/report-sample.php --record): run it by
+# hand, or push a branch named samples/..., then download report-sample.json to docs/examples and build the
+# samples with `php docs/examples/report-sample.php`
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'samples/**'
+
+permissions:
+  contents: read
+
+jobs:
+  record:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - name: Install Composer Packages
+        run: composer install --no-ansi --no-interaction --no-progress
+
+      - name: Record the rules of Semgrep
+        run: php docs/examples/report-sample.php --record
+
+      - name: Upload the record
+        uses: actions/upload-artifact@v7
+        with:
+          name: record
+          path: docs/examples/report-sample.json
+          retention-days: 7
