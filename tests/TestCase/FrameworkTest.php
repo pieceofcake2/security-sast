@@ -106,6 +106,7 @@ class FrameworkTest extends TestCase
         $this->assertSame(4, $findings[0]->line);
         $this->assertSame('"name": "pieceofcake2/cakephp",', $findings[0]->code);
         $this->assertStringContainsString('GHSA-wh43-gc93-wh4c', $findings[0]->message);
+        $this->assertSame('https://github.com/pieceofcake2/cakephp/security/advisories/GHSA-wh43-gc93-wh4c', $findings[0]->url);
 
         $this->assertCount(1, Framework::findings(self::project('cakephp/cakephp', '3.3.16')));
     }

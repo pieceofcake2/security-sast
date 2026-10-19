@@ -24,6 +24,11 @@ final class Framework
     ];
 
     /**
+     * The advisory of `here()` that keeps the leading `//`
+     */
+    public const ADVISORY = 'https://github.com/pieceofcake2/cakephp/security/advisories/GHSA-wh43-gc93-wh4c';
+
+    /**
      * Constructor
      *
      * @param string $package Name of the package, e.g. `pieceofcake2/cakephp`
@@ -144,6 +149,7 @@ final class Framework
             $definition['cwe'],
             $definition['owasp'],
             $definition['confidence'],
+            self::ADVISORY,
         )];
     }
 

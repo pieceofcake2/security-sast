@@ -202,7 +202,7 @@ redirect to a route array chosen by a key: `['controller' => 'orders', 'action' 
 
 `$this->request->here()` is a value of the request too: before pieceofcake2/cakephp 2.12.11 (and cakephp/cakephp
 3.4.0), CakePHP takes only one `/` off the path, so for `https://example.com//evil.example` it returns
-`//evil.example`, a URL of another site (GHSA-wh43-gc93-wh4c). Update CakePHP: with pieceofcake2/cakephp 2.12.11+
+`//evil.example`, a URL of another site ([GHSA-wh43-gc93-wh4c](https://github.com/pieceofcake2/cakephp/security/advisories/GHSA-wh43-gc93-wh4c)). Update CakePHP: with pieceofcake2/cakephp 2.12.11+
 or cakephp/cakephp 3.4+ in the `composer.lock` of the project, `$this->request->here()`, `here(false)` and
 `$this->request->here` are paths of the application, and a redirect to them is not reported by either engine (a
 redirect with another value of the request still is). The old version itself is reported by
@@ -559,10 +559,17 @@ also with `--config-check=0`, and are placed at the line of the package in `comp
 ### cakephp2-framework-protocol-relative-here
 
 The installed CakePHP keeps the leading `//` of the path of the request in `$this->request->here()`:
-pieceofcake2/cakephp before 2.12.11, and cakephp/cakephp before 3.4.0 (GHSA-wh43-gc93-wh4c). For
-`https://example.com//evil.example`, `here()` returns `//evil.example`, a URL of another site: a redirect to it,
-or a URL built from it, takes the user there. This is reported even when the code has no such redirect, as
-CakePHP builds URLs from it too.
+pieceofcake2/cakephp before 2.12.11, and cakephp/cakephp before 3.4.0
+([GHSA-wh43-gc93-wh4c](https://github.com/pieceofcake2/cakephp/security/advisories/GHSA-wh43-gc93-wh4c)). For a link of your site to
+`https://example.com//evil.example/users/login`, `here()` returns `//evil.example/users/login`, a URL of another
+host:
+
+- `FormHelper::create()` without a `url` renders `<form action="//evil.example/users/login">`: the data of the
+  form, e.g. the password, is sent to the other host
+- a redirect to `here()` goes to the other host
+
+It is reported even when the code has no redirect to `here()`, as every form of `FormHelper` without a `url` is
+affected.
 
 Update to pieceofcake2/cakephp 2.12.11 or later, which takes all the leading slashes off the path:
 

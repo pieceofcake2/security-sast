@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Unreleased
+## 1.1.0
 
 - `cakephp2-redirect-request` no longer reports, with either engine, a URL of the origin of the application: a
   concatenation that begins with `Router::url('/', true)`, or with `Router::fullBaseUrl()` or
@@ -12,8 +12,10 @@
   `cakephp/cakephp`):
   - New rule `cakephp2-framework-protocol-relative-here` (medium): pieceofcake2/cakephp before 2.12.11 or
     cakephp/cakephp before 3.4.0, whose `$this->request->here()` keeps the leading `//` of the path
-    (GHSA-wh43-gc93-wh4c), placed at the package in `composer.lock`. Run by both engines, also with
-    `--config-check=0`
+    ([GHSA-wh43-gc93-wh4c](https://github.com/pieceofcake2/cakephp/security/advisories/GHSA-wh43-gc93-wh4c)): for a request to
+    `//evil.example/...`, `FormHelper::create()` without a `url` renders `<form action="//evil.example/...">`,
+    which sends the data of the form to another host, and a redirect to `here()` goes there. Placed at the package
+    in `composer.lock`; run by both engines, also with `--config-check=0`
   - With pieceofcake2/cakephp 2.12.11+ or cakephp/cakephp 3.4+, `cakephp2-redirect-request` no longer reports, with
     either engine, a redirect to `$this->request->here()`, `here(false)` or `$this->request->here`; a redirect with
     another value of the request still is. Its message says that `here()` can begin with `//` before 2.12.11

@@ -63,7 +63,7 @@
     "rule.cakephp2-config-session-cache-limiter": "Pages with a session without Cache-Control: no-store",
     "message.cakephp2-config-session-cache-limiter": "The pages with a session get no Cache-Control: no-store, as Session.cacheLimiter is not 'nocache'. CakePHP 2 sets it to 'must-revalidate' by default, for Internet Explorer 8 and before, which PHP does not know: PHP then sends no cache header. Set Session.cacheLimiter to 'nocache', as CakePHP 5 leaves it.",
     "rule.cakephp2-framework-protocol-relative-here": "CakePHP whose here() can begin with //",
-    "message.cakephp2-framework-protocol-relative-here": "The installed CakePHP keeps the leading // of the path of the request in $this->request->here() (pieceofcake2/cakephp before 2.12.11, cakephp/cakephp before 3.4.0, GHSA-wh43-gc93-wh4c): a redirect to it, or a URL built from it, can go to another site, e.g. //evil.example. Update to pieceofcake2/cakephp 2.12.11 or later.",
+    "message.cakephp2-framework-protocol-relative-here": "The installed CakePHP keeps the leading // of the path of the request in $this->request->here() (pieceofcake2/cakephp before 2.12.11, cakephp/cakephp before 3.4.0, GHSA-wh43-gc93-wh4c): for a request to //evil.example/..., FormHelper::create() without a url renders <form action=\"//evil.example/...\">, which sends the data of the form to another host, and a redirect to here() goes there. Update to pieceofcake2/cakephp 2.12.11 or later.",
     "field.config": "Configuration",
     "config.env": "Checked with APP_ENV={env}",
     "config.none": "Not checked",

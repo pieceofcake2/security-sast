@@ -169,7 +169,7 @@ final class RuleCatalog
             'cwe' => ["CWE-601: URL Redirection to Untrusted Site ('Open Redirect')"],
             'owasp' => ['A06:2021 - Vulnerable and Outdated Components'],
             'confidence' => 'HIGH',
-            'message' => 'The installed CakePHP keeps the leading // of the path of the request in $this->request->here() (pieceofcake2/cakephp before 2.12.11, cakephp/cakephp before 3.4.0, GHSA-wh43-gc93-wh4c): a redirect to it, or a URL built from it, can go to another site, e.g. //evil.example. Update to pieceofcake2/cakephp 2.12.11 or later.',
+            'message' => 'The installed CakePHP keeps the leading // of the path of the request in $this->request->here() (pieceofcake2/cakephp before 2.12.11, cakephp/cakephp before 3.4.0, GHSA-wh43-gc93-wh4c): for a request to //evil.example/..., FormHelper::create() without a url renders <form action="//evil.example/...">, which sends the data of the form to another host, and a redirect to here() goes there. Update to pieceofcake2/cakephp 2.12.11 or later.',
         ],
     ];
 

@@ -63,7 +63,7 @@
     "rule.cakephp2-config-session-cache-limiter": "Cache-Control: no-store のないセッションのページ",
     "message.cakephp2-config-session-cache-limiter": "Session.cacheLimiter が 'nocache' ではないため、セッションのあるページに Cache-Control: no-store が付きません。CakePHP 2 は Internet Explorer 8 以前のためにデフォルトで 'must-revalidate' にしますが、PHP はこの値を知らないのでキャッシュのヘッダーを送りません。CakePHP 5 と同じく、Session.cacheLimiter を 'nocache' にしてください。",
     "rule.cakephp2-framework-protocol-relative-here": "here() が // で始まりうる CakePHP",
-    "message.cakephp2-framework-protocol-relative-here": "インストールされている CakePHP は、リクエストのパスの先頭の // を $this->request->here() に残します (pieceofcake2/cakephp 2.12.11 より前、cakephp/cakephp 3.4.0 より前、GHSA-wh43-gc93-wh4c)。ここへのリダイレクトや、ここから作った URL が、//evil.example のようなほかのサイトに向くことがあります。pieceofcake2/cakephp 2.12.11 以降に更新してください。",
+    "message.cakephp2-framework-protocol-relative-here": "インストールされている CakePHP は、リクエストのパスの先頭の // を $this->request->here() に残します (pieceofcake2/cakephp 2.12.11 より前、cakephp/cakephp 3.4.0 より前、GHSA-wh43-gc93-wh4c)。//evil.example/... へのリクエストでは、url を指定しない FormHelper::create() が <form action=\"//evil.example/...\"> を出力してフォームのデータをほかのホストに送り、here() へのリダイレクトもそこへ向かいます。pieceofcake2/cakephp 2.12.11 以降に更新してください。",
     "field.config": "設定",
     "config.env": "APP_ENV={env} で検査",
     "config.none": "検査していません",

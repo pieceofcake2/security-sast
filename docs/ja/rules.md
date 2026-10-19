@@ -196,7 +196,7 @@ return $this->redirect($url);
 
 `$this->request->here()` もリクエストの値です。pieceofcake2/cakephp 2.12.11 (cakephp/cakephp では 3.4.0) より前の
 CakePHP はパスの先頭の `/` を 1 つしか取らないため、`https://example.com//evil.example` では `//evil.example` を返します。
-これはほかのサイトの URL です (GHSA-wh43-gc93-wh4c)。CakePHP を更新してください。プロジェクトの `composer.lock` が
+これはほかのサイトの URL です ([GHSA-wh43-gc93-wh4c](https://github.com/pieceofcake2/cakephp/security/advisories/GHSA-wh43-gc93-wh4c))。CakePHP を更新してください。プロジェクトの `composer.lock` が
 pieceofcake2/cakephp 2.12.11 以降か cakephp/cakephp 3.4 以降なら、`$this->request->here()`、`here(false)`、
 `$this->request->here` はアプリケーションのパスなので、どちらのエンジンもそこへのリダイレクトを指摘しません
 (ほかのリクエストの値があれば指摘します)。古いバージョン自体は
@@ -545,10 +545,16 @@ OpenSSL の実装は mcrypt のもの (AES-256-CBC。32 バイトの鍵の Rijnd
 ### cakephp2-framework-protocol-relative-here
 
 インストールされている CakePHP は、リクエストのパスの先頭の `//` を `$this->request->here()` に残します。
-pieceofcake2/cakephp 2.12.11 より前と、cakephp/cakephp 3.4.0 より前です (GHSA-wh43-gc93-wh4c)。
-`https://example.com//evil.example` では `here()` が `//evil.example` を返します。これはほかのサイトの URL で、ここへの
-リダイレクトや、ここから作った URL はユーザーをそこへ連れて行きます。CakePHP 自身もここから URL を作るため、コードに
-そのようなリダイレクトが無くても指摘します。
+pieceofcake2/cakephp 2.12.11 より前と、cakephp/cakephp 3.4.0 より前です
+([GHSA-wh43-gc93-wh4c](https://github.com/pieceofcake2/cakephp/security/advisories/GHSA-wh43-gc93-wh4c))。あなたのサイトの
+`https://example.com//evil.example/users/login` へのリンクでは、`here()` が `//evil.example/users/login` を返します。
+これはほかのホストの URL です。
+
+- `url` を指定しない `FormHelper::create()` が `<form action="//evil.example/users/login">` を出力します。パスワード
+  などのフォームのデータがほかのホストに送られます
+- `here()` へのリダイレクトはほかのホストに向かいます
+
+`url` を指定しない `FormHelper` のフォームはすべて影響を受けるため、コードに `here()` へのリダイレクトが無くても指摘します。
 
 パスの先頭のスラッシュをすべて取る pieceofcake2/cakephp 2.12.11 以降に更新してください。
 
