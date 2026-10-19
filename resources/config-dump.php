@@ -51,6 +51,11 @@ try {
         'useOpenSsl' => (bool)Configure::read('Security.useOpenSsl'),
         'sessionHttpOnly' => array_key_exists('session.cookie_httponly', $ini) ? (bool)$ini['session.cookie_httponly'] : null,
         'sessionSecure' => array_key_exists('session.cookie_secure', $ini) ? (bool)$ini['session.cookie_secure'] : null,
+        // The cache limiter that PHP gets: CakeSession sets 'must-revalidate' when it is not set, and leaves the one of
+        // PHP when it is empty
+        'sessionCacheLimiter' => is_array($session) && array_key_exists('cacheLimiter', $session)
+            ? (string)$session['cacheLimiter'] ?: (string)($ini['session.cache_limiter'] ?? ini_get('session.cache_limiter'))
+            : 'must-revalidate',
         'core' => is_file(CONFIG . 'core.php') ? realpath(CONFIG . 'core.php') : null,
     ];
 

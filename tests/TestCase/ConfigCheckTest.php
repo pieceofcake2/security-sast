@@ -31,6 +31,7 @@ class ConfigCheckTest extends TestCase
             'useOpenSsl' => true,
             'sessionHttpOnly' => null,
             'sessionSecure' => null,
+            'sessionCacheLimiter' => 'nocache',
             'core' => realpath(self::PROJECT) . DS . 'config' . DS . 'core.php',
         ];
     }
@@ -55,6 +56,7 @@ class ConfigCheckTest extends TestCase
             'cookieType' => null,
             'useOpenSsl' => false,
             'sessionHttpOnly' => false,
+            'sessionCacheLimiter' => 'must-revalidate',
         ]), (string)realpath(self::PROJECT));
 
         $this->assertSame([
@@ -64,6 +66,7 @@ class ConfigCheckTest extends TestCase
             'cakephp2-config-cookie-cipher medium config/core.php:5',
             'cakephp2-config-openssl low config/core.php:6',
             'cakephp2-config-session-cookie medium config/core.php:7',
+            'cakephp2-config-session-cache-limiter low config/core.php:7',
         ], self::rules($findings));
         $this->assertSame("Configure::write('Security.salt', 'DYhG93b0qyJfIxfs2guVoUubWwvniR2G0FgaC9mi');", $findings[1]->code);
         // The secrets are never in the findings
@@ -131,5 +134,41 @@ class ConfigCheckTest extends TestCase
     {
         $this->assertFalse(ConfigCheck::applies(self::PROJECT));
         $this->assertFalse(ConfigCheck::applies(SemgrepEngineTest::APP));
+    }
+
+    /**
+     * The cache limiters that leave the pages with a session without Cache-Control: no-store
+     *
+     * @return void
+     */
+    public function testSessionCacheLimiter(): void
+    {
+        foreach (['must-revalidate', 'public', 'private', 'private_no_expire', ''] as $limiter) {
+            $findings = ConfigCheck::findings(self::values(['sessionCacheLimiter' => $limiter, 'core' => null]), (string)realpath(self::PROJECT));
+
+            $this->assertSame(['cakephp2-config-session-cache-limiter low config/core.php:0'], self::rules($findings), $limiter);
+        }
+        foreach (['nocache', 'NoCache', null] as $limiter) {
+            $this->assertSame([], ConfigCheck::findings(self::values(['sessionCacheLimiter' => $limiter]), (string)realpath(self::PROJECT)), (string)$limiter);
+        }
+    }
+
+    /**
+     * The finding points to the line of Session.cacheLimiter when core.php has one, or to that of Session
+     *
+     * @return void
+     */
+    public function testSessionCacheLimiterLine(): void
+    {
+        $core = (string)tempnam(sys_get_temp_dir(), 'core');
+        file_put_contents($core, "<?php\nConfigure::write('Session', ['defaults' => 'php']);\nConfigure::write('Session.cacheLimiter', 'public');\n");
+        try {
+            $findings = ConfigCheck::findings(self::values(['sessionCacheLimiter' => 'public', 'core' => $core]), dirname($core));
+        } finally {
+            unlink($core);
+        }
+
+        $this->assertSame([3], array_map(static fn($finding): int => $finding->line, $findings));
+        $this->assertSame("Configure::write('Session.cacheLimiter', 'public');", $findings[0]->code);
     }
 }

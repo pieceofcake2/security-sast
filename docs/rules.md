@@ -361,6 +361,7 @@ turned off with `--config-check=0`. They are placed at the line of the setting i
 | [`cakephp2-config-cookie-cipher`](#cakephp2-config-cookie-cipher) | Medium | CWE-327 | A02 Cryptographic Failures |
 | [`cakephp2-config-cookie-key`](#cakephp2-config-cookie-key) | Medium | CWE-321, CWE-326 | A02 Cryptographic Failures |
 | [`cakephp2-config-session-cookie`](#cakephp2-config-session-cookie) | Medium | CWE-1004, CWE-614 | A05 Security Misconfiguration |
+| [`cakephp2-config-session-cache-limiter`](#cakephp2-config-session-cache-limiter) | Low | CWE-525 | A05 Security Misconfiguration |
 | [`cakephp2-config-openssl`](#cakephp2-config-openssl) | Low | CWE-1104 | A06 Vulnerable and Outdated Components |
 
 The secrets are compared with the values of the distributions of CakePHP 2 and pieceofcake2 and the samples of
@@ -492,6 +493,23 @@ Configure::write('Session', [
 
 Behind a proxy that ends HTTPS, CakePHP sets `Secure` only when it sees the request as HTTPS: set
 `'session.cookie_secure' => 1` in the `ini` of production then.
+
+### cakephp2-config-session-cache-limiter
+
+The pages with a session get no `Cache-Control: no-store`: `Session.cacheLimiter` is not `nocache`. A browser can
+show the pages of a logged-in user again after the logout, and a shared cache, e.g. a proxy of a company, can store
+them.
+
+CakePHP 2 sets `Session.cacheLimiter` to `must-revalidate` by default, for Internet Explorer 8 and before. PHP does
+not know this value and sends no cache header at all; `public` and `private` let the caches keep the pages. Use the
+cache limiter of PHP, as CakePHP 5 does:
+
+```php
+Configure::write('Session.cacheLimiter', 'nocache');
+```
+
+PHP then sends `Cache-Control: no-store, no-cache, must-revalidate` with the pages that start a session. An action
+that must be cached, e.g. a download, sets its own headers with `$this->response->cache()`.
 
 ### cakephp2-config-openssl
 

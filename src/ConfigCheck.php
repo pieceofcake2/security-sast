@@ -158,6 +158,10 @@ final class ConfigCheck
         if (($values['sessionHttpOnly'] ?? null) === false || ($values['sessionSecure'] ?? null) === false) {
             $add('cakephp2-config-session-cookie', "'Session'");
         }
+        $limiter = $values['sessionCacheLimiter'] ?? null;
+        if (is_string($limiter) && strtolower($limiter) !== 'nocache') {
+            $add('cakephp2-config-session-cache-limiter', self::place($core, $project, "'Session.cacheLimiter'")[1] > 0 ? "'Session.cacheLimiter'" : "'Session'");
+        }
 
         return $findings;
     }

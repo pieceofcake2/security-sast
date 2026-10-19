@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## Unreleased
+
+- New rule `cakephp2-config-session-cache-limiter` (low): the pages with a session get no
+  `Cache-Control: no-store` unless `Session.cacheLimiter` is `nocache`. CakePHP 2 sets it to `must-revalidate` by
+  default, for Internet Explorer 8 and before, which PHP does not know, so PHP sends no cache header at all
+
 ## 1.0.6
 
 - `cakephp2-view-unescaped-output` no longer reports, with either engine, a variable set in the view to a number

@@ -60,6 +60,8 @@
     "message.cakephp2-config-openssl": "Security.useOpenSsl is not true: Security::encrypt() and the 'aes' cookies use mcrypt, which is not maintained and not bundled with PHP 7.2+. Set Security.useOpenSsl to true.",
     "rule.cakephp2-config-session-cookie": "Session cookie without HttpOnly or Secure",
     "message.cakephp2-config-session-cookie": "The session cookie is configured without HttpOnly or Secure (session.cookie_httponly or session.cookie_secure is false in Session.ini). CakePHP sets both by default (Secure on HTTPS); remove the settings that turn them off.",
+    "rule.cakephp2-config-session-cache-limiter": "Pages with a session without Cache-Control: no-store",
+    "message.cakephp2-config-session-cache-limiter": "The pages with a session get no Cache-Control: no-store, as Session.cacheLimiter is not 'nocache'. CakePHP 2 sets it to 'must-revalidate' by default, for Internet Explorer 8 and before, which PHP does not know: PHP then sends no cache header. Set Session.cacheLimiter to 'nocache', as CakePHP 5 leaves it.",
     "field.config": "Configuration",
     "config.env": "Checked with APP_ENV={env}",
     "config.none": "Not checked",
