@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Unreleased
+## 1.0.5
 
 - New rule `cakephp2-view-raw-output` of a new risk, Info, which never fails the scan: HTML printed in a view with
   `raw()`, the function of pieceofcake2/cakephp 2.12.10+ that prints a value without escaping on purpose, so that
@@ -29,7 +29,7 @@
   comment, and not the word in a sentence), and neither engine applies a comment across another comment or an
   empty line, which the report listed as suppressed
 
-## Unreleased
+## 1.0.5
 
 - Semgrep finds the conditions strings of `cakephp2-conditions-string` in any place of the options, e.g. after
   `'recursive' => -1` or `'limit' => 20`, as PHPStan does: it matched the first key only
