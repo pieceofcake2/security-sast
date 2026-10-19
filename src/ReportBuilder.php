@@ -28,7 +28,7 @@ final class ReportBuilder
     public const RESOURCE_DIR = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'resources';
 
     /**
-     * The most places shown on the page of a rule
+     * The most places shown with their code on the page of a rule; the others are listed by their file and line
      */
     public const MAX_PLACES = 100;
 
@@ -363,7 +363,7 @@ final class ReportBuilder
     }
 
     /**
-     * The places of a rule: the file and lines, then the code
+     * The places of a rule: the file and lines, then the code; after `MAX_PLACES`, the file and lines only
      *
      * @param array<\PieceOfCake2\SecuritySast\Finding> $findings Places
      * @return string HTML
@@ -381,7 +381,11 @@ final class ReportBuilder
             $html .= '</div>';
         }
         if (count($findings) > self::MAX_PLACES) {
-            $html .= '<p class="place-more">' . $h($this->t('occurrences.more', ['count' => count($findings) - self::MAX_PLACES])) . '</p>';
+            $html .= '<p class="place-more">' . $h($this->t('occurrences.more', ['count' => count($findings) - self::MAX_PLACES])) . '</p><ul class="place-list">';
+            foreach (array_slice($findings, self::MAX_PLACES) as $finding) {
+                $html .= '<li>' . $h($finding->file . ':' . $finding->line . ($finding->endLine > $finding->line ? '-' . $finding->endLine : '')) . '</li>';
+            }
+            $html .= '</ul>';
         }
 
         return $html . '</div>';

@@ -22,7 +22,7 @@
     "count.places": "{count}",
     "threshold.value": "{severity} or higher",
     "threshold.none": "None (the report only)",
-    "occurrences.more": "and {count} more places",
+    "occurrences.more": "and {count} more places, by their file and line without the code:",
     "note.none": "No finding in the scanned files.",
     "note.errors": "The engine reported {count} errors, e.g. files it could not parse: {first}",
     "note.viewErrors": "Semgrep reported {count} errors of its rules of HTML, which read only a part of the views as they contain PHP; the rules of PHP read the views as PHP.",

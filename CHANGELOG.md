@@ -20,6 +20,8 @@
   which the views given one by one did not follow
 - The errors of the rules of HTML in the views, which read the PHP of a template only in part, are said apart from
   the files that could not be read, in a note of the cover (`ScanResult::$viewErrors`)
+- The page of a rule lists the places after the first 100 by their file and line, without the code, in place of
+  `and N more places`
 
 ## 1.2.0
 

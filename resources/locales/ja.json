@@ -22,7 +22,7 @@
     "count.places": "{count}箇所",
     "threshold.value": "{severity}以上",
     "threshold.none": "なし（報告のみ）",
-    "occurrences.more": "ほか {count} 箇所",
+    "occurrences.more": "ほか {count} 箇所（コードは省略し、ファイルと行だけを示します）:",
     "note.none": "検査したファイルに指摘はありませんでした。",
     "note.errors": "エンジンが {count} 件のエラー（読めなかったファイルなど）を報告しました。例: {first}",
     "note.viewErrors": "Semgrep の HTML のルールが、PHP を含むビューを一部しか読めなかったとして {count} 件のエラーを報告しました。PHP のルールは、ビューを PHP として読んでいます。",

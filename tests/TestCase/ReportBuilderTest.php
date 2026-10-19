@@ -246,6 +246,11 @@ class ReportBuilderTest extends TestCase
         $html = self::html(new Config(project: SemgrepEngineTest::APP), new ScanResult($findings, 1, 'Semgrep'));
 
         $this->assertSame(ReportBuilder::MAX_PLACES, substr_count($html, '<div class="place">'));
-        $this->assertStringContainsString('and 5 more places', $html);
+        $this->assertStringContainsString('and 5 more places, by their file and line without the code:', $html);
+        // The other places by their file and line
+        $this->assertSame(5, substr_count($html, '<li>templates/a.ctp:'));
+        $this->assertStringContainsString('<ul class="place-list"><li>templates/a.ctp:101</li>', $html);
+        $this->assertStringContainsString('<li>templates/a.ctp:105</li></ul>', $html);
+        $this->assertStringNotContainsString('templates/a.ctp:100</li>', $html);
     }
 }

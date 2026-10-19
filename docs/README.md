@@ -200,7 +200,8 @@ file with `--settings`.
      (`--config-check=0`) or there is no configuration to load, the check of the CakePHP of `composer.lock` without
      one, and the rules that Semgrep skipped
 4. **A page for each rule**: its title, ID, risk, CWE, OWASP Top 10 category and confidence, what it found and
-   how to fix it, then each place (file and line) with its code, up to 100 places
+   how to fix it, then each place (file and line) with its code, up to 100 places; the other places by their file
+   and line, without the code
 
 The risks of Semgrep are `ERROR` (high), `WARNING` (medium) and `INFO` (low). The rules of this package set
 their own risks (see [Rules](rules.md)).
