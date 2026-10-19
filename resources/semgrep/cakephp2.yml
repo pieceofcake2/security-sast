@@ -289,6 +289,29 @@ rules:
       category: security
       confidence: MEDIUM
 
+  - id: cakephp2-view-raw-output
+    languages: [php]
+    severity: INFO
+    message: >-
+      HTML is printed without escaping on purpose with raw(). Check that it is built by the application or
+      sanitized, never a value of the request.
+    pattern: echo raw(...);
+    paths:
+      include:
+        - "**/templates/**/*.ctp"
+        - "**/View/**/*.ctp"
+      # The text mails are not HTML
+      exclude:
+        - "**/Emails/text/**"
+        # The classes of the directories of views: the helpers, and the views, e.g. View/AppView.php
+        - "**/View/Helper/**"
+        - "**/View/*View.php"
+    metadata:
+      cwe: ["CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"]
+      owasp: ["A03:2021 - Injection"]
+      category: security
+      confidence: LOW
+
   - id: cakephp2-view-unescaped-output
     languages: [php]
     severity: WARNING

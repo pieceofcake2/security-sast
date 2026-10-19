@@ -82,6 +82,14 @@ final class RuleCatalog
             'confidence' => 'MEDIUM',
             'message' => 'The CSRF check or the form tampering check of SecurityComponent is turned off. Turn it off only for the actions that need it, e.g. with unlockedActions.',
         ],
+        'cakephp2-view-raw-output' => [
+            'identifier' => 'securitySast.viewRawOutput',
+            'severity' => Severity::INFO,
+            'cwe' => ["CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"],
+            'owasp' => ['A03:2021 - Injection'],
+            'confidence' => 'LOW',
+            'message' => 'HTML is printed without escaping on purpose with raw(). Check that it is built by the application or sanitized, never a value of the request.',
+        ],
         'cakephp2-view-unescaped-output' => [
             'identifier' => 'securitySast.viewUnescapedOutput',
             'severity' => Severity::MEDIUM,

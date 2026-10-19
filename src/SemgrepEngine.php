@@ -138,7 +138,8 @@ final class SemgrepEngine implements Engine
             $include .= '        - ' . json_encode($pattern, JSON_UNESCAPED_SLASHES) . "\n";
         }
 
-        return (string)preg_replace('/(    paths:\n      include:\n)(?:        - .*\n)+/', '$1' . str_replace('$', '\\$', $include), $yaml, 1);
+        // The views of every rule of the views
+        return (string)preg_replace('/(    paths:\n      include:\n)(?:        - .*\n)+/', '$1' . str_replace('$', '\\$', $include), $yaml);
     }
 
     /**

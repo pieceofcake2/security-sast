@@ -73,7 +73,7 @@ final class ReportBuilder
             $bySeverity[$finding->severity]++;
         }
         foreach ($bySeverity as $severity => $count) {
-            if ($severity !== Severity::UNKNOWN || $count > 0) {
+            if (!in_array($severity, [Severity::UNKNOWN, Severity::INFO], true) || $count > 0) {
                 $counts[] = new Count($count, $this->t('severity.' . $severity), $count > 0 ? 't-' . $severity : '');
             }
         }

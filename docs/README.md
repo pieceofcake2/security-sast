@@ -181,7 +181,7 @@ file with `--settings`.
 1. **Cover**: the result, the numbers of findings by risk, the repository, branch and commit, the scanned paths
    and the number of files, the rules, the `APP_ENV` of the configuration, the threshold, and the date,
    environment and software of the run (the engine and its version)
-2. **Findings by risk**: Critical, High, Medium, Low and Unknown; each rule that found places, with their
+2. **Findings by risk**: Critical, High, Medium, Low, Unknown and Info (never fails); each rule that found places, with their
    number, and a link to its page
 3. **A page for each rule**: its title, ID, risk, CWE, OWASP Top 10 category and confidence, what it found and
    how to fix it, then each place (file and line) with its code, up to 100 places

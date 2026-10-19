@@ -44,6 +44,7 @@ class ViewsTest extends TestCase
         $yaml = SemgrepEngine::rules(['ctp', 'html']);
 
         $this->assertStringContainsString("    paths:\n      include:\n        - \"**/templates/**/*.ctp\"\n        - \"**/View/**/*.ctp\"\n        - \"**/templates/**/*.html\"\n        - \"**/View/**/*.html\"\n      # The text mails are not HTML\n      exclude:\n        - \"**/Emails/text/**\"\n        # The classes of the directories of views: the helpers, and the views, e.g. View/AppView.php\n        - \"**/View/Helper/**\"\n        - \"**/View/*View.php\"\n    metadata:", $yaml);
-        $this->assertSame(1, substr_count($yaml, 'include:'));
+        // The rules of the views: the unescaped output and raw()
+        $this->assertSame(2, substr_count($yaml, 'include:'));
     }
 }

@@ -94,6 +94,11 @@ final class ViewUnescapedOutputRule implements Rule
                 continue;
             }
             foreach ($statement->exprs as $expr) {
+                // HTML printed with raw() on purpose: information to check
+                if ($expr instanceof FuncCall && $expr->name instanceof Name && $expr->name->toLowerString() === 'raw') {
+                    $errors[] = Nodes::error('cakephp2-view-raw-output', $statement->getStartLine());
+                    break;
+                }
                 if (preg_match(self::REQUEST, $printer->prettyPrintExpr($expr))) {
                     $errors[] = Nodes::error('cakephp2-view-unescaped-output', $statement->getStartLine());
                     break;
