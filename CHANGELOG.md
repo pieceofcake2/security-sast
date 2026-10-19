@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Unreleased
+## 1.2.0
 
 - The report lists what was checked besides the findings, on pages after the findings by risk
   (pieceofcake2/report 1.1):
