@@ -1,0 +1,16 @@
+{
+    "_readme": [
+        "A composer.lock of the tests: the CakePHP of the project"
+    ],
+    "packages": [
+        {
+            "name": "psr/log",
+            "version": "3.0.2"
+        },
+        {
+            "name": "pieceofcake2/cakephp",
+            "version": "v2.12.11"
+        }
+    ],
+    "packages-dev": []
+}

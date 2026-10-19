@@ -25,6 +25,16 @@ use PHPStan\Rules\Rule;
 final class RedirectRequestRule implements Rule
 {
     /**
+     * Constructor
+     *
+     * @param bool $hereIsPath Whether `here()` of the request is a path of the application, with the CakePHP of the
+     *  project (`Framework::hereIsPath()`): a redirect to it is then not reported
+     */
+    public function __construct(private bool $hereIsPath = false)
+    {
+    }
+
+    /**
      * @inheritDoc
      */
     public function getNodeType(): string
@@ -45,11 +55,53 @@ final class RedirectRequestRule implements Rule
         if ($args === [] || $args[0]->value instanceof Node\Expr\Array_ || !Nodes::hasRequestValue($args[0]->value)) {
             return [];
         }
+        if ($this->hereIsPath && !self::hasRequestValueBesidesHere($args[0]->value)) {
+            return [];
+        }
         if (self::isOwnOriginUrl($args[0]->value)) {
             return [];
         }
 
         return [Nodes::error('cakephp2-redirect-request')];
+    }
+
+    /**
+     * Whether a node holds a value of the request other than `$this->request->here()` and `$this->request->here`
+     * (the arguments of `here()` are values too)
+     *
+     * @param \PhpParser\Node $node Node
+     * @return bool
+     */
+    private static function hasRequestValueBesidesHere(Node $node): bool
+    {
+        if (($node instanceof MethodCall || $node instanceof PropertyFetch) && self::isHere($node)) {
+            return $node instanceof MethodCall && array_filter($node->getArgs(), static fn(Node\Arg $arg): bool => Nodes::hasRequestValue($arg->value)) !== [];
+        }
+        if (Nodes::isThisProperty($node, 'request') || ($node instanceof Variable && is_string($node->name) && in_array($node->name, Nodes::SUPERGLOBALS, true))) {
+            return true;
+        }
+        foreach ($node->getSubNodeNames() as $name) {
+            $children = $node->{$name};
+            foreach (is_array($children) ? $children : [$children] as $child) {
+                if ($child instanceof Node && self::hasRequestValueBesidesHere($child)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Whether a node is `$this->request->here()` or `$this->request->here`
+     *
+     * @param \PhpParser\Node\Expr\MethodCall|\PhpParser\Node\Expr\PropertyFetch $node Node
+     * @return bool
+     */
+    private static function isHere(MethodCall|PropertyFetch $node): bool
+    {
+        return Nodes::isThisProperty($node->var, 'request')
+            && $node->name instanceof Identifier && $node->name->toLowerString() === 'here';
     }
 
     /**
@@ -128,12 +180,8 @@ final class RedirectRequestRule implements Rule
         if ($expr instanceof String_) {
             return str_starts_with($expr->value, '/');
         }
-        if (!$expr instanceof MethodCall && !$expr instanceof PropertyFetch) {
-            return false;
-        }
 
-        return Nodes::isThisProperty($expr->var, 'request')
-            && $expr->name instanceof Identifier && $expr->name->toLowerString() === 'here';
+        return ($expr instanceof MethodCall || $expr instanceof PropertyFetch) && self::isHere($expr);
     }
 
     /**

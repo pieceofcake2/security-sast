@@ -153,6 +153,32 @@ class CommandTest extends TestCase
         }
     }
 
+    /**
+     * The CakePHP of the composer.lock of the project is reported whatever the engine, and its redirects to here()
+     *
+     * @return void
+     */
+    public function testRunWithAnOldCakephp(): void
+    {
+        if (PdfPrinter::findChrome() === null && empty($_SERVER['REPORT_CHROME_BINARY'])) {
+            $this->markTestSkipped('Chrome is not installed.');
+        }
+        $project = FrameworkTest::project('pieceofcake2/cakephp', 'v2.12.10');
+        $stdout = fopen('php://memory', 'w+');
+        $command = new Command($stdout, fopen('php://memory', 'w+'), new PhpstanEngine(), new ReportWriter(PdfPrinter::fromEnv($_SERVER)), new Environment());
+
+        $this->assertSame(Command::SUCCESS, $command->run(['--project=' . $project, '--pdf=' . $project . DS . 'report.pdf', '--fail-on=high']));
+        rewind($stdout);
+        $this->assertStringContainsString('10 findings (10 medium) of 2 rules in 1 files', (string)stream_get_contents($stdout));
+
+        $project = FrameworkTest::project('pieceofcake2/cakephp', 'v2.12.11');
+        $stdout = fopen('php://memory', 'w+');
+        $command = new Command($stdout, fopen('php://memory', 'w+'), new PhpstanEngine(), new ReportWriter(PdfPrinter::fromEnv($_SERVER)), new Environment());
+        $command->run(['--project=' . $project, '--pdf=' . $project . DS . 'report.pdf', '--fail-on=high']);
+        rewind($stdout);
+        $this->assertStringContainsString('5 findings (5 medium) of 1 rules in 1 files', (string)stream_get_contents($stdout));
+    }
+
     public function testRunWhenTheConfigurationCannotBeLoaded(): void
     {
         if (PdfPrinter::findChrome() === null && empty($_SERVER['REPORT_CHROME_BINARY'])) {

@@ -8,6 +8,17 @@
   `$this->request->here` or a string literal), e.g. `Router::fullBaseUrl() . $this->request->here()`. Whatever
   follows the `/` stays on the same host. A value of the request right after the origin, the origin after a
   value of the request, and `sprintf()` are still reported. The docs say that `here()` can begin with `//`
+- The rules take into account the CakePHP of the `composer.lock` of the project (`pieceofcake2/cakephp` or
+  `cakephp/cakephp`):
+  - New rule `cakephp2-framework-protocol-relative-here` (medium): pieceofcake2/cakephp before 2.12.11 or
+    cakephp/cakephp before 3.4.0, whose `$this->request->here()` keeps the leading `//` of the path
+    (GHSA-wh43-gc93-wh4c), placed at the package in `composer.lock`. Run by both engines, also with
+    `--config-check=0`
+  - With pieceofcake2/cakephp 2.12.11+ or cakephp/cakephp 3.4+, `cakephp2-redirect-request` no longer reports, with
+    either engine, a redirect to `$this->request->here()`, `here(false)` or `$this->request->here`; a redirect with
+    another value of the request still is. Its message says that `here()` can begin with `//` before 2.12.11
+  - The PHPStan rule of the redirects, `RedirectRequestRule`, is added by `PhpstanEngine` with the CakePHP of the
+    project, no longer by `resources/phpstan/rules.neon`
 
 ## 1.0.7
 

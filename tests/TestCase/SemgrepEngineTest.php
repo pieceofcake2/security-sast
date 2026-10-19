@@ -79,6 +79,27 @@ class SemgrepEngineTest extends TestCase
     ];
 
     /**
+     * The redirects of the fixture of here() that are reported with any CakePHP
+     */
+    public const HERE_EXPECTED = [
+        'cakephp2-redirect-request src/Controller/PagesController.php:16',
+        'cakephp2-redirect-request src/Controller/PagesController.php:17',
+        'cakephp2-redirect-request src/Controller/PagesController.php:18',
+        'cakephp2-redirect-request src/Controller/PagesController.php:19',
+        'cakephp2-redirect-request src/Controller/PagesController.php:20',
+    ];
+
+    /**
+     * The redirects of the fixture of here() that are reported only when here() can begin with //
+     */
+    public const HERE_PROTOCOL_RELATIVE = [
+        'cakephp2-redirect-request src/Controller/PagesController.php:11',
+        'cakephp2-redirect-request src/Controller/PagesController.php:12',
+        'cakephp2-redirect-request src/Controller/PagesController.php:13',
+        'cakephp2-redirect-request src/Controller/PagesController.php:14',
+    ];
+
+    /**
      * The places of a result, as `rule file:line`
      *
      * @param array<\PieceOfCake2\SecuritySast\Finding> $findings Findings
@@ -108,6 +129,40 @@ class SemgrepEngineTest extends TestCase
         $this->assertStringContainsString(':/rules:ro -w /src semgrep/semgrep:1.180.0 semgrep scan --json --metrics=off', $command);
         $this->assertStringContainsString(' --scan-unknown-extensions ', $command);
         $this->assertStringContainsString('--config /rules/cakephp2.yml --config p/php --config /src/rules/app.yml --include /src --include /templates --exclude /vendor . templates/Emails/html/default.ctp templates/Posts/edit.ctp templates/Posts/index.php templates/Posts/links.ctp templates/Posts/parity.ctp templates/Posts/raw.ctp templates/Posts/request.ctp templates/Posts/view.ctp', $command);
+    }
+
+    public function testRulesWithHereAsAPath(): void
+    {
+        $this->assertStringNotContainsString(SemgrepEngine::HERE_IS_PATH, SemgrepEngine::rules());
+        $rules = SemgrepEngine::rules(hereIsPath: true);
+        $this->assertStringContainsString("(SemgrepEngine::HERE_IS_PATH)\n" . SemgrepEngine::HERE_IS_PATH, $rules);
+        $this->assertSame(1, substr_count($rules, SemgrepEngine::HERE_IS_PATH));
+    }
+
+    /**
+     * The rules given to Semgrep leave out here() with the CakePHP of the composer.lock of the project
+     *
+     * @return void
+     */
+    public function testCommandWithTheCakephpOfTheProject(): void
+    {
+        $rules = static function (string $project): string {
+            $yaml = '';
+            $engine = new SemgrepEngine(configs: [], run: static function (array $command, string $dir) use (&$yaml): array {
+                $mount = $command[(int)array_search('-v', array_slice($command, 4), true) + 5];
+                $yaml = (string)file_get_contents(substr($mount, 0, -strlen(':/rules:ro')) . DS . 'cakephp2.yml');
+
+                return [0, '{"results": [], "errors": []}', ''];
+            });
+            $engine->scan($project, ['src']);
+
+            return $yaml;
+        };
+
+        $this->assertStringContainsString(SemgrepEngine::HERE_IS_PATH, $rules(FrameworkTest::HERE));
+        $this->assertStringContainsString(SemgrepEngine::HERE_IS_PATH, $rules(FrameworkTest::project('cakephp/cakephp', '3.4.0')));
+        $this->assertStringNotContainsString(SemgrepEngine::HERE_IS_PATH, $rules(FrameworkTest::project('pieceofcake2/cakephp', 'v2.12.10')));
+        $this->assertStringNotContainsString(SemgrepEngine::HERE_IS_PATH, $rules(FrameworkTest::project(null)));
     }
 
     public function testResult(): void
@@ -229,5 +284,12 @@ class SemgrepEngineTest extends TestCase
 
         $this->assertNotContains('cakephp2-view-unescaped-output templates/Posts/edit.ctp:10', self::places($result->findings));
         $this->assertContains('cakephp2-view-unescaped-output templates/Posts/edit.ctp:12', self::places($result->findings));
+
+        // here() of the request, with the CakePHP of the composer.lock of the project
+        $here = static fn(string $project): array => self::places(array_filter((new SemgrepEngine(configs: []))->scan($project, ['src'])->findings, static fn($finding): bool => str_starts_with($finding->rule, 'cakephp2-')));
+        $old = array_merge(self::HERE_PROTOCOL_RELATIVE, self::HERE_EXPECTED);
+        sort($old);
+        $this->assertSame(self::HERE_EXPECTED, $here(FrameworkTest::HERE));
+        $this->assertSame($old, $here(FrameworkTest::project('pieceofcake2/cakephp', 'v2.12.10')));
     }
 }

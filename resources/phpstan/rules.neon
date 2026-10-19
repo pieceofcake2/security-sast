@@ -1,12 +1,12 @@
 # The security rules of pieceofcake2/security-sast for CakePHP 2 applications. The rule of the views,
 # PieceOfCake2\SecuritySast\PHPStan\ViewUnescapedOutputRule, is added by PhpstanEngine with the extensions of the
-# views, which are also scanned (fileExtensions).
+# views, which are also scanned (fileExtensions), and the rule of the redirects,
+# PieceOfCake2\SecuritySast\PHPStan\RedirectRequestRule, with the CakePHP of the project (Framework::hereIsPath()).
 rules:
     - PieceOfCake2\SecuritySast\PHPStan\ConditionsArgumentRule
     - PieceOfCake2\SecuritySast\PHPStan\ConditionsStringRule
     - PieceOfCake2\SecuritySast\PHPStan\OrderRequestRule
     - PieceOfCake2\SecuritySast\PHPStan\QueryConcatenationRule
-    - PieceOfCake2\SecuritySast\PHPStan\RedirectRequestRule
     - PieceOfCake2\SecuritySast\PHPStan\RenderRequestRule
     - PieceOfCake2\SecuritySast\PHPStan\SecurityCsrfDisabledRule
     - PieceOfCake2\SecuritySast\PHPStan\SecuritySettingsRule

@@ -23,7 +23,8 @@ of the Semgrep Registry (`p/php` by default), which are described on [semgrep.de
 The rules look at the code, not at where the values come from, so a finding is a place to check, not always a
 vulnerability. A value "of the request" is `$this->request` (its `query()`, `data()`, `params`, ...) or
 `$_GET`, `$_POST`, `$_REQUEST`, `$_COOKIE` and `$_FILES`. See [Fixing the Findings](fixing.md) for the way
-through a report, and [The Configuration](#the-configuration) for the rules of the settings.
+through a report, [The Configuration](#the-configuration) for the rules of the settings, and
+[The Framework](#the-framework) for the rule of the installed CakePHP.
 
 A string "with a variable" is a concatenation with a value that is not a string literal (a variable, a constant,
 a call), or a double-quoted string with a variable in it; a concatenation in the arguments of a call, e.g. of
@@ -199,12 +200,17 @@ return $this->redirect($url);
 `//evil.example` and `/\evil.example` are URLs of another site for the browsers: check for them as above. Better,
 redirect to a route array chosen by a key: `['controller' => 'orders', 'action' => 'index']`.
 
-`$this->request->here()` is a value of the request too: CakePHP takes only one `/` off the path, so for
-`https://example.com//evil.example` it returns `//evil.example`, a URL of another site. To redirect to the current
-URL, put the origin of the application before it, as the Location header gets the full URL:
+`$this->request->here()` is a value of the request too: before pieceofcake2/cakephp 2.12.11 (and cakephp/cakephp
+3.4.0), CakePHP takes only one `/` off the path, so for `https://example.com//evil.example` it returns
+`//evil.example`, a URL of another site (GHSA-wh43-gc93-wh4c). Update CakePHP: with pieceofcake2/cakephp 2.12.11+
+or cakephp/cakephp 3.4+ in the `composer.lock` of the project, `$this->request->here()`, `here(false)` and
+`$this->request->here` are paths of the application, and a redirect to them is not reported by either engine (a
+redirect with another value of the request still is). The old version itself is reported by
+[`cakephp2-framework-protocol-relative-here`](#cakephp2-framework-protocol-relative-here). Without the update,
+put the origin of the application before it, as the Location header gets the full URL:
 
 ```php
-// Found: //evil.example for https://example.com//evil.example
+// Found before pieceofcake2/cakephp 2.12.11: //evil.example for https://example.com//evil.example
 return $this->redirect($this->request->here());
 
 // Not reported: https://example.com//evil.example stays on example.com
@@ -538,3 +544,31 @@ that must be cached, e.g. a download, sets its own headers with `$this->response
 maintained and not bundled with PHP 7.2+. Set `Security.useOpenSsl` to `true`. The OpenSSL implementation of
 CakePHP is compatible with the one of mcrypt (AES-256-CBC: Rijndael-128 with a key of 32 bytes): the values encrypted before the switch are read
 after it.
+
+## The Framework
+
+The rules of the framework check the CakePHP that the project installs: its package and version in the
+`composer.lock` of the project (`pieceofcake2/cakephp`, or `cakephp/cakephp`). They are run by both engines,
+also with `--config-check=0`, and are placed at the line of the package in `composer.lock`. A project without
+`composer.lock`, or with a branch of CakePHP (`dev-master`), is not checked.
+
+| Rule | Risk | CWE | OWASP Top 10 (2021) |
+| --- | --- | --- | --- |
+| [`cakephp2-framework-protocol-relative-here`](#cakephp2-framework-protocol-relative-here) | Medium | CWE-601 | A06 Vulnerable and Outdated Components |
+
+### cakephp2-framework-protocol-relative-here
+
+The installed CakePHP keeps the leading `//` of the path of the request in `$this->request->here()`:
+pieceofcake2/cakephp before 2.12.11, and cakephp/cakephp before 3.4.0 (GHSA-wh43-gc93-wh4c). For
+`https://example.com//evil.example`, `here()` returns `//evil.example`, a URL of another site: a redirect to it,
+or a URL built from it, takes the user there. This is reported even when the code has no such redirect, as
+CakePHP builds URLs from it too.
+
+Update to pieceofcake2/cakephp 2.12.11 or later, which takes all the leading slashes off the path:
+
+```bash
+composer update pieceofcake2/cakephp
+```
+
+The redirects to `here()` are then no longer reported by
+[`cakephp2-redirect-request`](#cakephp2-redirect-request).

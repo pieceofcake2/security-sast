@@ -22,6 +22,25 @@ class PhpstanEngineTest extends TestCase
         $this->assertSame('medium', $view->severity);
     }
 
+    /**
+     * here() of the request is a path of the application with pieceofcake2/cakephp 2.12.11+ or cakephp/cakephp 3.4+
+     * in the composer.lock of the project, as with Semgrep
+     *
+     * @return void
+     */
+    public function testScanWithTheCakephpOfTheProject(): void
+    {
+        $here = static fn(string $project): array => SemgrepEngineTest::places((new PhpstanEngine())->scan($project, ['src'])->findings);
+        $old = array_merge(SemgrepEngineTest::HERE_PROTOCOL_RELATIVE, SemgrepEngineTest::HERE_EXPECTED);
+        sort($old);
+
+        $this->assertSame(SemgrepEngineTest::HERE_EXPECTED, $here(FrameworkTest::HERE));
+        $this->assertSame(SemgrepEngineTest::HERE_EXPECTED, $here(FrameworkTest::project('cakephp/cakephp', '3.4.0')));
+        $this->assertSame($old, $here(FrameworkTest::project('pieceofcake2/cakephp', 'v2.12.10')));
+        $this->assertSame($old, $here(FrameworkTest::project('cakephp/cakephp', '2.10.24')));
+        $this->assertSame($old, $here(FrameworkTest::project(null)));
+    }
+
     public function testScanViewsOfMoreExtensions(): void
     {
         $result = (new PhpstanEngine(null, null, ['ctp', 'php', 'html']))->scan(SemgrepEngineTest::APP, ['src', 'templates']);
@@ -73,6 +92,8 @@ class PhpstanEngineTest extends TestCase
         $this->assertStringContainsString('rules.neon', $neon);
         $this->assertStringContainsString("    level: 0\n", $neon);
         $this->assertStringContainsString("        arguments: [['ctp', 'php'], [], '{$app}']\n", $neon);
+        $this->assertStringContainsString("        class: PieceOfCake2\\SecuritySast\\PHPStan\\RedirectRequestRule\n        arguments: [false]\n", $neon);
+        $this->assertStringContainsString("RedirectRequestRule\n        arguments: [true]\n", PhpstanEngine::config($app, ['src'], hereIsPath: true));
         $this->assertStringContainsString("    fileExtensions:\n        - 'php'\n        - 'ctp'\n", $neon);
         $this->assertStringContainsString("        - '{$app}/src'\n        - '{$app}/templates'\n", $neon);
         // Only the paths that exist are left out

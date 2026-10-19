@@ -92,6 +92,8 @@ final class Command
             }
             $engine = $this->engine ?? $config->engine($config->viewExtensions($layout));
             $result = $engine->scan($config->project, $paths, $config->exclude($layout));
+            // The CakePHP of the composer.lock of the project, whatever the engine
+            $result->findings = array_merge($result->findings, Framework::findings((string)realpath($config->project)));
             if ($config->configCheck && $values !== null) {
                 $result->findings = array_merge($result->findings, ConfigCheck::findings($values, (string)realpath($config->project)));
                 $result->configEnv = $config->configEnv;

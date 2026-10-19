@@ -175,7 +175,7 @@
     "offset": 986
    },
    "extra": {
-    "message": "A value of the request is passed to redirect(). Redirect only to paths of the application, e.g. with Router::url() of a route array, or check the URL against a list.",
+    "message": "A value of the request is passed to redirect(). Redirect only to paths of the application, e.g. with Router::url() of a route array, or check the URL against a list. Before pieceofcake2/cakephp 2.12.11, $this->request->here() can begin with // (a URL of another site): update CakePHP, or put Router::fullBaseUrl() before it.",
     "metadata": {
      "cwe": [
       "CWE-601: URL Redirection to Untrusted Site ('Open Redirect')"
@@ -207,7 +207,7 @@
     "offset": 1099
    },
    "extra": {
-    "message": "A value of the request is passed to redirect(). Redirect only to paths of the application, e.g. with Router::url() of a route array, or check the URL against a list.",
+    "message": "A value of the request is passed to redirect(). Redirect only to paths of the application, e.g. with Router::url() of a route array, or check the URL against a list. Before pieceofcake2/cakephp 2.12.11, $this->request->here() can begin with // (a URL of another site): update CakePHP, or put Router::fullBaseUrl() before it.",
     "metadata": {
      "cwe": [
       "CWE-601: URL Redirection to Untrusted Site ('Open Redirect')"
@@ -559,7 +559,7 @@
     "offset": 2498
    },
    "extra": {
-    "message": "A value of the request is passed to redirect(). Redirect only to paths of the application, e.g. with Router::url() of a route array, or check the URL against a list.",
+    "message": "A value of the request is passed to redirect(). Redirect only to paths of the application, e.g. with Router::url() of a route array, or check the URL against a list. Before pieceofcake2/cakephp 2.12.11, $this->request->here() can begin with // (a URL of another site): update CakePHP, or put Router::fullBaseUrl() before it.",
     "metadata": {
      "cwe": [
       "CWE-601: URL Redirection to Untrusted Site ('Open Redirect')"
@@ -591,7 +591,7 @@
     "offset": 5108
    },
    "extra": {
-    "message": "A value of the request is passed to redirect(). Redirect only to paths of the application, e.g. with Router::url() of a route array, or check the URL against a list.",
+    "message": "A value of the request is passed to redirect(). Redirect only to paths of the application, e.g. with Router::url() of a route array, or check the URL against a list. Before pieceofcake2/cakephp 2.12.11, $this->request->here() can begin with // (a URL of another site): update CakePHP, or put Router::fullBaseUrl() before it.",
     "metadata": {
      "cwe": [
       "CWE-601: URL Redirection to Untrusted Site ('Open Redirect')"
@@ -623,7 +623,7 @@
     "offset": 5212
    },
    "extra": {
-    "message": "A value of the request is passed to redirect(). Redirect only to paths of the application, e.g. with Router::url() of a route array, or check the URL against a list.",
+    "message": "A value of the request is passed to redirect(). Redirect only to paths of the application, e.g. with Router::url() of a route array, or check the URL against a list. Before pieceofcake2/cakephp 2.12.11, $this->request->here() can begin with // (a URL of another site): update CakePHP, or put Router::fullBaseUrl() before it.",
     "metadata": {
      "cwe": [
       "CWE-601: URL Redirection to Untrusted Site ('Open Redirect')"
@@ -655,7 +655,7 @@
     "offset": 5292
    },
    "extra": {
-    "message": "A value of the request is passed to redirect(). Redirect only to paths of the application, e.g. with Router::url() of a route array, or check the URL against a list.",
+    "message": "A value of the request is passed to redirect(). Redirect only to paths of the application, e.g. with Router::url() of a route array, or check the URL against a list. Before pieceofcake2/cakephp 2.12.11, $this->request->here() can begin with // (a URL of another site): update CakePHP, or put Router::fullBaseUrl() before it.",
     "metadata": {
      "cwe": [
       "CWE-601: URL Redirection to Untrusted Site ('Open Redirect')"
@@ -687,7 +687,7 @@
     "offset": 5379
    },
    "extra": {
-    "message": "A value of the request is passed to redirect(). Redirect only to paths of the application, e.g. with Router::url() of a route array, or check the URL against a list.",
+    "message": "A value of the request is passed to redirect(). Redirect only to paths of the application, e.g. with Router::url() of a route array, or check the URL against a list. Before pieceofcake2/cakephp 2.12.11, $this->request->here() can begin with // (a URL of another site): update CakePHP, or put Router::fullBaseUrl() before it.",
     "metadata": {
      "cwe": [
       "CWE-601: URL Redirection to Untrusted Site ('Open Redirect')"
@@ -719,7 +719,7 @@
     "offset": 5453
    },
    "extra": {
-    "message": "A value of the request is passed to redirect(). Redirect only to paths of the application, e.g. with Router::url() of a route array, or check the URL against a list.",
+    "message": "A value of the request is passed to redirect(). Redirect only to paths of the application, e.g. with Router::url() of a route array, or check the URL against a list. Before pieceofcake2/cakephp 2.12.11, $this->request->here() can begin with // (a URL of another site): update CakePHP, or put Router::fullBaseUrl() before it.",
     "metadata": {
      "cwe": [
       "CWE-601: URL Redirection to Untrusted Site ('Open Redirect')"
@@ -751,7 +751,7 @@
     "offset": 5528
    },
    "extra": {
-    "message": "A value of the request is passed to redirect(). Redirect only to paths of the application, e.g. with Router::url() of a route array, or check the URL against a list.",
+    "message": "A value of the request is passed to redirect(). Redirect only to paths of the application, e.g. with Router::url() of a route array, or check the URL against a list. Before pieceofcake2/cakephp 2.12.11, $this->request->here() can begin with // (a URL of another site): update CakePHP, or put Router::fullBaseUrl() before it.",
     "metadata": {
      "cwe": [
       "CWE-601: URL Redirection to Untrusted Site ('Open Redirect')"
@@ -783,7 +783,7 @@
     "offset": 5617
    },
    "extra": {
-    "message": "A value of the request is passed to redirect(). Redirect only to paths of the application, e.g. with Router::url() of a route array, or check the URL against a list.",
+    "message": "A value of the request is passed to redirect(). Redirect only to paths of the application, e.g. with Router::url() of a route array, or check the URL against a list. Before pieceofcake2/cakephp 2.12.11, $this->request->here() can begin with // (a URL of another site): update CakePHP, or put Router::fullBaseUrl() before it.",
     "metadata": {
      "cwe": [
       "CWE-601: URL Redirection to Untrusted Site ('Open Redirect')"

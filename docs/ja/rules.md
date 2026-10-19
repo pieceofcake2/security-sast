@@ -23,7 +23,7 @@
 ルールが見るのはコードの書き方で、値がどこから来たかではありません。そのため、指摘は確かめるべき箇所であって、いつも
 脆弱性とは限りません。「リクエストの値」とは、`$this->request` (その `query()`、`data()`、`params` など) と、`$_GET`、
 `$_POST`、`$_REQUEST`、`$_COOKIE`、`$_FILES` のことです。報告書の進め方は [指摘を修正する](fixing.md) を、設定のルールは
-[設定](#設定) をご覧ください。
+[設定](#設定) を、インストールされている CakePHP のルールは [フレームワーク](#フレームワーク) をご覧ください。
 
 「変数を含む」文字列とは、文字列リテラルでない値 (変数、定数、呼び出し) との連結か、変数を埋め込んだダブルクォートの
 文字列です。`sprintf()` などの呼び出しの引数の中の連結は含みません。下の修正例の `(string)` のキャストは、`?sort[]=x`
@@ -194,12 +194,17 @@ return $this->redirect($url);
 `//evil.example` や `/\evil.example` は、ブラウザにとってはほかのサイトの URL です。上のように確かめてください。キーで
 選んだルートの配列 `['controller' => 'orders', 'action' => 'index']` にリダイレクトするほうが、よりよい方法です。
 
-`$this->request->here()` もリクエストの値です。CakePHP はパスの先頭の `/` を 1 つしか取らないため、
-`https://example.com//evil.example` では `//evil.example` を返します。これはほかのサイトの URL です。今の URL に
-リダイレクトするときは、アプリケーションのオリジンを前に付けてください。Location ヘッダーがそのままの完全な URL になります。
+`$this->request->here()` もリクエストの値です。pieceofcake2/cakephp 2.12.11 (cakephp/cakephp では 3.4.0) より前の
+CakePHP はパスの先頭の `/` を 1 つしか取らないため、`https://example.com//evil.example` では `//evil.example` を返します。
+これはほかのサイトの URL です (GHSA-wh43-gc93-wh4c)。CakePHP を更新してください。プロジェクトの `composer.lock` が
+pieceofcake2/cakephp 2.12.11 以降か cakephp/cakephp 3.4 以降なら、`$this->request->here()`、`here(false)`、
+`$this->request->here` はアプリケーションのパスなので、どちらのエンジンもそこへのリダイレクトを指摘しません
+(ほかのリクエストの値があれば指摘します)。古いバージョン自体は
+[`cakephp2-framework-protocol-relative-here`](#cakephp2-framework-protocol-relative-here) が指摘します。更新しない
+あいだは、アプリケーションのオリジンを前に付けてください。Location ヘッダーがそのままの完全な URL になります。
 
 ```php
-// 見つかる書き方: https://example.com//evil.example では //evil.example
+// pieceofcake2/cakephp 2.12.11 より前で見つかる書き方: https://example.com//evil.example では //evil.example
 return $this->redirect($this->request->here());
 
 // 指摘しない書き方: https://example.com//evil.example は example.com のまま
@@ -525,3 +530,31 @@ Configure::write('Session.cacheLimiter', 'nocache');
 `Security.useOpenSsl` が `true` ではありません。`Security::encrypt()` と `aes` の Cookie が mcrypt を使います。mcrypt は
 メンテナンスされておらず、PHP 7.2 以降には同梱されていません。`Security.useOpenSsl` を `true` にしてください。CakePHP の
 OpenSSL の実装は mcrypt のもの (AES-256-CBC。32 バイトの鍵の Rijndael-128) と互換なので、切り替える前に暗号化した値も、切り替えたあとに読めます。
+
+## フレームワーク
+
+フレームワークのルールは、プロジェクトがインストールする CakePHP を検査します。プロジェクトの `composer.lock` にある
+パッケージ (`pieceofcake2/cakephp` か `cakephp/cakephp`) とバージョンを見ます。どちらのエンジンでも、`--config-check=0`
+でも実行し、指摘は `composer.lock` のそのパッケージの行に付きます。`composer.lock` の無いプロジェクトや、CakePHP が
+ブランチ (`dev-master` など) のプロジェクトは検査しません。
+
+| ルール | リスク | CWE | OWASP Top 10 (2021) |
+| --- | --- | --- | --- |
+| [`cakephp2-framework-protocol-relative-here`](#cakephp2-framework-protocol-relative-here) | 中 | CWE-601 | A06 脆弱で古くなったコンポーネント |
+
+### cakephp2-framework-protocol-relative-here
+
+インストールされている CakePHP は、リクエストのパスの先頭の `//` を `$this->request->here()` に残します。
+pieceofcake2/cakephp 2.12.11 より前と、cakephp/cakephp 3.4.0 より前です (GHSA-wh43-gc93-wh4c)。
+`https://example.com//evil.example` では `here()` が `//evil.example` を返します。これはほかのサイトの URL で、ここへの
+リダイレクトや、ここから作った URL はユーザーをそこへ連れて行きます。CakePHP 自身もここから URL を作るため、コードに
+そのようなリダイレクトが無くても指摘します。
+
+パスの先頭のスラッシュをすべて取る pieceofcake2/cakephp 2.12.11 以降に更新してください。
+
+```bash
+composer update pieceofcake2/cakephp
+```
+
+更新すると、`here()` へのリダイレクトは [`cakephp2-redirect-request`](#cakephp2-redirect-request) で指摘されなく
+なります。
