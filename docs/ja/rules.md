@@ -353,6 +353,7 @@ return [
 | [`cakephp2-config-cookie-cipher`](#cakephp2-config-cookie-cipher) | 中 | CWE-327 | A02 暗号化の失敗 |
 | [`cakephp2-config-cookie-key`](#cakephp2-config-cookie-key) | 中 | CWE-321、CWE-326 | A02 暗号化の失敗 |
 | [`cakephp2-config-session-cookie`](#cakephp2-config-session-cookie) | 中 | CWE-1004、CWE-614 | A05 セキュリティの設定ミス |
+| [`cakephp2-config-session-cache-limiter`](#cakephp2-config-session-cache-limiter) | 低 | CWE-525 | A05 セキュリティの設定ミス |
 | [`cakephp2-config-openssl`](#cakephp2-config-openssl) | 低 | CWE-1104 | A06 脆弱で古くなったコンポーネント |
 
 秘密の値は、CakePHP 2 と pieceofcake2 の配布時の値と、それらのドキュメントのサンプルと、SHA-256 と長さで比べます。報告書
@@ -481,6 +482,23 @@ Configure::write('Session', [
 
 HTTPS を終端するプロキシの後ろでは、CakePHP はリクエストを HTTPS と見たときだけ `Secure` を付けます。その場合は、本番の
 `ini` に `'session.cookie_secure' => 1` を設定してください。
+
+### cakephp2-config-session-cache-limiter
+
+セッションのあるページに `Cache-Control: no-store` が付きません。`Session.cacheLimiter` が `nocache` ではありません。
+ログアウトしたあとに、ブラウザーがログイン中のページを再び表示したり、会社のプロキシなどの共有のキャッシュがページを
+保存したりできます。
+
+CakePHP 2 は、Internet Explorer 8 以前のために、`Session.cacheLimiter` をデフォルトで `must-revalidate` にします。
+PHP はこの値を知らないので、キャッシュのヘッダーをまったく送りません。`public` と `private` は、キャッシュがページを
+保存することを許します。CakePHP 5 と同じく、PHP のキャッシュリミッターを使ってください。
+
+```php
+Configure::write('Session.cacheLimiter', 'nocache');
+```
+
+これで PHP は、セッションを開始するページに `Cache-Control: no-store, no-cache, must-revalidate` を送ります。
+ダウンロードなど、キャッシュさせたいアクションは `$this->response->cache()` で自分のヘッダーを設定します。
 
 ### cakephp2-config-openssl
 

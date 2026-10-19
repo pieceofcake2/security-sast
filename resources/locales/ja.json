@@ -60,6 +60,8 @@
     "message.cakephp2-config-openssl": "Security.useOpenSsl が true ではありません。Security::encrypt() と 'aes' の Cookie が、メンテナンスされておらず PHP 7.2 以降に同梱されない mcrypt を使います。Security.useOpenSsl を true にしてください。",
     "rule.cakephp2-config-session-cookie": "HttpOnly や Secure のないセッションの Cookie",
     "message.cakephp2-config-session-cookie": "セッションの Cookie の HttpOnly か Secure を無効にしています (Session.ini の session.cookie_httponly か session.cookie_secure が false)。CakePHP はどちらも既定で付けます (Secure は HTTPS のとき)。無効にしている設定を削除してください。",
+    "rule.cakephp2-config-session-cache-limiter": "Cache-Control: no-store のないセッションのページ",
+    "message.cakephp2-config-session-cache-limiter": "Session.cacheLimiter が 'nocache' ではないため、セッションのあるページに Cache-Control: no-store が付きません。CakePHP 2 は Internet Explorer 8 以前のためにデフォルトで 'must-revalidate' にしますが、PHP はこの値を知らないのでキャッシュのヘッダーを送りません。CakePHP 5 と同じく、Session.cacheLimiter を 'nocache' にしてください。",
     "field.config": "設定",
     "config.env": "APP_ENV={env} で検査",
     "config.none": "検査していません",

@@ -154,6 +154,14 @@ final class RuleCatalog
             'confidence' => 'HIGH',
             'message' => 'The session cookie is configured without HttpOnly or Secure (session.cookie_httponly or session.cookie_secure is false in Session.ini). CakePHP sets both by default (Secure on HTTPS); remove the settings that turn them off.',
         ],
+        'cakephp2-config-session-cache-limiter' => [
+            'identifier' => '',
+            'severity' => Severity::LOW,
+            'cwe' => ['CWE-525: Use of Web Browser Cache Containing Sensitive Information'],
+            'owasp' => ['A05:2021 - Security Misconfiguration'],
+            'confidence' => 'HIGH',
+            'message' => 'The pages with a session get no Cache-Control: no-store, as Session.cacheLimiter is not \'nocache\'. CakePHP 2 sets it to \'must-revalidate\' by default, for Internet Explorer 8 and before, which PHP does not know: PHP then sends no cache header. Set Session.cacheLimiter to \'nocache\', as CakePHP 5 leaves it.',
+        ],
     ];
 
     /**
