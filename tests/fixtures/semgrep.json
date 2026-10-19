@@ -578,6 +578,230 @@
    }
   },
   {
+   "check_id": "rules.cakephp2-redirect-request",
+   "path": "src/Controller/PostsController.php",
+   "start": {
+    "line": 127,
+    "col": 9,
+    "offset": 5045
+   },
+   "end": {
+    "line": 127,
+    "col": 72,
+    "offset": 5108
+   },
+   "extra": {
+    "message": "A value of the request is passed to redirect(). Redirect only to paths of the application, e.g. with Router::url() of a route array, or check the URL against a list.",
+    "metadata": {
+     "cwe": [
+      "CWE-601: URL Redirection to Untrusted Site ('Open Redirect')"
+     ],
+     "owasp": [
+      "A01:2021 - Broken Access Control"
+     ],
+     "category": "security",
+     "confidence": "HIGH"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-redirect-request",
+   "path": "src/Controller/PostsController.php",
+   "start": {
+    "line": 128,
+    "col": 9,
+    "offset": 5118
+   },
+   "end": {
+    "line": 128,
+    "col": 103,
+    "offset": 5212
+   },
+   "extra": {
+    "message": "A value of the request is passed to redirect(). Redirect only to paths of the application, e.g. with Router::url() of a route array, or check the URL against a list.",
+    "metadata": {
+     "cwe": [
+      "CWE-601: URL Redirection to Untrusted Site ('Open Redirect')"
+     ],
+     "owasp": [
+      "A01:2021 - Broken Access Control"
+     ],
+     "category": "security",
+     "confidence": "HIGH"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-redirect-request",
+   "path": "src/Controller/PostsController.php",
+   "start": {
+    "line": 129,
+    "col": 9,
+    "offset": 5222
+   },
+   "end": {
+    "line": 129,
+    "col": 79,
+    "offset": 5292
+   },
+   "extra": {
+    "message": "A value of the request is passed to redirect(). Redirect only to paths of the application, e.g. with Router::url() of a route array, or check the URL against a list.",
+    "metadata": {
+     "cwe": [
+      "CWE-601: URL Redirection to Untrusted Site ('Open Redirect')"
+     ],
+     "owasp": [
+      "A01:2021 - Broken Access Control"
+     ],
+     "category": "security",
+     "confidence": "HIGH"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-redirect-request",
+   "path": "src/Controller/PostsController.php",
+   "start": {
+    "line": 130,
+    "col": 9,
+    "offset": 5302
+   },
+   "end": {
+    "line": 130,
+    "col": 86,
+    "offset": 5379
+   },
+   "extra": {
+    "message": "A value of the request is passed to redirect(). Redirect only to paths of the application, e.g. with Router::url() of a route array, or check the URL against a list.",
+    "metadata": {
+     "cwe": [
+      "CWE-601: URL Redirection to Untrusted Site ('Open Redirect')"
+     ],
+     "owasp": [
+      "A01:2021 - Broken Access Control"
+     ],
+     "category": "security",
+     "confidence": "HIGH"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-redirect-request",
+   "path": "src/Controller/PostsController.php",
+   "start": {
+    "line": 131,
+    "col": 9,
+    "offset": 5389
+   },
+   "end": {
+    "line": 131,
+    "col": 73,
+    "offset": 5453
+   },
+   "extra": {
+    "message": "A value of the request is passed to redirect(). Redirect only to paths of the application, e.g. with Router::url() of a route array, or check the URL against a list.",
+    "metadata": {
+     "cwe": [
+      "CWE-601: URL Redirection to Untrusted Site ('Open Redirect')"
+     ],
+     "owasp": [
+      "A01:2021 - Broken Access Control"
+     ],
+     "category": "security",
+     "confidence": "HIGH"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-redirect-request",
+   "path": "src/Controller/PostsController.php",
+   "start": {
+    "line": 132,
+    "col": 9,
+    "offset": 5463
+   },
+   "end": {
+    "line": 132,
+    "col": 74,
+    "offset": 5528
+   },
+   "extra": {
+    "message": "A value of the request is passed to redirect(). Redirect only to paths of the application, e.g. with Router::url() of a route array, or check the URL against a list.",
+    "metadata": {
+     "cwe": [
+      "CWE-601: URL Redirection to Untrusted Site ('Open Redirect')"
+     ],
+     "owasp": [
+      "A01:2021 - Broken Access Control"
+     ],
+     "category": "security",
+     "confidence": "HIGH"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "rules.cakephp2-redirect-request",
+   "path": "src/Controller/PostsController.php",
+   "start": {
+    "line": 133,
+    "col": 9,
+    "offset": 5538
+   },
+   "end": {
+    "line": 133,
+    "col": 88,
+    "offset": 5617
+   },
+   "extra": {
+    "message": "A value of the request is passed to redirect(). Redirect only to paths of the application, e.g. with Router::url() of a route array, or check the URL against a list.",
+    "metadata": {
+     "cwe": [
+      "CWE-601: URL Redirection to Untrusted Site ('Open Redirect')"
+     ],
+     "owasp": [
+      "A01:2021 - Broken Access Control"
+     ],
+     "category": "security",
+     "confidence": "HIGH"
+    },
+    "severity": "WARNING",
+    "fingerprint": "requires login",
+    "lines": "requires login",
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
    "check_id": "rules.cakephp2-view-unescaped-output",
    "path": "templates/Emails/html/default.ctp",
    "start": {

@@ -178,7 +178,7 @@ can change.
 ## cakephp2-redirect-request
 
 A value of the request passed to `$this->redirect()`. A route array, `['action' => 'view', $id]`, is a URL of the
-application and is not reported.
+application and is not reported, nor is a URL that begins with the origin of the application and a path (below).
 
 **Why it matters.** An attacker sends a link of your site, `https://example.com/users/login?redirect=https://evil.example`:
 the user sees your domain, logs in, and lands on the page of the attacker, e.g. a copy of the login that asks for
@@ -198,6 +198,27 @@ return $this->redirect($url);
 
 `//evil.example` and `/\evil.example` are URLs of another site for the browsers: check for them as above. Better,
 redirect to a route array chosen by a key: `['controller' => 'orders', 'action' => 'index']`.
+
+`$this->request->here()` is a value of the request too: CakePHP takes only one `/` off the path, so for
+`https://example.com//evil.example` it returns `//evil.example`, a URL of another site. To redirect to the current
+URL, put the origin of the application before it, as the Location header gets the full URL:
+
+```php
+// Found: //evil.example for https://example.com//evil.example
+return $this->redirect($this->request->here());
+
+// Not reported: https://example.com//evil.example stays on example.com
+return $this->redirect(Router::fullBaseUrl() . $this->request->here());
+```
+
+Not reported, as a URL of the origin of the application: a concatenation that begins with `Router::url('/', true)`,
+or with `Router::fullBaseUrl()` or `Configure::read('App.fullBaseUrl')` followed by `$this->request->here()`,
+`$this->request->here` or a string literal that begins with `/`, e.g.
+`Router::fullBaseUrl() . '/posts/view/' . $id`. Whatever follows the `/` is in the path of the same host. Without
+it, a value of the request right after the origin can change the host, as `@evil.example` or `.evil.example` does
+for `https://example.com`: `Router::fullBaseUrl() . $this->request->query('path')` is reported, and so are the
+origin after a value of the request and `sprintf()`. Set `App.fullBaseUrl` in the configuration: otherwise
+CakePHP takes it from the `Host` header of the request.
 
 `AuthComponent::redirectUrl()` keeps the redirect after the login on the site (pieceofcake2/cakephp 2.12.5 and
 later, [GHSA-x4p9-p4cx-gxwx](https://github.com/pieceofcake2/cakephp/security/advisories/GHSA-x4p9-p4cx-gxwx)):

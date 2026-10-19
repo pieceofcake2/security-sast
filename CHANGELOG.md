@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## Unreleased
+
+- `cakephp2-redirect-request` no longer reports, with either engine, a URL of the origin of the application: a
+  concatenation that begins with `Router::url('/', true)`, or with `Router::fullBaseUrl()` or
+  `Configure::read('App.fullBaseUrl')` followed by a path that begins with `/` (`$this->request->here()`,
+  `$this->request->here` or a string literal), e.g. `Router::fullBaseUrl() . $this->request->here()`. Whatever
+  follows the `/` stays on the same host. A value of the request right after the origin, the origin after a
+  value of the request, and `sprintf()` are still reported. The docs say that `here()` can begin with `//`
+
 ## 1.0.7
 
 - New rule `cakephp2-config-session-cache-limiter` (low): the pages with a session get no

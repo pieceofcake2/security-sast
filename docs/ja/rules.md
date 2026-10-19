@@ -173,7 +173,7 @@ JSON で書きます。ユーザーのデータはそこか、セッションに
 ## cakephp2-redirect-request
 
 リクエストの値を `$this->redirect()` に渡しています。ルートの配列 (`['action' => 'view', $id]`) はアプリケーションの
-URL なので指摘しません。
+URL なので指摘しません。アプリケーションのオリジンとパスで始まる URL (後述) も指摘しません。
 
 **なぜ危ないか。** 攻撃者は、`https://example.com/users/login?redirect=https://evil.example` のような、あなたのサイトの
 リンクを送ります。ユーザーはあなたのドメインを見てログインし、攻撃者のページに着きます。もう一度パスワードを聞く、
@@ -193,6 +193,26 @@ return $this->redirect($url);
 
 `//evil.example` や `/\evil.example` は、ブラウザにとってはほかのサイトの URL です。上のように確かめてください。キーで
 選んだルートの配列 `['controller' => 'orders', 'action' => 'index']` にリダイレクトするほうが、よりよい方法です。
+
+`$this->request->here()` もリクエストの値です。CakePHP はパスの先頭の `/` を 1 つしか取らないため、
+`https://example.com//evil.example` では `//evil.example` を返します。これはほかのサイトの URL です。今の URL に
+リダイレクトするときは、アプリケーションのオリジンを前に付けてください。Location ヘッダーがそのままの完全な URL になります。
+
+```php
+// 見つかる書き方: https://example.com//evil.example では //evil.example
+return $this->redirect($this->request->here());
+
+// 指摘しない書き方: https://example.com//evil.example は example.com のまま
+return $this->redirect(Router::fullBaseUrl() . $this->request->here());
+```
+
+アプリケーションのオリジンの URL として、`Router::url('/', true)` で始まる連結と、`Router::fullBaseUrl()` か
+`Configure::read('App.fullBaseUrl')` の後に `$this->request->here()`、`$this->request->here`、`/` で始まる文字列
+リテラル (`Router::fullBaseUrl() . '/posts/view/' . $id` など) が続く連結は指摘しません。`/` の後は、何が続いても同じ
+ホストのパスです。`/` が無いと、オリジンのすぐ後のリクエストの値でホストを変えられます。`https://example.com` に
+`@evil.example` や `.evil.example` が続く場合です。そのため `Router::fullBaseUrl() . $this->request->query('path')`
+は指摘します。リクエストの値の後のオリジンや、`sprintf()` も指摘します。`App.fullBaseUrl` は設定に書いてください。
+書かないと、CakePHP はリクエストの `Host` ヘッダーから作ります。
 
 `AuthComponent::redirectUrl()` は、ログインのあとのリダイレクトをサイトの中に保ちます (pieceofcake2/cakephp 2.12.5 以降、
 [GHSA-x4p9-p4cx-gxwx](https://github.com/pieceofcake2/cakephp/security/advisories/GHSA-x4p9-p4cx-gxwx))。古い

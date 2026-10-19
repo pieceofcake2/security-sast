@@ -173,6 +173,22 @@ rules:
           - pattern: $this->redirect(<... $_FILES ...>, ...)
       # A route array is a URL of the application, whatever the values of the request in it
       - pattern-not: $this->redirect([...], ...)
+      # A URL of the own origin of the application: Router::url('/', true), or the origin followed by a path that
+      # begins with / (here() of the request, or a string literal). Whatever follows, even //evil.example, is in
+      # the path of the same host. Semgrep matches $REST with the rest of a longer concatenation
+      - pattern-not: $this->redirect(Router::url('/', true) . $REST, ...)
+      - pattern-not: $this->redirect(Router::fullBaseUrl() . $this->request->here(...), ...)
+      - pattern-not: $this->redirect(Router::fullBaseUrl() . $this->request->here(...) . $REST, ...)
+      - pattern-not: $this->redirect(Router::fullBaseUrl() . $this->request->here, ...)
+      - pattern-not: $this->redirect(Router::fullBaseUrl() . $this->request->here . $REST, ...)
+      - pattern-not: $this->redirect(Router::fullBaseUrl() . "=~/^\//", ...)
+      - pattern-not: $this->redirect(Router::fullBaseUrl() . "=~/^\//" . $REST, ...)
+      - pattern-not: $this->redirect(Configure::read('App.fullBaseUrl') . $this->request->here(...), ...)
+      - pattern-not: $this->redirect(Configure::read('App.fullBaseUrl') . $this->request->here(...) . $REST, ...)
+      - pattern-not: $this->redirect(Configure::read('App.fullBaseUrl') . $this->request->here, ...)
+      - pattern-not: $this->redirect(Configure::read('App.fullBaseUrl') . $this->request->here . $REST, ...)
+      - pattern-not: $this->redirect(Configure::read('App.fullBaseUrl') . "=~/^\//", ...)
+      - pattern-not: $this->redirect(Configure::read('App.fullBaseUrl') . "=~/^\//" . $REST, ...)
     metadata:
       cwe: ["CWE-601: URL Redirection to Untrusted Site ('Open Redirect')"]
       owasp: ["A01:2021 - Broken Access Control"]

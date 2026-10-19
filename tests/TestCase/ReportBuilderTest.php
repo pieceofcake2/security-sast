@@ -43,7 +43,7 @@ class ReportBuilderTest extends TestCase
         $this->assertStringContainsString('<div class="project">acme/app</div>', $html);
         $this->assertStringContainsString('<div class="verdict failed">', $html);
         $this->assertStringContainsString('<b class="t-high">26</b><span>High</span>', $html);
-        $this->assertStringContainsString('<b class="t-medium">26</b><span>Medium</span>', $html);
+        $this->assertStringContainsString('<b class="t-medium">33</b><span>Medium</span>', $html);
         $this->assertStringContainsString('src　templates', $html);
         $this->assertStringContainsString('pieceofcake2/security-sast (CakePHP 2)　p/php', $html);
         $this->assertStringContainsString('Semgrep 1.', $html);
