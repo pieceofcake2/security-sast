@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Unreleased
+## 1.0.7
 
 - New rule `cakephp2-config-session-cache-limiter` (low): the pages with a session get no
   `Cache-Control: no-store` unless `Session.cacheLimiter` is `nocache`. CakePHP 2 sets it to `must-revalidate` by
