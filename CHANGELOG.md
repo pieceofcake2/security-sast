@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Unreleased
+## 1.2.1
 
 - Semgrep reads every view as PHP, checked on the same code with Semgrep 1.180.0 in Docker: the views were given
   to Semgrep one by one with `--scan-unknown-extensions`, which reads a file of an extension that it does not know
