@@ -4,8 +4,11 @@ declare(strict_types=1);
 namespace PieceOfCake2\SecuritySast\Test;
 
 use PHPUnit\Framework\TestCase;
+use PieceOfCake2\SecuritySast\Files;
 use PieceOfCake2\SecuritySast\RuleCatalog;
+use PieceOfCake2\SecuritySast\ScanResult;
 use PieceOfCake2\SecuritySast\SemgrepEngine;
+use PieceOfCake2\SecuritySast\Views;
 use RuntimeException;
 
 class SemgrepEngineTest extends TestCase
@@ -58,12 +61,19 @@ class SemgrepEngineTest extends TestCase
         'cakephp2-view-raw-output templates/Posts/raw.ctp:2',
         'cakephp2-view-raw-output templates/Posts/raw.ctp:3',
         'cakephp2-view-unescaped-output templates/Emails/html/default.ctp:1',
+        'cakephp2-view-unescaped-output templates/Layouts/error.ctp:14',
         'cakephp2-view-unescaped-output templates/Posts/edit.ctp:10',
         'cakephp2-view-unescaped-output templates/Posts/edit.ctp:12',
         'cakephp2-view-unescaped-output templates/Posts/index.php:2',
         'cakephp2-view-unescaped-output templates/Posts/links.ctp:11',
         'cakephp2-view-unescaped-output templates/Posts/links.ctp:12',
         'cakephp2-view-unescaped-output templates/Posts/links.ctp:13',
+        'cakephp2-view-unescaped-output templates/Posts/mixed.ctp:11',
+        'cakephp2-view-unescaped-output templates/Posts/mixed.ctp:16',
+        'cakephp2-view-unescaped-output templates/Posts/mixed.ctp:20',
+        'cakephp2-view-unescaped-output templates/Posts/mixed.ctp:21',
+        'cakephp2-view-unescaped-output templates/Posts/mixed.ctp:7',
+        'cakephp2-view-unescaped-output templates/Posts/mixed.ctp:7',
         'cakephp2-view-unescaped-output templates/Posts/parity.ctp:28',
         'cakephp2-view-unescaped-output templates/Posts/parity.ctp:29',
         'cakephp2-view-unescaped-output templates/Posts/parity.ctp:30',
@@ -77,6 +87,15 @@ class SemgrepEngineTest extends TestCase
         'cakephp2-view-unescaped-output templates/Posts/view.ctp:2',
         'cakephp2-view-unescaped-output templates/Posts/view.ctp:3',
         'cakephp2-xml-build-variable src/Controller/PostsController.php:44',
+    ];
+
+    /**
+     * The places of the views of the fixture application with `.html` as an extension of the views
+     */
+    public const HTML_VIEWS = [
+        'cakephp2-view-unescaped-output templates/Elements/banner.html:1',
+        'cakephp2-view-unescaped-output templates/Elements/notice.html:13',
+        'cakephp2-view-unescaped-output templates/Elements/notice.html:7',
     ];
 
     /**
@@ -114,6 +133,19 @@ class SemgrepEngineTest extends TestCase
         return $places;
     }
 
+    /**
+     * The result of the recorded JSON of Semgrep (`tests/fixtures/semgrep.json`), a scan of `src` and `templates`
+     * of the fixture application with the rules of this package
+     *
+     * @return \PieceOfCake2\SecuritySast\ScanResult
+     */
+    public static function recorded(): ScanResult
+    {
+        $data = json_decode((string)file_get_contents(__DIR__ . DS . '..' . DS . 'fixtures' . DS . 'semgrep.json'), true);
+
+        return SemgrepEngine::result($data, (string)realpath(self::APP), SemgrepEngine::viewCopies(Files::find(self::APP, ['src', 'templates'], [], Views::EXTENSIONS)));
+    }
+
     public function testCommand(): void
     {
         $commands = [];
@@ -127,9 +159,90 @@ class SemgrepEngineTest extends TestCase
 
         $command = implode(' ', $commands[0]);
         $this->assertStringStartsWith('docker run --rm -v ' . realpath(self::APP) . ':/src:ro -v ', $command);
-        $this->assertStringContainsString(':/rules:ro -w /src semgrep/semgrep:1.180.0 semgrep scan --json --time --metrics=off', $command);
-        $this->assertStringContainsString(' --scan-unknown-extensions ', $command);
-        $this->assertStringContainsString('--config /rules/cakephp2.yml --config p/php --config /src/rules/app.yml --include /src --include /templates --exclude /vendor . templates/Emails/html/default.ctp templates/Posts/edit.ctp templates/Posts/index.php templates/Posts/links.ctp templates/Posts/parity.ctp templates/Posts/raw.ctp templates/Posts/request.ctp templates/Posts/view.ctp', $command);
+        $this->assertMatchesRegularExpression('#:/rules:ro -v \S+-views:/views:ro -w /src semgrep/semgrep:1\.180\.0 semgrep scan --json --time --metrics=off #', $command);
+        // The views are read in their copies, not given one by one to be read by every language
+        $this->assertStringNotContainsString('--scan-unknown-extensions', $command);
+        $this->assertStringEndsWith('--config /rules/cakephp2.yml --config p/php --config /src/rules/app.yml --include /src --include /templates --exclude /vendor . /views', $command);
+        // No copy is left
+        $views = substr($command, strpos($command, ':/rules:ro -v ') + strlen(':/rules:ro -v '));
+        $this->assertDirectoryDoesNotExist(substr($views, 0, (int)strpos($views, ':/views:ro')));
+    }
+
+    /**
+     * A view given by its path is included with its copies; without a view, nothing is copied
+     *
+     * @return void
+     */
+    public function testCommandOfAView(): void
+    {
+        $commands = [];
+        $engine = new SemgrepEngine(configs: [], run: static function (array $command, string $dir) use (&$commands): array {
+            $commands[] = implode(' ', $command);
+
+            return [0, '{"results": [], "errors": []}', ''];
+        });
+
+        $engine->scan(self::APP, ['templates/Posts/view.ctp', 'src']);
+        $engine->scan(self::APP, ['src']);
+
+        $this->assertStringEndsWith('--include /templates/Posts/view.ctp --include /templates/Posts/view.ctp.php --include /templates/Posts/view.ctp.html --include /src . /views', $commands[0]);
+        $this->assertStringNotContainsString('/views', $commands[1]);
+        $this->assertStringEndsWith('--include /src .', $commands[1]);
+    }
+
+    /**
+     * The views that Semgrep would not read as PHP, or not as HTML, are copied with the extension of the language
+     *
+     * @return void
+     */
+    public function testViewCopies(): void
+    {
+        $this->assertSame([
+            'templates/Posts/view.ctp.php' => 'templates/Posts/view.ctp',
+            'templates/Posts/view.ctp.html' => 'templates/Posts/view.ctp',
+            'templates/Posts/index.php.html' => 'templates/Posts/index.php',
+            'templates/Elements/banner.html.php' => 'templates/Elements/banner.html',
+            'app/View/Pages/home.htm.php' => 'app/View/Pages/home.htm',
+        ], SemgrepEngine::viewCopies([
+            'templates/Posts/view.ctp',
+            'templates/Posts/index.php',
+            'templates/Elements/banner.html',
+            'app/View/Pages/home.htm',
+            // Not views
+            'templates/Emails/text/default.ctp',
+            'src/View/Helper/PostHelper.php',
+            'src/Controller/PostsController.php',
+        ], ['ctp', 'php', 'html', 'htm']));
+        $this->assertSame([], SemgrepEngine::viewCopies(['templates/Elements/banner.html']));
+    }
+
+    /**
+     * The results, the files and the errors of the copies of the views are those of the views; the errors of the
+     * rules of HTML in the views are apart
+     *
+     * @return void
+     */
+    public function testResultOfTheCopiesOfViews(): void
+    {
+        $views = SemgrepEngine::viewCopies(['templates/Posts/view.ctp', 'templates/Elements/banner.html'], ['ctp', 'html']);
+        $result = static fn(string $path, int $line): array => ['check_id' => 'rules.cakephp2-view-unescaped-output', 'path' => $path, 'start' => ['line' => $line, 'col' => 6], 'end' => ['line' => $line], 'extra' => ['severity' => 'WARNING', 'message' => 'Message', 'lines' => 'requires login']];
+        $result = SemgrepEngine::result([
+            'results' => [$result('/views/templates/Posts/view.ctp.php', 2), $result('/views/templates/Elements/banner.html.php', 1)],
+            'paths' => ['scanned' => ['/views/templates/Posts/view.ctp.php', '/views/templates/Posts/view.ctp.html', 'templates/Elements/banner.html', '/views/templates/Elements/banner.html.php', 'src/Model/Post.php']],
+            'errors' => [
+                ['level' => 'warn', 'type' => 'Syntax error', 'path' => '/views/templates/Posts/view.ctp.php', 'message' => 'Syntax error at line /views/templates/Posts/view.ctp.php:3'],
+                ['level' => 'warn', 'type' => ['PartialParsing', []], 'path' => '/views/templates/Posts/view.ctp.html', 'message' => 'Syntax error at line /views/templates/Posts/view.ctp.html:1'],
+                ['level' => 'warn', 'type' => 'Syntax error', 'path' => 'templates/Elements/banner.html', 'message' => 'Syntax error at line templates/Elements/banner.html:1'],
+                ['level' => 'warn', 'type' => 'Syntax error', 'path' => 'webroot/index.html', 'message' => 'Syntax error at line webroot/index.html:1'],
+            ],
+        ], (string)realpath(self::APP), $views);
+
+        $this->assertSame(['cakephp2-view-unescaped-output templates/Elements/banner.html:1', 'cakephp2-view-unescaped-output templates/Posts/view.ctp:2'], self::places($result->findings));
+        $this->assertSame("<div><?= \$post['Post']['body'] ?></div>", array_values(array_filter($result->findings, static fn($finding): bool => $finding->file === 'templates/Posts/view.ctp'))[0]->code);
+        $this->assertSame(3, $result->files);
+        // A copy as PHP that could not be read is an error of the view
+        $this->assertSame(['Syntax error: Syntax error at line templates/Posts/view.ctp:3', 'Syntax error: Syntax error at line webroot/index.html:1'], $result->errors);
+        $this->assertSame(['PartialParsing: Syntax error at line templates/Posts/view.ctp:1', 'Syntax error: Syntax error at line templates/Elements/banner.html:1'], $result->viewErrors);
     }
 
     public function testRulesWithHereAsAPath(): void
@@ -168,11 +281,10 @@ class SemgrepEngineTest extends TestCase
 
     public function testResult(): void
     {
-        $data = json_decode((string)file_get_contents(__DIR__ . DS . '..' . DS . 'fixtures' . DS . 'semgrep.json'), true);
-        $result = SemgrepEngine::result($data, (string)realpath(self::APP));
+        $result = self::recorded();
 
         $this->assertSame(self::EXPECTED, self::places($result->findings));
-        $this->assertSame(14, $result->files);
+        $this->assertSame(16, $result->files);
         $this->assertStringStartsWith('Semgrep 1.', $result->engine);
         $this->assertSame([], $result->errors);
 
@@ -201,8 +313,7 @@ class SemgrepEngineTest extends TestCase
         $this->assertSame([['id' => 'php.lang.security.new-rule', 'reason' => 'Requires a newer version']], $result->skippedRules);
 
         // Without --time, or an older Semgrep: unknown
-        $data = json_decode((string)file_get_contents(__DIR__ . DS . '..' . DS . 'fixtures' . DS . 'semgrep.json'), true);
-        $this->assertNull(SemgrepEngine::result($data, (string)realpath(self::APP))->engineRules);
+        $this->assertNull(self::recorded()->engineRules);
         $this->assertSame([], SemgrepEngine::result(['skipped_rules' => 0], (string)realpath(self::APP))->skippedRules);
     }
 
@@ -309,6 +420,24 @@ class SemgrepEngineTest extends TestCase
             $this->assertContains($rule, $result->engineRules);
         }
         $this->assertGreaterThan(10, count(array_filter($result->engineRules, static fn(string $rule): bool => !str_starts_with($rule, 'cakephp2-'))));
+
+        $this->assertSame([], $result->errors);
+        $this->assertSame([], $result->viewErrors);
+
+        // The views of .html, which Semgrep reads as HTML: in their copies as PHP, as PHPStan finds them
+        $result = (new SemgrepEngine(configs: [], viewExtensions: ['ctp', 'php', 'html']))->scan(self::APP, ['src', 'templates']);
+        $expected = array_merge(self::EXPECTED, self::HTML_VIEWS);
+        sort($expected);
+        $this->assertSame($expected, self::places($result->findings));
+
+        // The rules of other languages, as in p/security-audit: those of HTML read the views, the others do not
+        $result = (new SemgrepEngine(configs: ['semgrep/languages.yml'], viewExtensions: ['ctp', 'php', 'html']))->scan(self::APP, ['src', 'templates']);
+        $this->assertSame([
+            'semgrep.languages-html-plaintext-link templates/Elements/notice.html:10',
+            'semgrep.languages-html-plaintext-link templates/Posts/mixed.ctp:22',
+        ], self::places(array_filter($result->findings, static fn($finding): bool => !str_starts_with($finding->rule, 'cakephp2-'))));
+        $this->assertSame([], $result->errors);
+        $this->assertNotSame([], $result->viewErrors);
 
         $result = (new SemgrepEngine(safeViewVariables: ['body_html']))->scan(self::APP, ['templates']);
 

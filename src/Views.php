@@ -67,7 +67,8 @@ final class Views
     }
 
     /**
-     * The `paths: include` patterns of Semgrep for the views
+     * The `paths: include` patterns of Semgrep for the views: Semgrep reads a view of another extension than `.php`
+     * as PHP in its copy with `.php` added (`SemgrepEngine::viewCopies()`), e.g. `view.ctp.php`
      *
      * @param array<string> $extensions Extensions of the views, without the dot
      * @return array<string>
@@ -77,7 +78,7 @@ final class Views
         $patterns = [];
         foreach ($extensions as $extension) {
             foreach (self::DIRECTORIES as $directory) {
-                $patterns[] = '**/' . $directory . '/**/*.' . $extension;
+                $patterns[] = '**/' . $directory . '/**/*.' . $extension . (strtolower($extension) === 'php' ? '' : '.php');
             }
         }
 

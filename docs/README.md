@@ -99,6 +99,13 @@ your views with `--view-extensions`:
 vendor/bin/security-sast --view-extensions=ctp,php,html
 ```
 
+Semgrep tells the language of a file by its extension: it would not read `.ctp` as PHP, and it reads `.html` as
+HTML. So the views are copied to a temporary directory, with the same lines, as `.php` files for the rules of PHP
+and as `.html` files for the rules of HTML (e.g. `templates/Posts/view.ctp.php` and `templates/Posts/view.ctp.html`
+for `templates/Posts/view.ctp`); the report places what they find in the views. The rules of the other
+languages (e.g. JavaScript of `p/security-audit`) do not read the views. The `.semgrepignore` of the project
+also applies to the copies.
+
 ### The Configuration
 
 The same load of CakePHP also checks the configuration of the application, as it is in production: the values
@@ -193,7 +200,8 @@ file with `--settings`.
      (`--config-check=0`) or there is no configuration to load, the check of the CakePHP of `composer.lock` without
      one, and the rules that Semgrep skipped
 4. **A page for each rule**: its title, ID, risk, CWE, OWASP Top 10 category and confidence, what it found and
-   how to fix it, then each place (file and line) with its code, up to 100 places
+   how to fix it, then each place (file and line) with its code, up to 100 places; the other places by their file
+   and line, without the code
 
 The risks of Semgrep are `ERROR` (high), `WARNING` (medium) and `INFO` (low). The rules of this package set
 their own risks (see [Rules](rules.md)).
@@ -271,6 +279,11 @@ paths with `--paths`.
 **The report says that the engine reported errors**: a file could not be parsed, e.g. a PHP syntax error, and
 was not scanned; the message names it. The other files are scanned. Fix the file, or leave it out with
 `--exclude`.
+
+**The report says that the rules of HTML of Semgrep reported errors**: the rules of HTML (e.g. of
+`p/security-audit`) read a view, which contains PHP, only in part. This is expected for the views: they are
+read as PHP besides, by the rules of this package and those of PHP of the Registry, which report the views that
+they could not read as errors.
 
 **`Chrome is needed to print the report`**: install Chrome or Chromium, or set `REPORT_CHROME_BINARY` (see
 [pieceofcake2/report](https://pieceofcake2.github.io/report/)).

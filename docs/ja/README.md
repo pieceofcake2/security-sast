@@ -91,6 +91,12 @@ PHP のファイル (`.php`) とビューを検査します。ビューとは、
 vendor/bin/security-sast --view-extensions=ctp,php,html
 ```
 
+Semgrep はファイルの言語を拡張子で決めるので、`.ctp` を PHP として読まず、`.html` は HTML として読みます。そのため、
+ビューを同じ行のまま一時ディレクトリにコピーし、PHP のルールには `.php`、HTML のルールには `.html` のファイルとして
+読ませます (`templates/Posts/view.ctp` なら `templates/Posts/view.ctp.php` と `templates/Posts/view.ctp.html`)。
+見つかった箇所は、報告書ではビューの箇所として載せます。ほかの言語のルール (`p/security-audit` の JavaScript など) は
+ビューを読みません。プロジェクトの `.semgrepignore` はコピーにも適用されます。
+
 ### 設定
 
 同じく読み込んだ CakePHP で、アプリケーションの本番の設定も検査します。`APP_ENV=prod` (`--config-env`) の `.env`
@@ -178,7 +184,7 @@ return [
      読み込む設定が無いときの設定の検査、`composer.lock` に CakePHP が無いときのフレームワークの検査、Semgrep が
      飛ばしたルール
 4. **ルールごとのページ**: タイトル、ID、リスク、CWE、OWASP Top 10 の分類、確度、見つけたものと修正方法、続けて各箇所
-   (ファイルと行) とそのコード。100 箇所まで
+   (ファイルと行) とそのコード。100 箇所までで、残りの箇所はコードを省いてファイルと行だけを載せます
 
 Semgrep のリスクは、`ERROR` が高、`WARNING` が中、`INFO` が低です。このパッケージのルールは、それぞれのリスクを
 決めています ([ルール](rules.md))。
@@ -253,6 +259,10 @@ Docker を起動するか、`--engine=phpstan` を使ってください。
 **報告書に「エンジンがエラーを報告しました」と出る**: PHP の構文エラーなどで、読めないファイルがあり、そのファイルは
 検査していません。メッセージにファイルが出ます。ほかのファイルは検査しています。ファイルを修正するか、`--exclude` で
 除いてください。
+
+**報告書に「Semgrep の HTML のルールが…エラーを報告しました」と出る**: HTML のルール (`p/security-audit` のものなど) が、
+PHP を含むビューを一部しか読めませんでした。ビューではこうなります。ビューは、このパッケージのルールと Registry の PHP の
+ルールが PHP としても読んでいて、読めなかったビューはエラーとして報告します。
 
 **`Chrome is needed to print the report`**: Chrome か Chromium をインストールするか、`REPORT_CHROME_BINARY` を設定して
 ください ([pieceofcake2/report](https://pieceofcake2.github.io/report/ja/))。

@@ -12,15 +12,12 @@ use PieceOfCake2\SecuritySast\Finding;
 use PieceOfCake2\SecuritySast\ReportBuilder;
 use PieceOfCake2\SecuritySast\RuleCatalog;
 use PieceOfCake2\SecuritySast\ScanResult;
-use PieceOfCake2\SecuritySast\SemgrepEngine;
 
 class ReportBuilderTest extends TestCase
 {
     private static function result(): ScanResult
     {
-        $data = json_decode((string)file_get_contents(__DIR__ . DS . '..' . DS . 'fixtures' . DS . 'semgrep.json'), true);
-
-        return SemgrepEngine::result($data, (string)realpath(SemgrepEngineTest::APP));
+        return SemgrepEngineTest::recorded();
     }
 
     private static function html(Config $config, ?ScanResult $result = null): string
@@ -44,7 +41,7 @@ class ReportBuilderTest extends TestCase
         $this->assertStringContainsString('<div class="project">acme/app</div>', $html);
         $this->assertStringContainsString('<div class="verdict failed">', $html);
         $this->assertStringContainsString('<b class="t-high">26</b><span>High</span>', $html);
-        $this->assertStringContainsString('<b class="t-medium">33</b><span>Medium</span>', $html);
+        $this->assertStringContainsString('<b class="t-medium">40</b><span>Medium</span>', $html);
         $this->assertStringContainsString('src　templates', $html);
         $this->assertStringContainsString('pieceofcake2/security-sast (CakePHP 2)　p/php', $html);
         $this->assertStringContainsString('Semgrep 1.', $html);
@@ -107,6 +104,24 @@ class ReportBuilderTest extends TestCase
         $this->assertStringContainsString('<div class="verdict passed">', $html);
         $this->assertStringContainsString('No finding in the scanned files.', $html);
         $this->assertStringContainsString('The engine reported 1 errors, e.g. files it could not parse: Syntax error in a.php', $html);
+        $this->assertStringNotContainsString('rules of HTML', $html);
+    }
+
+    /**
+     * The errors of the rules of HTML of Semgrep in the views are said apart from the files that could not be read
+     *
+     * @return void
+     */
+    public function testErrorsOfTheRulesOfHtmlInTheViews(): void
+    {
+        $result = new ScanResult([], 10, 'Semgrep 1.180.0', viewErrors: ['PartialParsing: templates/a.ctp:1', 'Syntax error: templates/b.html:1']);
+
+        $html = self::html(new Config(failOn: 'none', project: SemgrepEngineTest::APP), $result);
+        $this->assertStringContainsString('Semgrep reported 2 errors of its rules of HTML, which read only a part of the views as they contain PHP; the rules of PHP read the views as PHP.', $html);
+        $this->assertStringNotContainsString('The engine reported', $html);
+
+        $html = self::html(new Config(failOn: 'none', project: SemgrepEngineTest::APP, language: 'ja'), $result);
+        $this->assertStringContainsString('Semgrep の HTML のルールが、PHP を含むビューを一部しか読めなかったとして 2 件のエラーを報告しました。', $html);
     }
 
     /**
@@ -231,6 +246,11 @@ class ReportBuilderTest extends TestCase
         $html = self::html(new Config(project: SemgrepEngineTest::APP), new ScanResult($findings, 1, 'Semgrep'));
 
         $this->assertSame(ReportBuilder::MAX_PLACES, substr_count($html, '<div class="place">'));
-        $this->assertStringContainsString('and 5 more places', $html);
+        $this->assertStringContainsString('and 5 more places, by their file and line without the code:', $html);
+        // The other places by their file and line
+        $this->assertSame(5, substr_count($html, '<li>templates/a.ctp:'));
+        $this->assertStringContainsString('<ul class="place-list"><li>templates/a.ctp:101</li>', $html);
+        $this->assertStringContainsString('<li>templates/a.ctp:105</li></ul>', $html);
+        $this->assertStringNotContainsString('templates/a.ctp:100</li>', $html);
     }
 }

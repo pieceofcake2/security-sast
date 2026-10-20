@@ -1,0 +1,18 @@
+# Rules of other languages than PHP, as in p/security-audit: Semgrep read the views given one by one with the rules
+# of every language, and reported the errors of their parsers
+rules:
+  - id: languages-javascript-call
+    languages: [javascript]
+    message: A call
+    severity: INFO
+    pattern: $F(...)
+  - id: languages-json-object
+    languages: [json]
+    message: An object
+    severity: INFO
+    pattern: '{...}'
+  - id: languages-html-plaintext-link
+    languages: [html]
+    message: A link of http
+    severity: INFO
+    pattern-regex: href="http://

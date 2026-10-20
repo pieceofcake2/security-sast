@@ -24,8 +24,9 @@ class ViewsTest extends TestCase
 
     public function testSemgrepIncludes(): void
     {
-        $this->assertSame(['**/templates/**/*.ctp', '**/View/**/*.ctp', '**/templates/**/*.php', '**/View/**/*.php'], Views::semgrepIncludes());
-        $this->assertSame(['**/templates/**/*.html', '**/View/**/*.html'], Views::semgrepIncludes(['html']));
+        // The views of another extension than .php in their copies as PHP
+        $this->assertSame(['**/templates/**/*.ctp.php', '**/View/**/*.ctp.php', '**/templates/**/*.php', '**/View/**/*.php'], Views::semgrepIncludes());
+        $this->assertSame(['**/templates/**/*.html.php', '**/View/**/*.html.php'], Views::semgrepIncludes(['html']));
     }
 
     public function testTextMails(): void
@@ -43,7 +44,7 @@ class ViewsTest extends TestCase
     {
         $yaml = SemgrepEngine::rules(['ctp', 'html']);
 
-        $this->assertStringContainsString("    paths:\n      include:\n        - \"**/templates/**/*.ctp\"\n        - \"**/View/**/*.ctp\"\n        - \"**/templates/**/*.html\"\n        - \"**/View/**/*.html\"\n      # The text mails are not HTML\n      exclude:\n        - \"**/Emails/text/**\"\n        # The classes of the directories of views: the helpers, and the views, e.g. View/AppView.php\n        - \"**/View/Helper/**\"\n        - \"**/View/*View.php\"\n    metadata:", $yaml);
+        $this->assertStringContainsString("    paths:\n      include:\n        - \"**/templates/**/*.ctp.php\"\n        - \"**/View/**/*.ctp.php\"\n        - \"**/templates/**/*.html.php\"\n        - \"**/View/**/*.html.php\"\n      # The text mails are not HTML\n      exclude:\n        - \"**/Emails/text/**\"\n        # The classes of the directories of views: the helpers, and the views, e.g. View/AppView.php\n        - \"**/View/Helper/**\"\n        - \"**/View/*View.php\"\n    metadata:", $yaml);
         // The rules of the views: the unescaped output and raw()
         $this->assertSame(2, substr_count($yaml, 'include:'));
     }

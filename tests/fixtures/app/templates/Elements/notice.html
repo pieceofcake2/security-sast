@@ -1,0 +1,15 @@
+<?php
+// A view of the extension .html, which Semgrep read as HTML
+?>
+<div class="notice">
+<?php if (!empty($notices)): ?>
+	<?php foreach ($notices as $notice): ?>
+	<a href="/notices/<?php echo $notice['Notice']['id']; ?>"><?php echo h($notice['Notice']['title']); ?></a>
+	<?php endforeach; ?>
+<?php else: ?>
+	<p>Don't miss the <a href="http://example.com/">news</a>.</p>
+<?php endif; ?>
+<?php if ($link) { ?>
+	<p><?php echo $link ?></p>
+<?php } ?>
+</div>
