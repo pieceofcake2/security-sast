@@ -40,7 +40,7 @@ package.
 - Semgrep: Docker. The image `semgrep/semgrep` is pulled on the first run
 - PHPStan: nothing else (`phpstan/phpstan` is a dependency of this package)
 - For the check of the configuration: an application on [pieceofcake2/cakephp](https://github.com/pieceofcake2/cakephp)
-  with its packages installed (`vendor/autoload.php`); on the original `cakephp/cakephp`, use `--config-check=0`
+  2.13+ with its packages installed (`vendor/autoload.php`); on the original `cakephp/cakephp`, use `--config-check=0`
 - Google Chrome or Chromium 131+ to print the PDF, and on Linux `fonts-noto-cjk` for a Japanese report
 
 ## Installation
