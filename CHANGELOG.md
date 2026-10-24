@@ -2,10 +2,11 @@
 
 ## Unreleased
 
-- The configuration check no longer calls `App::uses()` in the scanned application: pieceofcake2/cakephp 2.13
-  deprecates it, and the call wrote a warning in the log of the application. `AppController` (for the extension of
-  the views) is found by the autoloader, as on 2.13 and in the applications whose classes Composer loads, or else
-  with `App::import()`, which still finds it in the other applications on 2.12
+- The check of the configuration requires an application on pieceofcake2/cakephp 2.13: on an older release, the
+  configuration is not loaded ("The check of the configuration requires pieceofcake2/cakephp 2.13 or later."), so the
+  report says that it was not checked and the run fails, unless the check is turned off with `--config-check=0`. It no longer calls `App::uses()` in the scanned application, which 2.13 deprecates
+  and which wrote a warning in the log of the application: `AppController` (for the extension of the views) is
+  found with `App::className()`
 
 ## 1.2.1
 

@@ -36,7 +36,7 @@ Semgrep は Registry のルールの分だけ多くを見つけます。PHPStan 
 - PHP 8.0 以上
 - Semgrep: Docker。最初の実行で `semgrep/semgrep` のイメージを取得します
 - PHPStan: ほかには不要です (`phpstan/phpstan` はこのパッケージの依存です)
-- 設定の検査には、[pieceofcake2/cakephp](https://github.com/pieceofcake2/cakephp) で動き、パッケージをインストール
+- 設定の検査には、[pieceofcake2/cakephp](https://github.com/pieceofcake2/cakephp) 2.13 以上で動き、パッケージをインストール
   したアプリケーション (`vendor/autoload.php`)。本家の `cakephp/cakephp` では `--config-check=0` を使ってください
 - PDF を印刷するための Google Chrome または Chromium 131 以上。日本語の報告書には、Linux では `fonts-noto-cjk`
 

@@ -28,7 +28,11 @@ try {
     }
     $vendors = defined('VENDORS') ? VENDORS : $project . DS . 'vendor' . DS;
     require_once $vendors . 'autoload.php';
-    require_once InstalledVersions::getInstallPath('pieceofcake2/cakephp') . DS . 'src' . DS . 'Cake' . DS . 'bootstrap.php';
+    $core = InstalledVersions::getInstallPath('pieceofcake2/cakephp') . DS . 'src' . DS . 'bootstrap.php';
+    if (!is_file($core)) {
+        throw new RuntimeException('The check of the configuration requires pieceofcake2/cakephp 2.13 or later.');
+    }
+    require_once $core;
 
     $secret = static function (mixed $value): ?array {
         if ($value === null || $value === false) {
@@ -71,13 +75,9 @@ try {
     };
     $paths = static fn(array $list): array => array_values(array_unique(array_filter(array_map($inProject, $list))));
     $ext = '.ctp';
-    // Not App::uses(), deprecated in pieceofcake2/cakephp 2.13, which finds AppController without it, as Composer
-    // does in most applications. App::import() finds it in the others on 2.12.
-    if (!class_exists('AppController')) {
-        App::import('Controller', 'App');
-    }
-    if (class_exists('AppController')) {
-        $ext = (string)((new ReflectionClass('AppController'))->getDefaultProperties()['ext'] ?? '.ctp');
+    $appController = App::className('AppController', 'Controller');
+    if ($appController !== null) {
+        $ext = (string)((new ReflectionClass($appController))->getDefaultProperties()['ext'] ?? '.ctp');
     }
     $installed = [];
     foreach (InstalledVersions::getInstalledPackages() as $package) {
