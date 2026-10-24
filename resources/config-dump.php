@@ -71,7 +71,11 @@ try {
     };
     $paths = static fn(array $list): array => array_values(array_unique(array_filter(array_map($inProject, $list))));
     $ext = '.ctp';
-    App::uses('AppController', 'Controller');
+    // Not App::uses(), deprecated in pieceofcake2/cakephp 2.13, which finds AppController without it, as Composer
+    // does in most applications. App::import() finds it in the others on 2.12.
+    if (!class_exists('AppController')) {
+        App::import('Controller', 'App');
+    }
     if (class_exists('AppController')) {
         $ext = (string)((new ReflectionClass('AppController'))->getDefaultProperties()['ext'] ?? '.ctp');
     }

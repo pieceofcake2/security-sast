@@ -426,9 +426,6 @@ Cookie、開いているページのフォームなどです。以下の各節�
 
 ```php
 // src/Controller/Component/Auth/MigratingPasswordHasher.php (従来の構成では app/Controller/Component/Auth/)
-App::uses('BlowfishPasswordHasher', 'Controller/Component/Auth');
-App::uses('Security', 'Utility');
-
 class MigratingPasswordHasher extends BlowfishPasswordHasher
 {
     public function check($password, $hashedPassword)

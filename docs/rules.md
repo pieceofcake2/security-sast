@@ -438,9 +438,6 @@ old salt as `Security.previousSalt` until every user has logged in once:
 
 ```php
 // src/Controller/Component/Auth/MigratingPasswordHasher.php (app/Controller/Component/Auth/ in the legacy layout)
-App::uses('BlowfishPasswordHasher', 'Controller/Component/Auth');
-App::uses('Security', 'Utility');
-
 class MigratingPasswordHasher extends BlowfishPasswordHasher
 {
     public function check($password, $hashedPassword)

@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## Unreleased
+
+- The configuration check no longer calls `App::uses()` in the scanned application: pieceofcake2/cakephp 2.13
+  deprecates it, and the call wrote a warning in the log of the application. `AppController` (for the extension of
+  the views) is found by the autoloader, as on 2.13 and in the applications whose classes Composer loads, or else
+  with `App::import()`, which still finds it in the other applications on 2.12
+
 ## 1.2.1
 
 - Semgrep reads every view as PHP, checked on the same code with Semgrep 1.180.0 in Docker: the views were given
